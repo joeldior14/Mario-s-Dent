@@ -280,7 +280,8 @@ export default function PosPage() {
 
   // Cálculos dinámicos en vivo
   const subtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
-  const total = subtotal;
+  const iva = subtotal * 0.13; // 13% IVA
+  const total = subtotal + iva;
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-700 flex flex-col font-sans select-none">
@@ -476,6 +477,11 @@ export default function PosPage() {
             <div className="flex justify-between text-slate-500">
               <span>Subtotal</span>
               <span className="font-semibold tabular-nums">${subtotal.toFixed(2)}</span>
+            </div>
+            
+            <div className="flex justify-between text-slate-500">
+              <span>IVA (13%)</span>
+              <span className="font-semibold tabular-nums">${iva.toFixed(2)}</span>
             </div>
 
             <div className="flex justify-between items-center text-base font-black text-slate-900 pt-2 border-t border-slate-200">

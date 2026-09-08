@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useAuth } from "@/app/context/AuthContext";
 import {
   Lock,
   User,
@@ -16,8 +16,9 @@ import {
 } from "lucide-react";
 
 export default function LoginPage() {
-  const router = useRouter();
+  const { login } = useAuth();
   const [role, setRole] = useState<"cashier" | "admin">("cashier");
+  const [branch, setBranch] = useState<"Santa Ana" | "Ahuachapán" | "Sonsonate">("Santa Ana");
   const [username, setUsername] = useState("maria.g");
   const [password, setPassword] = useState("••••••••");
   const [showPassword, setShowPassword] = useState(false);
@@ -36,40 +37,32 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulación de autenticación y redirección por rol
     setTimeout(() => {
       setIsLoading(false);
-      if (role === "cashier") {
-        router.push("/caja"); // El cajero va directo al flujo de apertura
-      } else {
-        router.push("/dashboard"); // El administrador va al panel de control
-      }
-    }, 800);
+      login(role, branch);
+    }, 600);
   };
 
   return (
     <div className="min-h-screen w-full flex bg-slate-900 font-sans select-none">
-      {/* 1. LADO IZQUIERDO: Branding y Bienvenida (Visible en pantallas medianas y grandes) */}
+      {/* LADO IZQUIERDO: Branding */}
       <div className="hidden lg:flex lg:w-1/2 relative bg-gradient-to-br from-slate-950 via-sky-950 to-slate-900 p-12 flex-col justify-between overflow-hidden border-r border-slate-800">
-        {/* Glow decorativo de fondo */}
         <div className="absolute -top-24 -left-24 w-96 h-96 bg-sky-500/20 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Logo superior */}
         <div className="relative z-10 flex items-center gap-3">
           <div className="bg-white p-2.5 rounded-2xl shadow-xl border border-white/20 inline-flex items-center">
             <Image
               src="/mariosdent.jpg"
               alt="Mario's Dent"
               width={140}
-              height={60}
+              height={45}
               priority
-              className="h-30 w-auto object-contain"
+              className="h-10 w-auto object-contain"
             />
           </div>
         </div>
 
-        {/* Mensaje central */}
         <div className="relative z-10 space-y-4 max-w-lg">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-400/20 text-sky-300 text-xs font-semibold">
             <Sparkles className="w-3.5 h-3.5" />
@@ -81,55 +74,32 @@ export default function LoginPage() {
           </h1>
 
           <p className="text-sm text-slate-400 leading-relaxed">
-            Control de lotes médicos, trazabilidad de vencimientos, escaneo continuo en caja y conciliación de turnos diarios en tiempo real.
+            Control de inventario multi-sucursal, arqueos de turno y ventas ágiles en mostrador.
           </p>
-
-          <div className="pt-4 grid grid-cols-2 gap-4 text-xs text-slate-300">
-            <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 backdrop-blur-xs">
-              <span className="block font-bold text-white mb-0.5">Venta en Mostrador</span>
-              <span className="text-slate-400 text-[11px]">Lectura continua de códigos e impresión de tickets[cite: 1, 2].</span>
-            </div>
-            <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 backdrop-blur-xs">
-              <span className="block font-bold text-white mb-0.5">Monitoreo Remoto</span>
-              <span className="text-slate-400 text-[11px]">Control de ingresos y existencias 24/7 desde el móvil[cite: 1, 2].</span>
-            </div>
-          </div>
         </div>
 
-        {/* Footer legal e indicativo */}
         <div className="relative z-10 flex items-center justify-between text-[11px] text-slate-500">
           <span>Terminal ID: POS-MD-01 (Mostrador)</span>
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-slate-400">Servidor en línea (v1.0.4)</span>
+            <span className="text-slate-400">Servidor en línea</span>
           </div>
         </div>
       </div>
 
-      {/* 2. LADO DERECHO: Tarjeta de Acceso y Formulario */}
+      {/* LADO DERECHO: Formulario de acceso */}
       <div className="flex-1 flex items-center justify-center p-6 sm:p-12 bg-white lg:bg-[#F8FAFC]">
         <div className="w-full max-w-md bg-white lg:p-8 lg:rounded-3xl lg:border lg:border-slate-200/80 lg:shadow-xl space-y-6">
-          
-          {/* Cabecera en Móvil / Identificación */}
           <div className="text-center space-y-2">
-            <div className="lg:hidden flex justify-center mb-4">
-              <Image
-                src="/logo.png"
-                alt="Mario's Dent"
-                width={120}
-                height={40}
-                className="h-10 w-auto object-contain"
-              />
-            </div>
             <h2 className="text-2xl font-black text-slate-900 tracking-tight">
               Bienvenido de nuevo
             </h2>
             <p className="text-xs text-slate-500">
-              Selecciona tu rol operativo para ingresar al sistema
+              Selecciona tu rol para ingresar a la terminal
             </p>
           </div>
 
-          {/* Selector interactivo de Rol (Cajero vs Admin) */}
+          {/* Selector de Rol */}
           <div className="grid grid-cols-2 p-1 bg-slate-100 rounded-2xl border border-slate-200">
             <button
               type="button"
@@ -158,12 +128,29 @@ export default function LoginPage() {
             </button>
           </div>
 
-          {/* Formulario */}
           <form onSubmit={handleLogin} className="space-y-4">
-            {/* Campo Usuario / Correo */}
+            {/* Si es cajero, selecciona su sucursal asignada */}
+            {role === "cashier" && (
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                  Sucursal de Atención
+                </label>
+                <select
+                  value={branch}
+                  onChange={(e) => setBranch(e.target.value as any)}
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
+                >
+                  <option value="Santa Ana">Santa Ana</option>
+                  <option value="Ahuachapán">Ahuachapán</option>
+                  <option value="Sonsonate">Sonsonate</option>
+                </select>
+              </div>
+            )}
+
+            {/* Campo Usuario */}
             <div className="space-y-1.5">
               <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                {role === "cashier" ? "Usuario de Caja" : "Correo Electrónico"}
+                {role === "cashier" ? "Usuario de Caja" : "Correo Administrador"}
               </label>
               <div className="relative">
                 <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
@@ -174,27 +161,16 @@ export default function LoginPage() {
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  placeholder={role === "cashier" ? "Ej. maria.g" : "admin@mariosdent.com"}
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all"
                 />
               </div>
             </div>
 
             {/* Campo Contraseña */}
             <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                  Contraseña o PIN
-                </label>
-                {role === "admin" && (
-                  <button
-                    type="button"
-                    className="text-[11px] text-sky-600 hover:text-sky-700 font-semibold"
-                  >
-                    ¿Olvidaste tu contraseña?
-                  </button>
-                )}
-              </div>
+              <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
+                Contraseña
+              </label>
               <div className="relative">
                 <div className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400">
                   <Lock className="w-4 h-4" />
@@ -204,8 +180,7 @@ export default function LoginPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all font-mono"
+                  className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all font-mono"
                 />
                 <button
                   type="button"
@@ -217,39 +192,30 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Indicador informativo de inicio rápido según rol */}
             <div className="p-3 bg-sky-50/70 border border-sky-100 rounded-xl flex items-center gap-2.5 text-[11px] text-sky-800 font-medium">
               <KeyRound className="w-4 h-4 text-sky-600 shrink-0" />
               <span>
                 {role === "cashier"
-                  ? "Acceso optimizado para apertura de turno y facturación rápida[cite: 1, 2]."
-                  : "Acceso total a métricas, inventario general y reportes financieros[cite: 1, 2]."}
+                  ? `Ingreso para mostrador asignado a ${branch}.`
+                  : "Acceso con control total de las 3 sucursales e inventario general."}
               </span>
             </div>
 
-            {/* Botón de Entrada */}
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 bg-[#0284C7] hover:bg-sky-700 text-white font-bold text-xs rounded-xl shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-70 active:scale-[0.99]"
+              className="w-full py-3 bg-[#0284C7] hover:bg-sky-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-70"
             >
               {isLoading ? (
                 <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
                 <>
-                  <span>Iniciar Sesión en Terminal</span>
+                  <span>Iniciar Sesión</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
           </form>
-
-          {/* Pie de autenticación */}
-          <div className="text-center pt-2">
-            <p className="text-[11px] text-slate-400">
-              Mario&apos;s Dent Depósito Dental © 2026 • Acceso Protegido
-            </p>
-          </div>
         </div>
       </div>
     </div>

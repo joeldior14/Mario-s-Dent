@@ -307,16 +307,6 @@ export default function CajaPage() {
                 >
                   Registrar Gasto Menor
                 </button>
-                <button
-                  disabled={!isShiftOpen}
-                  className={`px-4 py-2 border text-xs font-semibold rounded-lg shadow-xs transition-colors ${
-                    isShiftOpen
-                      ? "border-slate-200 bg-white hover:bg-slate-50 text-slate-700"
-                      : "border-slate-100 bg-slate-50 text-slate-300 cursor-not-allowed"
-                  }`}
-                >
-                  Realizar Corte Parcial X
-                </button>
               </div>
 
               {/* Botón rojo destructivo de Cierre Final (Corte Z) */}
