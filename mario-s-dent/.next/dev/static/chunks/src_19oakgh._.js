@@ -18,6 +18,12 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Transfe
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BranchStockModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/BranchStockModal.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$AjusteStockModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/AjusteStockModal.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$context$2f$AuthContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/app/context/AuthContext.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/supabaseClient.ts [app-client] (ecmascript)");
+(()=>{
+    const e = new Error("Cannot find module '@/appservices/inventoryService'");
+    e.code = 'MODULE_NOT_FOUND';
+    throw e;
+})();
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$search$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Search$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/search.mjs [app-client] (ecmascript) <export default as Search>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$plus$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Plus$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/plus.mjs [app-client] (ecmascript) <export default as Plus>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$pencil$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Pencil$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/pencil.mjs [app-client] (ecmascript) <export default as Pencil>");
@@ -29,6 +35,9 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$rotate$2d$ccw$2d$clock$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__History$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/rotate-ccw-clock.mjs [app-client] (ecmascript) <export default as History>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$sliders$2d$horizontal$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__SlidersHorizontal$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/sliders-horizontal.mjs [app-client] (ecmascript) <export default as SlidersHorizontal>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$file$2d$spreadsheet$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__FileSpreadsheet$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/file-spreadsheet.mjs [app-client] (ecmascript) <export default as FileSpreadsheet>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$loader$2d$circle$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Loader2$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/loader-circle.mjs [app-client] (ecmascript) <export default as Loader2>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$alert$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__AlertCircle$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/circle-alert.mjs [app-client] (ecmascript) <export default as AlertCircle>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$package$2d$x$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__PackageX$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/package-x.mjs [app-client] (ecmascript) <export default as PackageX>");
 ;
 var _s = __turbopack_context__.k.signature();
 "use client";
@@ -44,319 +53,8 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
-const INVENTORY_DATA = [
-    {
-        id: "1",
-        sku: "RS-305A",
-        barcode: "770201103051",
-        name: "Resina Universal A2",
-        brand: "3M Filtek Z350",
-        category: "Resins",
-        description: "Jeringa (4g)",
-        cost: 550.0,
-        price: 850.0,
-        branches: [
-            {
-                branchId: "santa-ana",
-                branchName: "Santa Ana",
-                stock: 0,
-                phone: "2440-1234"
-            },
-            {
-                branchId: "ahuachapan",
-                branchName: "Ahuachapán",
-                stock: 14,
-                phone: "2413-5678"
-            },
-            {
-                branchId: "sonsonate",
-                branchName: "Sonsonate",
-                stock: 28,
-                phone: "2451-9012"
-            }
-        ]
-    },
-    {
-        id: "2",
-        sku: "AN-1024",
-        barcode: "340104561024",
-        name: "Articaina 4% 1:100k",
-        brand: "Septodont",
-        category: "Endo",
-        description: "Caja (50 Cartuchos)",
-        cost: 620.0,
-        price: 920.0,
-        branches: [
-            {
-                branchId: "santa-ana",
-                branchName: "Santa Ana",
-                stock: 3,
-                phone: "2440-1234"
-            },
-            {
-                branchId: "ahuachapan",
-                branchName: "Ahuachapán",
-                stock: 0,
-                phone: "2413-5678"
-            },
-            {
-                branchId: "sonsonate",
-                branchName: "Sonsonate",
-                stock: 12,
-                phone: "2451-9012"
-            }
-        ]
-    },
-    {
-        id: "3",
-        sku: "DP-8820",
-        barcode: "084201882011",
-        name: "Guantes Nitrilo Med",
-        brand: "Cranberry",
-        category: "Disposables",
-        description: "Caja (100 pcs)",
-        cost: 130.0,
-        price: 210.0,
-        branches: [
-            {
-                branchId: "santa-ana",
-                branchName: "Santa Ana",
-                stock: 120,
-                phone: "2440-1234"
-            },
-            {
-                branchId: "ahuachapan",
-                branchName: "Ahuachapán",
-                stock: 45,
-                phone: "2413-5678"
-            },
-            {
-                branchId: "sonsonate",
-                branchName: "Sonsonate",
-                stock: 60,
-                phone: "2451-9012"
-            }
-        ]
-    },
-    {
-        id: "4",
-        sku: "OR-9002",
-        barcode: "072049900254",
-        name: "Opalescence Go 15%",
-        brand: "Ultradent",
-        category: "Ortho",
-        description: "Kit (10 Blísteres)",
-        cost: 980.0,
-        price: 1450.0,
-        image: "/diente.jpg",
-        branches: [
-            {
-                branchId: "santa-ana",
-                branchName: "Santa Ana",
-                stock: 15,
-                phone: "2440-1234"
-            },
-            {
-                branchId: "ahuachapan",
-                branchName: "Ahuachapán",
-                stock: 5,
-                phone: "2413-5678"
-            },
-            {
-                branchId: "sonsonate",
-                branchName: "Sonsonate",
-                stock: 10,
-                phone: "2451-9012"
-            }
-        ]
-    },
-    {
-        id: "5",
-        sku: "EN-5510",
-        barcode: "497401551091",
-        name: "Limas K-Files 25mm #15-40",
-        brand: "Mani",
-        category: "Endo",
-        description: "Caja (6 pcs)",
-        cost: 105.0,
-        price: 165.0,
-        branches: [
-            {
-                branchId: "santa-ana",
-                branchName: "Santa Ana",
-                stock: 28,
-                phone: "2440-1234"
-            },
-            {
-                branchId: "ahuachapan",
-                branchName: "Ahuachapán",
-                stock: 12,
-                phone: "2413-5678"
-            },
-            {
-                branchId: "sonsonate",
-                branchName: "Sonsonate",
-                stock: 16,
-                phone: "2451-9012"
-            }
-        ]
-    },
-    {
-        id: "6",
-        sku: "OR-7721",
-        barcode: "089123772102",
-        name: "Brackets Mini Diamond Roth .022",
-        brand: "Ormco",
-        category: "Ortho",
-        description: "Caso (20 pcs)",
-        cost: 420.0,
-        price: 680.0,
-        branches: [
-            {
-                branchId: "santa-ana",
-                branchName: "Santa Ana",
-                stock: 9,
-                phone: "2440-1234"
-            },
-            {
-                branchId: "ahuachapan",
-                branchName: "Ahuachapán",
-                stock: 4,
-                phone: "2413-5678"
-            },
-            {
-                branchId: "sonsonate",
-                branchName: "Sonsonate",
-                stock: 8,
-                phone: "2451-9012"
-            }
-        ]
-    },
-    {
-        id: "7",
-        sku: "RS-9912",
-        barcode: "761239912045",
-        name: "Tetric N-Ceram Bulk Fill IVA",
-        brand: "Ivoclar Vivadent",
-        category: "Resins",
-        description: "Jeringa (3.5g)",
-        cost: 510.0,
-        price: 790.0,
-        branches: [
-            {
-                branchId: "santa-ana",
-                branchName: "Santa Ana",
-                stock: 4,
-                phone: "2440-1234"
-            },
-            {
-                branchId: "ahuachapan",
-                branchName: "Ahuachapán",
-                stock: 2,
-                phone: "2413-5678"
-            },
-            {
-                branchId: "sonsonate",
-                branchName: "Sonsonate",
-                stock: 6,
-                phone: "2451-9012"
-            }
-        ]
-    },
-    {
-        id: "8",
-        sku: "IN-3301",
-        barcode: "045612330188",
-        name: "Fórceps 150 Universal Superior",
-        brand: "Hu-Friedy",
-        category: "Instruments",
-        description: "Unidad Quirúrgica",
-        cost: 1250.0,
-        price: 1850.0,
-        branches: [
-            {
-                branchId: "santa-ana",
-                branchName: "Santa Ana",
-                stock: 6,
-                phone: "2440-1234"
-            },
-            {
-                branchId: "ahuachapan",
-                branchName: "Ahuachapán",
-                stock: 2,
-                phone: "2413-5678"
-            },
-            {
-                branchId: "sonsonate",
-                branchName: "Sonsonate",
-                stock: 4,
-                phone: "2451-9012"
-            }
-        ]
-    },
-    {
-        id: "9",
-        sku: "EN-4420",
-        barcode: "078910442031",
-        name: "Puntas de Gutapercha ProTaper F1-F3",
-        brand: "Dentsply Sirona",
-        category: "Endo",
-        description: "Caja (60 pcs)",
-        cost: 155.0,
-        price: 240.0,
-        branches: [
-            {
-                branchId: "santa-ana",
-                branchName: "Santa Ana",
-                stock: 34,
-                phone: "2440-1234"
-            },
-            {
-                branchId: "ahuachapan",
-                branchName: "Ahuachapán",
-                stock: 15,
-                phone: "2413-5678"
-            },
-            {
-                branchId: "sonsonate",
-                branchName: "Sonsonate",
-                stock: 20,
-                phone: "2451-9012"
-            }
-        ]
-    },
-    {
-        id: "10",
-        sku: "DP-1105",
-        barcode: "750100110542",
-        name: "Baberos Odontológicos 3 Capas (x500)",
-        brand: "Mediclinic",
-        category: "Disposables",
-        description: "Paquete (500 pcs)",
-        cost: 115.0,
-        price: 180.0,
-        branches: [
-            {
-                branchId: "santa-ana",
-                branchName: "Santa Ana",
-                stock: 65,
-                phone: "2440-1234"
-            },
-            {
-                branchId: "ahuachapan",
-                branchName: "Ahuachapán",
-                stock: 30,
-                phone: "2413-5678"
-            },
-            {
-                branchId: "sonsonate",
-                branchName: "Sonsonate",
-                stock: 40,
-                phone: "2451-9012"
-            }
-        ]
-    }
-];
+;
+;
 function InventoryPage() {
     _s();
     const { user } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$context$2f$AuthContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useAuth"])();
@@ -366,7 +64,9 @@ function InventoryPage() {
         branch: "Santa Ana"
     };
     const isAdmin = currentUser.role === "admin";
-    const [items, setItems] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(INVENTORY_DATA);
+    const [items, setItems] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [isLoading, setIsLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
+    const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [search, setSearch] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
     const [category, setCategory] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("All");
     const [selectedBranch, setSelectedBranch] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(isAdmin ? "Santa Ana" : currentUser.branch);
@@ -379,32 +79,136 @@ function InventoryPage() {
     const [isNewProductOpen, setIsNewProductOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [isTransferModalOpen, setIsTransferModalOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [adjustingProduct, setAdjustingProduct] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const loadInventory = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
+        "InventoryPage.useCallback[loadInventory]": async ()=>{
+            try {
+                setIsLoading(true);
+                setError(null);
+                const { data, error: fetchError } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("products").select(`
+          id,
+          sku,
+          barcode,
+          name,
+          brand,
+          category,
+          description,
+          cost,
+          price,
+          image_url,
+          branch_inventory (
+            stock,
+            branches (
+              id,
+              name,
+              phone
+            )
+          )
+        `).order("created_at", {
+                    ascending: false
+                });
+                if (fetchError) throw fetchError;
+                const queryData = data ?? [];
+                const formatted = queryData.map({
+                    "InventoryPage.useCallback[loadInventory].formatted": (item)=>({
+                            id: item.id,
+                            sku: item.sku,
+                            barcode: item.barcode,
+                            name: item.name,
+                            brand: item.brand,
+                            category: item.category,
+                            description: item.description,
+                            cost: Number(item.cost),
+                            price: Number(item.price),
+                            image: item.image_url ?? undefined,
+                            branches: (item.branch_inventory ?? []).map({
+                                "InventoryPage.useCallback[loadInventory].formatted": (bi)=>{
+                                    const branchName = bi.branches?.name ?? "Sin sede";
+                                    const branchSlug = branchName.toLowerCase().replace(/á/g, "a").replace(/ /g, "-");
+                                    return {
+                                        branchId: branchSlug,
+                                        branchName,
+                                        stock: bi.stock ?? 0,
+                                        phone: bi.branches?.phone ?? ""
+                                    };
+                                }
+                            }["InventoryPage.useCallback[loadInventory].formatted"])
+                        })
+                }["InventoryPage.useCallback[loadInventory].formatted"]);
+                setItems(formatted);
+            } catch (err) {
+                const msg = err instanceof Error ? err.message : "Error al cargar el inventario";
+                setError(msg);
+            } finally{
+                setIsLoading(false);
+            }
+        }
+    }["InventoryPage.useCallback[loadInventory]"], []);
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "InventoryPage.useEffect": ()=>{
+            let isMounted = true;
+            const initLoad = {
+                "InventoryPage.useEffect.initLoad": async ()=>{
+                    if (isMounted) {
+                        await loadInventory();
+                    }
+                }
+            }["InventoryPage.useEffect.initLoad"];
+            initLoad();
+            return ({
+                "InventoryPage.useEffect": ()=>{
+                    isMounted = false;
+                }
+            })["InventoryPage.useEffect"];
+        }
+    }["InventoryPage.useEffect"], [
+        loadInventory
+    ]);
     const handleUpdateProduct = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
         "InventoryPage.useCallback[handleUpdateProduct]": (updated)=>{
             setItems({
                 "InventoryPage.useCallback[handleUpdateProduct]": (prev)=>prev.map({
                         "InventoryPage.useCallback[handleUpdateProduct]": (item)=>item.id === updated.id ? {
                                 ...item,
-                                ...updated
+                                ...updated,
+                                barcode: updated.barcode ?? undefined
                             } : item
                     }["InventoryPage.useCallback[handleUpdateProduct]"])
             }["InventoryPage.useCallback[handleUpdateProduct]"]);
         }
     }["InventoryPage.useCallback[handleUpdateProduct]"], []);
     const handleSaveNewProduct = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
-        "InventoryPage.useCallback[handleSaveNewProduct]": (newProd)=>{
-            const itemToAdd = {
-                id: crypto.randomUUID(),
-                ...newProd
-            };
-            setItems({
-                "InventoryPage.useCallback[handleSaveNewProduct]": (prev)=>[
-                        itemToAdd,
-                        ...prev
-                    ]
-            }["InventoryPage.useCallback[handleSaveNewProduct]"]);
+        "InventoryPage.useCallback[handleSaveNewProduct]": async (newProd)=>{
+            try {
+                setIsLoading(true);
+                const prodWithStock = newProd;
+                await createProductInDB({
+                    sku: newProd.sku,
+                    barcode: newProd.barcode,
+                    name: newProd.name,
+                    brand: newProd.brand || "Genérico",
+                    category: newProd.category,
+                    description: newProd.description || "",
+                    cost: Number(newProd.cost),
+                    price: Number(newProd.price),
+                    image: newProd.image,
+                    initialStock: {
+                        santaAna: prodWithStock.stockSantaAna ?? prodWithStock.stock ?? 0,
+                        ahuachapan: prodWithStock.stockAhuachapan ?? 0,
+                        sonsonate: prodWithStock.stockSonsonate ?? 0
+                    }
+                });
+                await loadInventory();
+                setIsNewProductOpen(false);
+            } catch (err) {
+                const msg = err instanceof Error ? err.message : "Error al registrar el producto";
+                alert(msg);
+            } finally{
+                setIsLoading(false);
+            }
         }
-    }["InventoryPage.useCallback[handleSaveNewProduct]"], []);
+    }["InventoryPage.useCallback[handleSaveNewProduct]"], [
+        loadInventory
+    ]);
     const handleConfirmTransfer = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
         "InventoryPage.useCallback[handleConfirmTransfer]": (productId, sourceBranch, targetBranch, qty)=>{
             setItems({
@@ -534,7 +338,7 @@ function InventoryPage() {
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Navbar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                 fileName: "[project]/src/app/inventario/page.tsx",
-                lineNumber: 356,
+                lineNumber: 348,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
@@ -553,7 +357,7 @@ function InventoryPage() {
                                                 className: "w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 364,
+                                                lineNumber: 356,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -564,13 +368,13 @@ function InventoryPage() {
                                                 className: "w-full h-[38px] pl-9 pr-4 bg-white border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:border-sky-500 shadow-2xs transition-colors"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 365,
+                                                lineNumber: 357,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                        lineNumber: 363,
+                                        lineNumber: 355,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -586,7 +390,7 @@ function InventoryPage() {
                                                         children: "Todas las categorías"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 381,
+                                                        lineNumber: 373,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -594,7 +398,7 @@ function InventoryPage() {
                                                         children: "Resinas"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 382,
+                                                        lineNumber: 374,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -602,7 +406,7 @@ function InventoryPage() {
                                                         children: "Endo"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 383,
+                                                        lineNumber: 375,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -610,7 +414,7 @@ function InventoryPage() {
                                                         children: "Orto"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 384,
+                                                        lineNumber: 376,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -618,7 +422,7 @@ function InventoryPage() {
                                                         children: "Instrumentos"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 385,
+                                                        lineNumber: 377,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -626,26 +430,26 @@ function InventoryPage() {
                                                         children: "Productos Desechables"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 386,
+                                                        lineNumber: 378,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 376,
+                                                lineNumber: 368,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$down$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDown$3e$__["ChevronDown"], {
                                                 className: "w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 388,
+                                                lineNumber: 380,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                        lineNumber: 375,
+                                        lineNumber: 367,
                                         columnNumber: 13
                                     }, this),
                                     isAdmin ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -655,7 +459,7 @@ function InventoryPage() {
                                                 className: "w-3.5 h-3.5 text-sky-600 mr-2 shrink-0"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 394,
+                                                lineNumber: 386,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -666,7 +470,7 @@ function InventoryPage() {
                                                         children: "Vista de Red"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 396,
+                                                        lineNumber: 388,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -674,13 +478,13 @@ function InventoryPage() {
                                                         children: selectedBranch === "ALL" ? "Todas las sedes" : selectedBranch
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 399,
+                                                        lineNumber: 391,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 395,
+                                                lineNumber: 387,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -693,7 +497,7 @@ function InventoryPage() {
                                                         children: "Santa Ana"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 408,
+                                                        lineNumber: 400,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -701,7 +505,7 @@ function InventoryPage() {
                                                         children: "Ahuachapán"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 409,
+                                                        lineNumber: 401,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -709,7 +513,7 @@ function InventoryPage() {
                                                         children: "Sonsonate"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 410,
+                                                        lineNumber: 402,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -717,26 +521,26 @@ function InventoryPage() {
                                                         children: "Todas las sucursales (Consolidado)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 411,
+                                                        lineNumber: 403,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 403,
+                                                lineNumber: 395,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$down$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDown$3e$__["ChevronDown"], {
                                                 className: "w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 413,
+                                                lineNumber: 405,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                        lineNumber: 393,
+                                        lineNumber: 385,
                                         columnNumber: 15
                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "flex items-center bg-slate-100/80 border border-slate-200 rounded-xl px-3 h-[38px] shadow-2xs select-none",
@@ -745,7 +549,7 @@ function InventoryPage() {
                                                 className: "w-4 h-4 text-sky-600 mr-2 shrink-0"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 417,
+                                                lineNumber: 409,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -756,7 +560,7 @@ function InventoryPage() {
                                                         children: "Sucursal Asignada"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 419,
+                                                        lineNumber: 411,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -764,25 +568,25 @@ function InventoryPage() {
                                                         children: currentUser.branch
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 422,
+                                                        lineNumber: 414,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 418,
+                                                lineNumber: 410,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                        lineNumber: 416,
+                                        lineNumber: 408,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 361,
+                                lineNumber: 353,
                                 columnNumber: 11
                             }, this),
                             isAdmin && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -797,20 +601,20 @@ function InventoryPage() {
                                                 className: "w-3.5 h-3.5 text-emerald-600"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 438,
+                                                lineNumber: 430,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Reporte Hacienda"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 439,
+                                                lineNumber: 431,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                        lineNumber: 433,
+                                        lineNumber: 425,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -822,20 +626,20 @@ function InventoryPage() {
                                                 className: "w-3.5 h-3.5 text-sky-600"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 447,
+                                                lineNumber: 439,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Traslado de Stock"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 448,
+                                                lineNumber: 440,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                        lineNumber: 442,
+                                        lineNumber: 434,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -847,38 +651,84 @@ function InventoryPage() {
                                                 className: "w-4 h-4"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 456,
+                                                lineNumber: 448,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Nuevo Producto"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 457,
+                                                lineNumber: 449,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                        lineNumber: 451,
+                                        lineNumber: 443,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 432,
+                                lineNumber: 424,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/inventario/page.tsx",
-                        lineNumber: 360,
+                        lineNumber: 352,
                         columnNumber: 9
+                    }, this),
+                    error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs font-semibold text-rose-600 flex items-center gap-2",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$alert$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__AlertCircle$3e$__["AlertCircle"], {
+                                className: "w-4 h-4 shrink-0"
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/inventario/page.tsx",
+                                lineNumber: 458,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                children: error
+                            }, void 0, false, {
+                                fileName: "[project]/src/app/inventario/page.tsx",
+                                lineNumber: 459,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/app/inventario/page.tsx",
+                        lineNumber: 457,
+                        columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs",
                         children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("table", {
+                            isLoading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "py-20 flex flex-col items-center justify-center text-slate-400 gap-2.5",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$loader$2d$circle$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Loader2$3e$__["Loader2"], {
+                                        className: "w-7 h-7 animate-spin text-sky-600"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/inventario/page.tsx",
+                                        lineNumber: 467,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "text-xs font-medium",
+                                        children: "Cargando inventario de sucursales..."
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/inventario/page.tsx",
+                                        lineNumber: 468,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/app/inventario/page.tsx",
+                                lineNumber: 466,
+                                columnNumber: 13
+                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("table", {
                                 className: "w-full text-left text-xs border-collapse",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("thead", {
@@ -890,32 +740,32 @@ function InventoryPage() {
                                                     children: "SKU / Barcode"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                    lineNumber: 468,
-                                                    columnNumber: 17
+                                                    lineNumber: 474,
+                                                    columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
                                                     className: "py-3.5 px-4",
                                                     children: "Producto / Marca"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                    lineNumber: 469,
-                                                    columnNumber: 17
+                                                    lineNumber: 475,
+                                                    columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
                                                     className: "py-3.5 px-4",
                                                     children: "Descripción"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                    lineNumber: 470,
-                                                    columnNumber: 17
+                                                    lineNumber: 476,
+                                                    columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
                                                     className: "py-3.5 px-4",
                                                     children: "Categoría"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                    lineNumber: 471,
-                                                    columnNumber: 17
+                                                    lineNumber: 477,
+                                                    columnNumber: 19
                                                 }, this),
                                                 isAdmin && selectedBranch === "ALL" ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
                                                     children: [
@@ -924,38 +774,38 @@ function InventoryPage() {
                                                             children: "Santa Ana"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                            lineNumber: 475,
-                                                            columnNumber: 21
+                                                            lineNumber: 481,
+                                                            columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
                                                             className: "py-3.5 px-3 text-center",
                                                             children: "Ahuachapán"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                            lineNumber: 476,
-                                                            columnNumber: 21
+                                                            lineNumber: 482,
+                                                            columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
                                                             className: "py-3.5 px-3 text-center",
                                                             children: "Sonsonate"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                            lineNumber: 477,
-                                                            columnNumber: 21
+                                                            lineNumber: 483,
+                                                            columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
                                                             className: "py-3.5 px-4 text-center font-black text-sky-700",
                                                             children: "Total Red"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                            lineNumber: 478,
-                                                            columnNumber: 21
+                                                            lineNumber: 484,
+                                                            columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                    lineNumber: 474,
-                                                    columnNumber: 19
+                                                    lineNumber: 480,
+                                                    columnNumber: 21
                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
                                                     children: [
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -967,57 +817,57 @@ function InventoryPage() {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                            lineNumber: 482,
-                                                            columnNumber: 21
+                                                            lineNumber: 488,
+                                                            columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
                                                             className: "py-3.5 px-4 text-center",
                                                             children: "Otras Sucursales"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                            lineNumber: 485,
-                                                            columnNumber: 21
+                                                            lineNumber: 491,
+                                                            columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                    lineNumber: 481,
-                                                    columnNumber: 19
+                                                    lineNumber: 487,
+                                                    columnNumber: 21
                                                 }, this),
                                                 isAdmin && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
                                                     className: "py-3.5 px-4 text-right",
                                                     children: "Costo"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                    lineNumber: 490,
-                                                    columnNumber: 29
+                                                    lineNumber: 496,
+                                                    columnNumber: 31
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
                                                     className: "py-3.5 px-4 text-right",
                                                     children: "Precio Venta"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                    lineNumber: 492,
-                                                    columnNumber: 17
+                                                    lineNumber: 498,
+                                                    columnNumber: 19
                                                 }, this),
                                                 isAdmin && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
                                                     className: "py-3.5 px-6 text-right",
                                                     children: "Acciones"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                    lineNumber: 493,
-                                                    columnNumber: 29
+                                                    lineNumber: 499,
+                                                    columnNumber: 31
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                            lineNumber: 467,
-                                            columnNumber: 15
+                                            lineNumber: 473,
+                                            columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                        lineNumber: 466,
-                                        columnNumber: 13
+                                        lineNumber: 472,
+                                        columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
                                         className: "divide-y divide-slate-100 font-medium text-slate-600",
@@ -1035,22 +885,22 @@ function InventoryPage() {
                                                                 children: item.sku
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                lineNumber: 505,
-                                                                columnNumber: 23
+                                                                lineNumber: 511,
+                                                                columnNumber: 25
                                                             }, this),
                                                             item.barcode && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                                 className: "font-mono text-[10px] text-slate-400 leading-none mt-0.5",
                                                                 children: item.barcode
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                lineNumber: 507,
-                                                                columnNumber: 25
+                                                                lineNumber: 513,
+                                                                columnNumber: 27
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 504,
-                                                        columnNumber: 21
+                                                        lineNumber: 510,
+                                                        columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
                                                         className: "py-3.5 px-4",
@@ -1060,30 +910,30 @@ function InventoryPage() {
                                                                 children: item.name
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                lineNumber: 514,
-                                                                columnNumber: 23
+                                                                lineNumber: 520,
+                                                                columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                                 className: "text-[10px] text-slate-400",
                                                                 children: item.brand
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                lineNumber: 515,
-                                                                columnNumber: 23
+                                                                lineNumber: 521,
+                                                                columnNumber: 25
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 513,
-                                                        columnNumber: 21
+                                                        lineNumber: 519,
+                                                        columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
                                                         className: "py-3.5 px-4 text-slate-500",
                                                         children: item.description
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 518,
-                                                        columnNumber: 21
+                                                        lineNumber: 524,
+                                                        columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
                                                         className: "py-3.5 px-4",
@@ -1092,13 +942,13 @@ function InventoryPage() {
                                                             children: item.category
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                            lineNumber: 521,
-                                                            columnNumber: 23
+                                                            lineNumber: 527,
+                                                            columnNumber: 25
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 520,
-                                                        columnNumber: 21
+                                                        lineNumber: 526,
+                                                        columnNumber: 23
                                                     }, this),
                                                     isAdmin && selectedBranch === "ALL" ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
                                                         children: [
@@ -1107,24 +957,24 @@ function InventoryPage() {
                                                                 children: item.branches.find((b)=>b.branchId === "santa-ana")?.stock ?? 0
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                lineNumber: 529,
-                                                                columnNumber: 25
+                                                                lineNumber: 535,
+                                                                columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
                                                                 className: "py-3.5 px-3 text-center font-mono font-medium",
                                                                 children: item.branches.find((b)=>b.branchId === "ahuachapan")?.stock ?? 0
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                lineNumber: 532,
-                                                                columnNumber: 25
+                                                                lineNumber: 538,
+                                                                columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
                                                                 className: "py-3.5 px-3 text-center font-mono font-medium",
                                                                 children: item.branches.find((b)=>b.branchId === "sonsonate")?.stock ?? 0
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                lineNumber: 535,
-                                                                columnNumber: 25
+                                                                lineNumber: 541,
+                                                                columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
                                                                 className: "py-3.5 px-4 text-center",
@@ -1133,19 +983,19 @@ function InventoryPage() {
                                                                     children: currentStock
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                                    lineNumber: 539,
-                                                                    columnNumber: 27
+                                                                    lineNumber: 545,
+                                                                    columnNumber: 29
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                lineNumber: 538,
-                                                                columnNumber: 25
+                                                                lineNumber: 544,
+                                                                columnNumber: 27
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 528,
-                                                        columnNumber: 23
+                                                        lineNumber: 534,
+                                                        columnNumber: 25
                                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
                                                         children: [
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -1155,13 +1005,13 @@ function InventoryPage() {
                                                                     children: currentStock === 0 ? "Agotado" : currentStock
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                                    lineNumber: 547,
-                                                                    columnNumber: 27
+                                                                    lineNumber: 553,
+                                                                    columnNumber: 29
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                lineNumber: 546,
-                                                                columnNumber: 25
+                                                                lineNumber: 552,
+                                                                columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
                                                                 className: "py-3.5 px-4 text-center",
@@ -1174,32 +1024,32 @@ function InventoryPage() {
                                                                             className: "w-3.5 h-3.5"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                                            lineNumber: 570,
-                                                                            columnNumber: 29
+                                                                            lineNumber: 576,
+                                                                            columnNumber: 31
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                             children: otherStock > 0 ? `${otherStock} en red` : "Sin stock"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                                            lineNumber: 571,
-                                                                            columnNumber: 29
+                                                                            lineNumber: 577,
+                                                                            columnNumber: 31
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                                    lineNumber: 561,
-                                                                    columnNumber: 27
+                                                                    lineNumber: 567,
+                                                                    columnNumber: 29
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                lineNumber: 560,
-                                                                columnNumber: 25
+                                                                lineNumber: 566,
+                                                                columnNumber: 27
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 545,
-                                                        columnNumber: 23
+                                                        lineNumber: 551,
+                                                        columnNumber: 25
                                                     }, this),
                                                     isAdmin && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
                                                         className: "py-3.5 px-4 text-right font-mono font-medium text-slate-500",
@@ -1209,8 +1059,8 @@ function InventoryPage() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 579,
-                                                        columnNumber: 23
+                                                        lineNumber: 585,
+                                                        columnNumber: 25
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
                                                         className: "py-3.5 px-4 text-right font-mono font-bold text-slate-800",
@@ -1220,8 +1070,8 @@ function InventoryPage() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 584,
-                                                        columnNumber: 21
+                                                        lineNumber: 590,
+                                                        columnNumber: 23
                                                     }, this),
                                                     isAdmin && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
                                                         className: "py-3.5 px-6 text-right",
@@ -1238,21 +1088,21 @@ function InventoryPage() {
                                                                             className: "w-3 h-3 text-sky-600"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                                            lineNumber: 599,
-                                                                            columnNumber: 31
+                                                                            lineNumber: 605,
+                                                                            columnNumber: 33
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                             children: "± Stock"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                                            lineNumber: 600,
-                                                                            columnNumber: 31
+                                                                            lineNumber: 606,
+                                                                            columnNumber: 33
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                                    lineNumber: 593,
-                                                                    columnNumber: 29
+                                                                    lineNumber: 599,
+                                                                    columnNumber: 31
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                                     type: "button",
@@ -1263,13 +1113,13 @@ function InventoryPage() {
                                                                         className: "w-3.5 h-3.5"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                                        lineNumber: 610,
-                                                                        columnNumber: 29
+                                                                        lineNumber: 616,
+                                                                        columnNumber: 31
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                                    lineNumber: 604,
-                                                                    columnNumber: 27
+                                                                    lineNumber: 610,
+                                                                    columnNumber: 29
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                                     type: "button",
@@ -1280,13 +1130,13 @@ function InventoryPage() {
                                                                         className: "w-3.5 h-3.5"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                                        lineNumber: 619,
-                                                                        columnNumber: 29
+                                                                        lineNumber: 625,
+                                                                        columnNumber: 31
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                                    lineNumber: 613,
-                                                                    columnNumber: 27
+                                                                    lineNumber: 619,
+                                                                    columnNumber: 29
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                                     type: "button",
@@ -1297,49 +1147,73 @@ function InventoryPage() {
                                                                         className: "w-3.5 h-3.5"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                                        lineNumber: 628,
-                                                                        columnNumber: 29
+                                                                        lineNumber: 634,
+                                                                        columnNumber: 31
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                                    lineNumber: 622,
-                                                                    columnNumber: 27
+                                                                    lineNumber: 628,
+                                                                    columnNumber: 29
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                            lineNumber: 591,
-                                                            columnNumber: 25
+                                                            lineNumber: 597,
+                                                            columnNumber: 27
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 590,
-                                                        columnNumber: 23
+                                                        lineNumber: 596,
+                                                        columnNumber: 25
                                                     }, this)
                                                 ]
                                             }, item.id, true, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 503,
-                                                columnNumber: 19
+                                                lineNumber: 509,
+                                                columnNumber: 21
                                             }, this);
                                         })
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                        lineNumber: 497,
-                                        columnNumber: 13
+                                        lineNumber: 503,
+                                        columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 465,
-                                columnNumber: 11
+                                lineNumber: 471,
+                                columnNumber: 13
                             }, this),
-                            filteredItems.length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "p-8 text-center text-xs text-slate-400",
-                                children: "No se encontraron productos coincidentes con los filtros seleccionados."
-                            }, void 0, false, {
+                            !isLoading && filteredItems.length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "py-16 flex flex-col items-center justify-center text-center text-slate-400 gap-2",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$package$2d$x$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__PackageX$3e$__["PackageX"], {
+                                        className: "w-8 h-8 text-slate-300"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/inventario/page.tsx",
+                                        lineNumber: 648,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                        className: "text-xs font-semibold text-slate-600",
+                                        children: "No hay productos en inventario"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/inventario/page.tsx",
+                                        lineNumber: 649,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                        className: "text-[11px] text-slate-400 max-w-sm",
+                                        children: search || category !== "All" ? "No se encontraron coincidencias para los filtros aplicados." : "El catálogo está vacío. Utiliza el botón \"Nuevo Producto\" para comenzar a poblar la base de datos."
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/app/inventario/page.tsx",
+                                        lineNumber: 652,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 640,
+                                lineNumber: 647,
                                 columnNumber: 13
                             }, this)
                         ]
@@ -1355,7 +1229,7 @@ function InventoryPage() {
                         product: selectedProduct
                     }, void 0, false, {
                         fileName: "[project]/src/app/inventario/page.tsx",
-                        lineNumber: 647,
+                        lineNumber: 662,
                         columnNumber: 9
                     }, this),
                     adjustingProduct && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$AjusteStockModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1368,7 +1242,7 @@ function InventoryPage() {
                         onConfirm: handleConfirmAdjustment
                     }, void 0, false, {
                         fileName: "[project]/src/app/inventario/page.tsx",
-                        lineNumber: 656,
+                        lineNumber: 671,
                         columnNumber: 11
                     }, this),
                     isAdmin && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -1379,7 +1253,7 @@ function InventoryPage() {
                                 onSave: handleSaveNewProduct
                             }, void 0, false, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 670,
+                                lineNumber: 685,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$TransferStockModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1389,7 +1263,7 @@ function InventoryPage() {
                                 onConfirmTransfer: handleConfirmTransfer
                             }, void 0, false, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 676,
+                                lineNumber: 691,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$HistorialProductoModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1399,7 +1273,7 @@ function InventoryPage() {
                                 currentBranch: selectedBranch
                             }, void 0, false, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 683,
+                                lineNumber: 698,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$EditarProductoModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1409,7 +1283,7 @@ function InventoryPage() {
                                 onSave: handleUpdateProduct
                             }, void 0, false, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 690,
+                                lineNumber: 705,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BorrarProductoModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1419,7 +1293,7 @@ function InventoryPage() {
                                 product: deletingProduct
                             }, void 0, false, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 696,
+                                lineNumber: 712,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ReporteHaciendaModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1428,29 +1302,29 @@ function InventoryPage() {
                                 products: items
                             }, void 0, false, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 702,
+                                lineNumber: 719,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/inventario/page.tsx",
-                        lineNumber: 669,
+                        lineNumber: 684,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/inventario/page.tsx",
-                lineNumber: 358,
+                lineNumber: 350,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/app/inventario/page.tsx",
-        lineNumber: 355,
+        lineNumber: 347,
         columnNumber: 5
     }, this);
 }
-_s(InventoryPage, "wKfnbpC7K5ywilq4Ht8PYMyofbk=", false, function() {
+_s(InventoryPage, "oeu/9w3dRxf0oEVHB8KD0YEDxLM=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$context$2f$AuthContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useAuth"]
     ];
@@ -1475,46 +1349,68 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$plus$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Plus$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/plus.mjs [app-client] (ecmascript) <export default as Plus>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$minus$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Minus$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/minus.mjs [app-client] (ecmascript) <export default as Minus>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$package$2d$check$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__PackageCheck$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/package-check.mjs [app-client] (ecmascript) <export default as PackageCheck>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$alert$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__AlertCircle$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/circle-alert.mjs [app-client] (ecmascript) <export default as AlertCircle>");
 ;
 var _s = __turbopack_context__.k.signature();
 "use client";
 ;
 ;
+const REASONS = {
+    add: [
+        "Reabastecimiento / Compra",
+        "Devolución de Cliente",
+        "Ajuste por Inventario Físico (+)"
+    ],
+    remove: [
+        "Merma / Deterioro",
+        "Producto Vencido",
+        "Ajuste por Inventario Físico (-)",
+        "Uso Interno / Muestra"
+    ]
+};
 function StockAdjustmentModal({ isOpen, onClose, productName, sku, branchName, currentStock, onConfirm }) {
     _s();
     const [operation, setOperation] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("add");
     const [quantity, setQuantity] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(1);
-    const [reason, setReason] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("Reabastecimiento / Compra");
-    // Reset al abrir
-    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
-        "StockAdjustmentModal.useEffect": ()=>{
-            if (isOpen) {
-                setOperation("add");
-                setQuantity(1);
-                setReason("Reabastecimiento / Compra");
-            }
-        }
-    }["StockAdjustmentModal.useEffect"], [
-        isOpen
-    ]);
+    const [reason, setReason] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(REASONS.add[0]);
+    const [errorMessage, setErrorMessage] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const formId = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useId"])();
     if (!isOpen) return null;
-    const numQty = typeof quantity === "number" ? quantity : parseInt(quantity) || 0;
+    const numQty = typeof quantity === "number" ? quantity : parseInt(quantity, 10) || 0;
     const projectedStock = operation === "add" ? currentStock + numQty : Math.max(0, currentStock - numQty);
+    const isExcessRemoval = operation === "remove" && numQty > currentStock;
+    const isInvalidQty = numQty <= 0;
+    const handleClose = ()=>{
+        setOperation("add");
+        setQuantity(1);
+        setReason(REASONS.add[0]);
+        setErrorMessage(null);
+        onClose();
+    };
+    const handleOperationChange = (type)=>{
+        setOperation(type);
+        setReason(REASONS[type][0]);
+        setErrorMessage(null);
+    };
     const handleSubmit = (e)=>{
         e.preventDefault();
-        if (numQty <= 0) {
-            alert("Por favor ingresa una cantidad válida mayor a cero.");
+        if (isInvalidQty) {
+            setErrorMessage("Ingresa una cantidad válida mayor a cero.");
             return;
         }
-        if (operation === "remove" && numQty > currentStock) {
-            alert("No puedes retirar más unidades de las que existen en stock actual.");
+        if (isExcessRemoval) {
+            setErrorMessage(`No puedes retirar más de ${currentStock} unidades disponibles en stock.`);
             return;
         }
         onConfirm(operation, numQty, reason);
-        onClose();
+        handleClose();
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4 select-none animate-in fade-in duration-150",
+        onClick: (e)=>e.target === e.currentTarget && handleClose(),
+        role: "dialog",
+        "aria-modal": "true",
+        "aria-labelledby": `${formId}-title`,
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             className: "bg-white border border-slate-200 w-full max-w-md rounded-2xl shadow-2xl overflow-hidden flex flex-col",
             children: [
@@ -1525,27 +1421,28 @@ function StockAdjustmentModal({ isOpen, onClose, productName, sku, branchName, c
                             className: "flex items-center gap-2.5",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center",
+                                    className: "w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center shrink-0",
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$package$2d$check$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__PackageCheck$3e$__["PackageCheck"], {
                                         className: "w-4 h-4"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/AjusteStockModal.tsx",
-                                        lineNumber: 68,
+                                        lineNumber: 103,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/AjusteStockModal.tsx",
-                                    lineNumber: 67,
+                                    lineNumber: 102,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                            id: `${formId}-title`,
                                             className: "text-sm font-bold text-slate-800",
                                             children: "Ajuste Manual de Existencias"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/AjusteStockModal.tsx",
-                                            lineNumber: 71,
+                                            lineNumber: 106,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1557,47 +1454,47 @@ function StockAdjustmentModal({ isOpen, onClose, productName, sku, branchName, c
                                                     children: branchName
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/AjusteStockModal.tsx",
-                                                    lineNumber: 75,
+                                                    lineNumber: 110,
                                                     columnNumber: 27
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/AjusteStockModal.tsx",
-                                            lineNumber: 74,
+                                            lineNumber: 109,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/AjusteStockModal.tsx",
-                                    lineNumber: 70,
+                                    lineNumber: 105,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/AjusteStockModal.tsx",
-                            lineNumber: 66,
+                            lineNumber: 101,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                             type: "button",
-                            onClick: onClose,
-                            className: "p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors",
+                            onClick: handleClose,
+                            className: "p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors",
                             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$x$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__X$3e$__["X"], {
                                 className: "w-4 h-4"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/AjusteStockModal.tsx",
-                                lineNumber: 84,
+                                lineNumber: 119,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/components/AjusteStockModal.tsx",
-                            lineNumber: 79,
+                            lineNumber: 114,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/AjusteStockModal.tsx",
-                    lineNumber: 65,
+                    lineNumber: 100,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1612,7 +1509,7 @@ function StockAdjustmentModal({ isOpen, onClose, productName, sku, branchName, c
                                         children: productName
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/AjusteStockModal.tsx",
-                                        lineNumber: 92,
+                                        lineNumber: 127,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1623,13 +1520,13 @@ function StockAdjustmentModal({ isOpen, onClose, productName, sku, branchName, c
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/AjusteStockModal.tsx",
-                                        lineNumber: 93,
+                                        lineNumber: 128,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/AjusteStockModal.tsx",
-                                lineNumber: 91,
+                                lineNumber: 126,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1640,7 +1537,7 @@ function StockAdjustmentModal({ isOpen, onClose, productName, sku, branchName, c
                                         children: "Stock Actual"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/AjusteStockModal.tsx",
-                                        lineNumber: 96,
+                                        lineNumber: 131,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1651,24 +1548,24 @@ function StockAdjustmentModal({ isOpen, onClose, productName, sku, branchName, c
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/AjusteStockModal.tsx",
-                                        lineNumber: 99,
+                                        lineNumber: 134,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/AjusteStockModal.tsx",
-                                lineNumber: 95,
+                                lineNumber: 130,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/AjusteStockModal.tsx",
-                        lineNumber: 90,
+                        lineNumber: 125,
                         columnNumber: 11
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/components/AjusteStockModal.tsx",
-                    lineNumber: 89,
+                    lineNumber: 124,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
@@ -1682,7 +1579,7 @@ function StockAdjustmentModal({ isOpen, onClose, productName, sku, branchName, c
                                     children: "Tipo de Movimiento"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/AjusteStockModal.tsx",
-                                    lineNumber: 110,
+                                    lineNumber: 145,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1690,108 +1587,158 @@ function StockAdjustmentModal({ isOpen, onClose, productName, sku, branchName, c
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                             type: "button",
-                                            onClick: ()=>{
-                                                setOperation("add");
-                                                setReason("Reabastecimiento / Compra");
-                                            },
+                                            onClick: ()=>handleOperationChange("add"),
                                             className: `py-2 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${operation === "add" ? "bg-emerald-50 border-emerald-300 text-emerald-700 shadow-2xs" : "border-slate-200 text-slate-600 hover:bg-slate-50"}`,
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$plus$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Plus$3e$__["Plus"], {
                                                     className: "w-3.5 h-3.5"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/AjusteStockModal.tsx",
-                                                    lineNumber: 126,
+                                                    lineNumber: 158,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                     children: "Entrada (Agregar)"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/AjusteStockModal.tsx",
-                                                    lineNumber: 127,
+                                                    lineNumber: 159,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/AjusteStockModal.tsx",
-                                            lineNumber: 114,
+                                            lineNumber: 149,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                             type: "button",
-                                            onClick: ()=>{
-                                                setOperation("remove");
-                                                setReason("Merma / Deterioro");
-                                            },
+                                            onClick: ()=>handleOperationChange("remove"),
                                             className: `py-2 px-3 rounded-xl border text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${operation === "remove" ? "bg-rose-50 border-rose-300 text-rose-700 shadow-2xs" : "border-slate-200 text-slate-600 hover:bg-slate-50"}`,
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$minus$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Minus$3e$__["Minus"], {
                                                     className: "w-3.5 h-3.5"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/AjusteStockModal.tsx",
-                                                    lineNumber: 142,
+                                                    lineNumber: 171,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                     children: "Salida (Quitar)"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/AjusteStockModal.tsx",
-                                                    lineNumber: 143,
+                                                    lineNumber: 172,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/AjusteStockModal.tsx",
-                                            lineNumber: 130,
+                                            lineNumber: 162,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/AjusteStockModal.tsx",
-                                    lineNumber: 113,
+                                    lineNumber: 148,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/AjusteStockModal.tsx",
-                            lineNumber: 109,
+                            lineNumber: 144,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                    htmlFor: `${formId}-reason`,
                                     className: "block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5",
-                                    children: "Cantidad de Unidades"
+                                    children: "Motivo del Ajuste"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/AjusteStockModal.tsx",
-                                    lineNumber: 150,
+                                    lineNumber: 179,
                                     columnNumber: 13
                                 }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "relative",
-                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                        type: "number",
-                                        min: "1",
-                                        max: operation === "remove" ? currentStock : undefined,
-                                        value: quantity,
-                                        onChange: (e)=>setQuantity(e.target.value),
-                                        placeholder: "Ej. 10",
-                                        className: "w-full pl-3 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-sky-500 focus:bg-white",
-                                        required: true
-                                    }, void 0, false, {
-                                        fileName: "[project]/src/components/AjusteStockModal.tsx",
-                                        lineNumber: 154,
-                                        columnNumber: 15
-                                    }, this)
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                    id: `${formId}-reason`,
+                                    value: reason,
+                                    onChange: (e)=>setReason(e.target.value),
+                                    className: "w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-sky-500 focus:bg-white",
+                                    children: REASONS[operation].map((r)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                            value: r,
+                                            children: r
+                                        }, r, false, {
+                                            fileName: "[project]/src/components/AjusteStockModal.tsx",
+                                            lineNumber: 192,
+                                            columnNumber: 17
+                                        }, this))
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/AjusteStockModal.tsx",
-                                    lineNumber: 153,
+                                    lineNumber: 185,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/AjusteStockModal.tsx",
-                            lineNumber: 149,
+                            lineNumber: 178,
                             columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                    htmlFor: `${formId}-qty`,
+                                    className: "block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5",
+                                    children: "Cantidad de Unidades"
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/AjusteStockModal.tsx",
+                                    lineNumber: 201,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                    id: `${formId}-qty`,
+                                    type: "number",
+                                    min: "1",
+                                    max: operation === "remove" ? currentStock : undefined,
+                                    value: quantity,
+                                    onChange: (e)=>{
+                                        setQuantity(e.target.value);
+                                        if (errorMessage) setErrorMessage(null);
+                                    },
+                                    placeholder: "Ej. 10",
+                                    className: "w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:outline-none focus:border-sky-500 focus:bg-white",
+                                    required: true
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/AjusteStockModal.tsx",
+                                    lineNumber: 207,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/src/components/AjusteStockModal.tsx",
+                            lineNumber: 200,
+                            columnNumber: 11
+                        }, this),
+                        errorMessage && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "flex items-center gap-2 p-2.5 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$alert$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__AlertCircle$3e$__["AlertCircle"], {
+                                    className: "w-4 h-4 shrink-0"
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/AjusteStockModal.tsx",
+                                    lineNumber: 226,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                    children: errorMessage
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/AjusteStockModal.tsx",
+                                    lineNumber: 227,
+                                    columnNumber: 15
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/src/components/AjusteStockModal.tsx",
+                            lineNumber: 225,
+                            columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "p-3 bg-sky-50/60 border border-sky-100 rounded-xl flex items-center justify-between text-xs",
@@ -1801,7 +1748,7 @@ function StockAdjustmentModal({ isOpen, onClose, productName, sku, branchName, c
                                     children: "Nuevo stock resultante:"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/AjusteStockModal.tsx",
-                                    lineNumber: 169,
+                                    lineNumber: 233,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1812,13 +1759,13 @@ function StockAdjustmentModal({ isOpen, onClose, productName, sku, branchName, c
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/AjusteStockModal.tsx",
-                                    lineNumber: 170,
+                                    lineNumber: 234,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/AjusteStockModal.tsx",
-                            lineNumber: 168,
+                            lineNumber: 232,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1826,48 +1773,53 @@ function StockAdjustmentModal({ isOpen, onClose, productName, sku, branchName, c
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                     type: "button",
-                                    onClick: onClose,
+                                    onClick: handleClose,
                                     className: "px-3.5 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer",
                                     children: "Cancelar"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/AjusteStockModal.tsx",
-                                    lineNumber: 177,
+                                    lineNumber: 241,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                     type: "submit",
-                                    className: `px-4 py-2 text-xs font-bold text-white rounded-xl shadow-2xs transition-colors cursor-pointer ${operation === "add" ? "bg-emerald-600 hover:bg-emerald-700" : "bg-rose-600 hover:bg-rose-700"}`,
+                                    disabled: isExcessRemoval || isInvalidQty,
+                                    className: `px-4 py-2 text-xs font-bold text-white rounded-xl shadow-2xs transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed ${operation === "add" ? "bg-emerald-600 hover:bg-emerald-700" : "bg-rose-600 hover:bg-rose-700"}`,
                                     children: operation === "add" ? "Confirmar Entrada" : "Confirmar Salida"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/AjusteStockModal.tsx",
-                                    lineNumber: 185,
+                                    lineNumber: 249,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/AjusteStockModal.tsx",
-                            lineNumber: 176,
+                            lineNumber: 240,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/AjusteStockModal.tsx",
-                    lineNumber: 107,
+                    lineNumber: 142,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/AjusteStockModal.tsx",
-            lineNumber: 63,
+            lineNumber: 98,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/components/AjusteStockModal.tsx",
-        lineNumber: 62,
+        lineNumber: 91,
         columnNumber: 5
     }, this);
 }
-_s(StockAdjustmentModal, "DlwH95f+YlCGfvzNQ1b5vdpHZW4=");
+_s(StockAdjustmentModal, "slBUXYITZjVw0BtxhyiSj2LOQ3A=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useId"]
+    ];
+});
 _c = StockAdjustmentModal;
 var _c;
 __turbopack_context__.k.register(_c, "StockAdjustmentModal");
@@ -2393,6 +2345,7 @@ __turbopack_context__.s([
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/image.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$x$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__X$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/x.mjs [app-client] (ecmascript) <export default as X>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$check$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Check$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/check.mjs [app-client] (ecmascript) <export default as Check>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$pencil$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Pencil$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/pencil.mjs [app-client] (ecmascript) <export default as Pencil>");
@@ -2404,6 +2357,7 @@ var _s = __turbopack_context__.k.signature();
 "use client";
 ;
 ;
+;
 const CATEGORIES = [
     "Resins",
     "Endo",
@@ -2411,67 +2365,48 @@ const CATEGORIES = [
     "Instruments",
     "Disposables"
 ];
-function EditProductModal({ isOpen, onClose, product, onSave }) {
+// Subcomponente interno del formulario: evita el useEffect y resetea su estado al cambiar la prop 'key'
+function EditProductFormContent({ product, onClose, onSave }) {
     _s();
-    const [sku, setSku] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
-    const [name, setName] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
-    const [brand, setBrand] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
-    const [category, setCategory] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("Resins");
-    const [description, setDescription] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
-    const [cost, setCost] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
-    const [price, setPrice] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
-    const [imagePreview, setImagePreview] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const formId = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useId"])();
     const fileInputRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
-    const [stockSantaAna, setStockSantaAna] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(0);
-    const [stockAhuachapan, setStockAhuachapan] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(0);
-    const [stockSonsonate, setStockSonsonate] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(0);
+    const [sku, setSku] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(product.sku || "");
+    const [barcode, setBarcode] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(product.barcode || "");
+    const [name, setName] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(product.name || "");
+    const [brand, setBrand] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(product.brand || "");
+    const [category, setCategory] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(product.category || CATEGORIES[0]);
+    const [description, setDescription] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(product.description || "");
+    const [cost, setCost] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(product.cost ?? "");
+    const [price, setPrice] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(product.price ?? "");
+    const [imagePreview, setImagePreview] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(product.image || null);
     const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
-    // Cargar datos del producto al abrir
-    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
-        "EditProductModal.useEffect": ()=>{
-            if (product && isOpen) {
-                setSku(product.sku || "");
-                setName(product.name || "");
-                setBrand(product.brand || "");
-                setCategory(product.category || "Resins");
-                setDescription(product.description || "");
-                setCost(product.cost ?? "");
-                setPrice(product.price ?? "");
-                setImagePreview(product.image || null);
-                const sa = product.branches.find({
-                    "EditProductModal.useEffect": (b)=>b.branchId === "santa-ana"
-                }["EditProductModal.useEffect"])?.stock ?? 0;
-                const ah = product.branches.find({
-                    "EditProductModal.useEffect": (b)=>b.branchId === "ahuachapan"
-                }["EditProductModal.useEffect"])?.stock ?? 0;
-                const so = product.branches.find({
-                    "EditProductModal.useEffect": (b)=>b.branchId === "sonsonate"
-                }["EditProductModal.useEffect"])?.stock ?? 0;
-                setStockSantaAna(sa);
-                setStockAhuachapan(ah);
-                setStockSonsonate(so);
-                setError(null);
-            }
-        }
-    }["EditProductModal.useEffect"], [
-        product,
-        isOpen
-    ]);
-    if (!isOpen || !product) return null;
+    // Estados de stock por sucursal
+    const [stockSantaAna, setStockSantaAna] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(product.branches.find({
+        "EditProductFormContent.useState": (b)=>b.branchId === "santa-ana"
+    }["EditProductFormContent.useState"])?.stock ?? 0);
+    const [stockAhuachapan, setStockAhuachapan] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(product.branches.find({
+        "EditProductFormContent.useState": (b)=>b.branchId === "ahuachapan"
+    }["EditProductFormContent.useState"])?.stock ?? 0);
+    const [stockSonsonate, setStockSonsonate] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(product.branches.find({
+        "EditProductFormContent.useState": (b)=>b.branchId === "sonsonate"
+    }["EditProductFormContent.useState"])?.stock ?? 0);
     const handleImageChange = (e)=>{
         const file = e.target.files?.[0];
-        if (file) {
-            if (!file.type.startsWith("image/")) {
-                setError("El archivo seleccionado debe ser una imagen válida (.png, .jpg, .webp).");
-                return;
-            }
-            const reader = new FileReader();
-            reader.onloadend = ()=>{
-                setImagePreview(reader.result);
-                setError(null);
-            };
-            reader.readAsDataURL(file);
+        if (!file) return;
+        if (!file.type.startsWith("image/")) {
+            setError("El archivo debe ser una imagen válida (.png, .jpg, .webp).");
+            return;
         }
+        if (file.size > 2 * 1024 * 1024) {
+            setError("La imagen no debe superar los 2MB de peso.");
+            return;
+        }
+        const reader = new FileReader();
+        reader.onloadend = ()=>{
+            setImagePreview(reader.result);
+            setError(null);
+        };
+        reader.readAsDataURL(file);
     };
     const handleRemoveImage = ()=>{
         setImagePreview(null);
@@ -2483,37 +2418,40 @@ function EditProductModal({ isOpen, onClose, product, onSave }) {
             setError("Por favor completa los campos obligatorios del producto.");
             return;
         }
-        if (cost === "" || Number(cost) < 0 || price === "" || Number(price) < 0) {
-            setError("Ingresa valores numéricos válidos para costo y precio.");
+        const numericCost = typeof cost === "number" ? cost : parseFloat(cost);
+        const numericPrice = typeof price === "number" ? price : parseFloat(price);
+        if (isNaN(numericCost) || numericCost < 0 || isNaN(numericPrice) || numericPrice < 0) {
+            setError("Ingresa valores monetarios numéricos válidos para costo y precio.");
             return;
         }
         const updatedData = {
             id: product.id,
             sku: sku.trim().toUpperCase(),
+            barcode: barcode.trim() || null,
             name: name.trim(),
             brand: brand.trim(),
             category,
             description: description.trim(),
-            cost: Number(cost),
-            price: Number(price),
+            cost: numericCost,
+            price: numericPrice,
             image: imagePreview || undefined,
             branches: [
                 {
                     branchId: "santa-ana",
                     branchName: "Santa Ana",
-                    stock: Number(stockSantaAna) || 0,
+                    stock: Math.max(0, Number(stockSantaAna) || 0),
                     phone: "2440-1234"
                 },
                 {
                     branchId: "ahuachapan",
                     branchName: "Ahuachapán",
-                    stock: Number(stockAhuachapan) || 0,
+                    stock: Math.max(0, Number(stockAhuachapan) || 0),
                     phone: "2413-5678"
                 },
                 {
                     branchId: "sonsonate",
                     branchName: "Sonsonate",
-                    stock: Number(stockSonsonate) || 0,
+                    stock: Math.max(0, Number(stockSonsonate) || 0),
                     phone: "2451-9012"
                 }
             ]
@@ -2522,491 +2460,690 @@ function EditProductModal({ isOpen, onClose, product, onSave }) {
         onClose();
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-        className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4 select-none animate-in fade-in duration-150",
-        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "bg-white border border-slate-200 w-full max-w-lg rounded-2xl shadow-xl overflow-hidden animate-in zoom-in-95 duration-150 flex flex-col max-h-[90vh]",
-            children: [
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50/60 shrink-0",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "flex items-center gap-2.5",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center",
-                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$pencil$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Pencil$3e$__["Pencil"], {
-                                        className: "w-4 h-4"
-                                    }, void 0, false, {
-                                        fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                        lineNumber: 161,
-                                        columnNumber: 15
-                                    }, this)
+        className: "bg-white border border-slate-200 w-full max-w-lg rounded-2xl shadow-xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-150",
+        onClick: (e)=>e.stopPropagation(),
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50/60 shrink-0",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "flex items-center gap-2.5",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center shrink-0",
+                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$pencil$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Pencil$3e$__["Pencil"], {
+                                    className: "w-4 h-4"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                    lineNumber: 160,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                            className: "text-sm font-bold text-slate-800 leading-tight",
-                                            children: "Editar Ficha de Producto"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                            lineNumber: 164,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                            className: "text-[11px] text-slate-500 font-mono",
-                                            children: [
-                                                "SKU: ",
-                                                product.sku
-                                            ]
-                                        }, void 0, true, {
-                                            fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                            lineNumber: 167,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                    lineNumber: 163,
+                                    lineNumber: 161,
                                     columnNumber: 13
                                 }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/src/components/EditarProductoModal.tsx",
-                            lineNumber: 159,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                            type: "button",
-                            onClick: onClose,
-                            className: "p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer",
-                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$x$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__X$3e$__["X"], {
-                                className: "w-4 h-4"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                lineNumber: 177,
-                                columnNumber: 13
+                                lineNumber: 160,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                        id: `${formId}-title`,
+                                        className: "text-sm font-bold text-slate-800 leading-tight",
+                                        children: "Editar Ficha de Producto"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                        lineNumber: 164,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                        className: "text-[11px] text-slate-500 font-mono",
+                                        children: [
+                                            "SKU: ",
+                                            product.sku
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                        lineNumber: 167,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                lineNumber: 163,
+                                columnNumber: 11
                             }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                        lineNumber: 159,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                        type: "button",
+                        onClick: onClose,
+                        className: "p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer",
+                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$x$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__X$3e$__["X"], {
+                            className: "w-4 h-4"
                         }, void 0, false, {
                             fileName: "[project]/src/components/EditarProductoModal.tsx",
-                            lineNumber: 172,
+                            lineNumber: 175,
                             columnNumber: 11
                         }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/src/components/EditarProductoModal.tsx",
-                    lineNumber: 158,
-                    columnNumber: 9
-                }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
-                    onSubmit: handleSubmit,
-                    className: "p-5 space-y-4 overflow-y-auto flex-1",
-                    children: [
-                        error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "flex items-center gap-2 p-2.5 bg-rose-50 border border-rose-200 rounded-xl text-[11px] font-semibold text-rose-600",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$alert$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__AlertCircle$3e$__["AlertCircle"], {
-                                    className: "w-4 h-4 shrink-0"
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                    lineNumber: 185,
-                                    columnNumber: 15
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                    children: error
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                    lineNumber: 186,
-                                    columnNumber: 15
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/src/components/EditarProductoModal.tsx",
-                            lineNumber: 184,
-                            columnNumber: 13
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                    className: "block text-xs font-semibold text-slate-600 mb-1.5",
-                                    children: "Fotografía del Producto"
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                    lineNumber: 192,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                    type: "file",
-                                    ref: fileInputRef,
-                                    onChange: handleImageChange,
-                                    accept: "image/*",
-                                    className: "hidden"
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                    lineNumber: 195,
-                                    columnNumber: 13
-                                }, this),
-                                imagePreview ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "relative w-full h-32 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-center overflow-hidden group",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                    }, void 0, false, {
+                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                        lineNumber: 170,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/components/EditarProductoModal.tsx",
+                lineNumber: 158,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
+                onSubmit: handleSubmit,
+                className: "p-5 space-y-4 overflow-y-auto flex-1",
+                children: [
+                    error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "flex items-center gap-2 p-2.5 bg-rose-50 border border-rose-200 rounded-xl text-[11px] font-semibold text-rose-600",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$alert$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__AlertCircle$3e$__["AlertCircle"], {
+                                className: "w-4 h-4 shrink-0"
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                lineNumber: 183,
+                                columnNumber: 13
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                children: error
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                lineNumber: 184,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                        lineNumber: 182,
+                        columnNumber: 11
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                className: "block text-xs font-semibold text-slate-600 mb-1.5",
+                                children: "Fotografía del Producto"
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                lineNumber: 190,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                type: "file",
+                                ref: fileInputRef,
+                                onChange: handleImageChange,
+                                accept: "image/png, image/jpeg, image/webp",
+                                className: "hidden"
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                lineNumber: 193,
+                                columnNumber: 11
+                            }, this),
+                            imagePreview ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "relative w-full h-32 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-center overflow-hidden",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "relative w-full h-full p-2",
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$image$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                             src: imagePreview,
                                             alt: "Vista previa",
-                                            className: "w-full h-full object-contain p-2"
+                                            fill: true,
+                                            unoptimized: imagePreview.startsWith("data:"),
+                                            className: "object-contain"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                            lineNumber: 206,
-                                            columnNumber: 17
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                            type: "button",
-                                            onClick: handleRemoveImage,
-                                            className: "absolute top-2 right-2 p-1.5 bg-rose-600 text-white rounded-lg opacity-90 hover:opacity-100 transition-opacity shadow-xs cursor-pointer",
-                                            title: "Eliminar imagen",
-                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$trash$2d$2$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Trash2$3e$__["Trash2"], {
-                                                className: "w-3.5 h-3.5"
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                                lineNumber: 217,
-                                                columnNumber: 19
-                                            }, this)
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                            lineNumber: 211,
+                                            lineNumber: 204,
                                             columnNumber: 17
                                         }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                    lineNumber: 204,
-                                    columnNumber: 15
-                                }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    onClick: ()=>fileInputRef.current?.click(),
-                                    className: "w-full h-24 border-2 border-dashed border-slate-200 hover:border-sky-400 rounded-xl flex flex-col items-center justify-center gap-1 cursor-pointer bg-slate-50/50 hover:bg-sky-50/20 transition-all text-slate-400 hover:text-sky-600",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$cloud$2d$upload$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__UploadCloud$3e$__["UploadCloud"], {
-                                            className: "w-5 h-5 stroke-[1.5]"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                            lineNumber: 225,
-                                            columnNumber: 17
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "text-xs font-medium",
-                                            children: "Subir o actualizar imagen"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                            lineNumber: 226,
-                                            columnNumber: 17
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "text-[10px] text-slate-400",
-                                            children: "PNG, JPG o WEBP"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                            lineNumber: 227,
-                                            columnNumber: 17
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                    lineNumber: 221,
-                                    columnNumber: 15
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/src/components/EditarProductoModal.tsx",
-                            lineNumber: 191,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "grid grid-cols-2 gap-3",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                            className: "block text-xs font-semibold text-slate-600 mb-1",
-                                            children: "Código / SKU *"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                            lineNumber: 235,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                            type: "text",
-                                            value: sku,
-                                            onChange: (e)=>setSku(e.target.value),
-                                            className: "w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs font-mono font-medium focus:outline-none focus:border-sky-500 shadow-2xs uppercase"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                            lineNumber: 238,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                    lineNumber: 234,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                            className: "block text-xs font-semibold text-slate-600 mb-1",
-                                            children: "Categoría *"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                            lineNumber: 247,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
-                                            value: category,
-                                            onChange: (e)=>setCategory(e.target.value),
-                                            className: "w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-700 focus:outline-none focus:border-sky-500 shadow-2xs cursor-pointer",
-                                            children: CATEGORIES.map((cat)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                    value: cat,
-                                                    children: cat
-                                                }, cat, false, {
-                                                    fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                                    lineNumber: 256,
-                                                    columnNumber: 19
-                                                }, this))
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                            lineNumber: 250,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                    lineNumber: 246,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/src/components/EditarProductoModal.tsx",
-                            lineNumber: 233,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                    className: "block text-xs font-semibold text-slate-600 mb-1",
-                                    children: "Nombre del Producto *"
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                    lineNumber: 266,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                    type: "text",
-                                    value: name,
-                                    onChange: (e)=>setName(e.target.value),
-                                    className: "w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:border-sky-500 shadow-2xs"
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                    lineNumber: 269,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/src/components/EditarProductoModal.tsx",
-                            lineNumber: 265,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "grid grid-cols-2 gap-3",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                            className: "block text-xs font-semibold text-slate-600 mb-1",
-                                            children: "Marca / Fabricante *"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                            lineNumber: 280,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                            type: "text",
-                                            value: brand,
-                                            onChange: (e)=>setBrand(e.target.value),
-                                            className: "w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:border-sky-500 shadow-2xs"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                            lineNumber: 283,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                    lineNumber: 279,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                            className: "block text-xs font-semibold text-slate-600 mb-1",
-                                            children: "Descripción *"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                            lineNumber: 292,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                            type: "text",
-                                            value: description,
-                                            onChange: (e)=>setDescription(e.target.value),
-                                            className: "w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:border-sky-500 shadow-2xs"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                            lineNumber: 295,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                    lineNumber: 291,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/src/components/EditarProductoModal.tsx",
-                            lineNumber: 278,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "grid grid-cols-2 gap-3",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                            className: "block text-xs font-semibold text-slate-600 mb-1",
-                                            children: "Costo Unitario ($) *"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                            lineNumber: 307,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                            type: "number",
-                                            step: "0.01",
-                                            min: "0",
-                                            value: cost,
-                                            onChange: (e)=>setCost(e.target.value === "" ? "" : parseFloat(e.target.value)),
-                                            className: "w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs font-mono font-medium focus:outline-none focus:border-sky-500 shadow-2xs"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                            lineNumber: 310,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                    lineNumber: 306,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                            className: "block text-xs font-semibold text-slate-600 mb-1",
-                                            children: "Precio de Venta ($) *"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                            lineNumber: 323,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                            type: "number",
-                                            step: "0.01",
-                                            min: "0",
-                                            value: price,
-                                            onChange: (e)=>setPrice(e.target.value === "" ? "" : parseFloat(e.target.value)),
-                                            className: "w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-800 focus:outline-none focus:border-sky-500 shadow-2xs"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                            lineNumber: 326,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                    lineNumber: 322,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/src/components/EditarProductoModal.tsx",
-                            lineNumber: 305,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "pt-3 border-t border-slate-100 flex items-center justify-end gap-2",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                    type: "button",
-                                    onClick: onClose,
-                                    className: "px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer",
-                                    children: "Cancelar"
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                    lineNumber: 341,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                    type: "submit",
-                                    className: "flex items-center gap-1.5 px-4 py-2 bg-[#0284C7] hover:bg-sky-700 text-white text-xs font-bold rounded-xl shadow-2xs transition-colors cursor-pointer",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$check$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Check$3e$__["Check"], {
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                        lineNumber: 203,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                        type: "button",
+                                        onClick: handleRemoveImage,
+                                        className: "absolute top-2 right-2 p-1.5 bg-rose-600 text-white rounded-lg opacity-90 hover:opacity-100 transition-opacity shadow-xs cursor-pointer z-10",
+                                        title: "Eliminar imagen",
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$trash$2d$2$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Trash2$3e$__["Trash2"], {
                                             className: "w-3.5 h-3.5"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                            lineNumber: 352,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            children: "Guardar Cambios"
-                                        }, void 0, false, {
-                                            fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                            lineNumber: 353,
-                                            columnNumber: 15
+                                            lineNumber: 218,
+                                            columnNumber: 17
                                         }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/src/components/EditarProductoModal.tsx",
-                                    lineNumber: 348,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/src/components/EditarProductoModal.tsx",
-                            lineNumber: 340,
-                            columnNumber: 11
-                        }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/src/components/EditarProductoModal.tsx",
-                    lineNumber: 182,
-                    columnNumber: 9
-                }, this)
-            ]
-        }, void 0, true, {
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                        lineNumber: 212,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                lineNumber: 202,
+                                columnNumber: 13
+                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                onClick: ()=>fileInputRef.current?.click(),
+                                className: "w-full h-24 border-2 border-dashed border-slate-200 hover:border-sky-400 rounded-xl flex flex-col items-center justify-center gap-1 cursor-pointer bg-slate-50/50 hover:bg-sky-50/20 transition-all text-slate-400 hover:text-sky-600",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$cloud$2d$upload$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__UploadCloud$3e$__["UploadCloud"], {
+                                        className: "w-5 h-5 stroke-[1.5]"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                        lineNumber: 226,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "text-xs font-medium",
+                                        children: "Subir o actualizar imagen"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                        lineNumber: 227,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        className: "text-[10px] text-slate-400",
+                                        children: "PNG, JPG o WEBP (Máx. 2MB)"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                        lineNumber: 228,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                lineNumber: 222,
+                                columnNumber: 13
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                        lineNumber: 189,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "grid grid-cols-2 gap-3",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                        htmlFor: `${formId}-sku`,
+                                        className: "block text-xs font-semibold text-slate-600 mb-1",
+                                        children: "Código / SKU *"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                        lineNumber: 236,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                        id: `${formId}-sku`,
+                                        type: "text",
+                                        value: sku,
+                                        onChange: (e)=>setSku(e.target.value),
+                                        className: "w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs font-mono font-medium focus:outline-none focus:border-sky-500 shadow-2xs uppercase",
+                                        required: true
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                        lineNumber: 242,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                lineNumber: 235,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                        htmlFor: `${formId}-barcode`,
+                                        className: "block text-xs font-semibold text-slate-600 mb-1",
+                                        children: "Código de Barras (EAN/UPC)"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                        lineNumber: 253,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                        id: `${formId}-barcode`,
+                                        type: "text",
+                                        value: barcode,
+                                        onChange: (e)=>setBarcode(e.target.value),
+                                        placeholder: "Opcional / Lector",
+                                        className: "w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs font-mono font-medium focus:outline-none focus:border-sky-500 shadow-2xs"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                        lineNumber: 259,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                lineNumber: 252,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                        lineNumber: 234,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "grid grid-cols-2 gap-3",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                        htmlFor: `${formId}-name`,
+                                        className: "block text-xs font-semibold text-slate-600 mb-1",
+                                        children: "Nombre del Producto *"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                        lineNumber: 273,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                        id: `${formId}-name`,
+                                        type: "text",
+                                        value: name,
+                                        onChange: (e)=>setName(e.target.value),
+                                        className: "w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:border-sky-500 shadow-2xs",
+                                        required: true
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                        lineNumber: 279,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                lineNumber: 272,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                        htmlFor: `${formId}-category`,
+                                        className: "block text-xs font-semibold text-slate-600 mb-1",
+                                        children: "Categoría *"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                        lineNumber: 290,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                        id: `${formId}-category`,
+                                        value: category,
+                                        onChange: (e)=>setCategory(e.target.value),
+                                        className: "w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-700 focus:outline-none focus:border-sky-500 shadow-2xs cursor-pointer",
+                                        children: CATEGORIES.map((cat)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                value: cat,
+                                                children: cat
+                                            }, cat, false, {
+                                                fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                                lineNumber: 303,
+                                                columnNumber: 17
+                                            }, this))
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                        lineNumber: 296,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                lineNumber: 289,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                        lineNumber: 271,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "grid grid-cols-2 gap-3",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                        htmlFor: `${formId}-brand`,
+                                        className: "block text-xs font-semibold text-slate-600 mb-1",
+                                        children: "Marca / Fabricante *"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                        lineNumber: 314,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                        id: `${formId}-brand`,
+                                        type: "text",
+                                        value: brand,
+                                        onChange: (e)=>setBrand(e.target.value),
+                                        className: "w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:border-sky-500 shadow-2xs",
+                                        required: true
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                        lineNumber: 320,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                lineNumber: 313,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                        htmlFor: `${formId}-desc`,
+                                        className: "block text-xs font-semibold text-slate-600 mb-1",
+                                        children: "Descripción *"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                        lineNumber: 331,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                        id: `${formId}-desc`,
+                                        type: "text",
+                                        value: description,
+                                        onChange: (e)=>setDescription(e.target.value),
+                                        className: "w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:border-sky-500 shadow-2xs",
+                                        required: true
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                        lineNumber: 337,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                lineNumber: 330,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                        lineNumber: 312,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "grid grid-cols-2 gap-3",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                        htmlFor: `${formId}-cost`,
+                                        className: "block text-xs font-semibold text-slate-600 mb-1",
+                                        children: "Costo Unitario ($) *"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                        lineNumber: 351,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                        id: `${formId}-cost`,
+                                        type: "number",
+                                        step: "0.01",
+                                        min: "0",
+                                        value: cost,
+                                        onChange: (e)=>setCost(e.target.value === "" ? "" : parseFloat(e.target.value)),
+                                        className: "w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs font-mono font-medium focus:outline-none focus:border-sky-500 shadow-2xs",
+                                        required: true
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                        lineNumber: 357,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                lineNumber: 350,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                        htmlFor: `${formId}-price`,
+                                        className: "block text-xs font-semibold text-slate-600 mb-1",
+                                        children: "Precio de Venta ($) *"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                        lineNumber: 372,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                        id: `${formId}-price`,
+                                        type: "number",
+                                        step: "0.01",
+                                        min: "0",
+                                        value: price,
+                                        onChange: (e)=>setPrice(e.target.value === "" ? "" : parseFloat(e.target.value)),
+                                        className: "w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-800 focus:outline-none focus:border-sky-500 shadow-2xs",
+                                        required: true
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                        lineNumber: 378,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                lineNumber: 371,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                        lineNumber: 349,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                className: "block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2",
+                                children: "Existencias por Sucursal"
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                lineNumber: 395,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "grid grid-cols-3 gap-2",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "p-2 bg-slate-50 border border-slate-200 rounded-xl",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "block text-[10px] text-slate-400 font-semibold mb-1",
+                                                children: "Santa Ana"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                                lineNumber: 400,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                type: "number",
+                                                min: "0",
+                                                value: stockSantaAna,
+                                                onChange: (e)=>setStockSantaAna(e.target.value === "" ? "" : parseInt(e.target.value, 10)),
+                                                className: "w-full h-8 px-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-800 focus:outline-none focus:border-sky-500"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                                lineNumber: 403,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                        lineNumber: 399,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "p-2 bg-slate-50 border border-slate-200 rounded-xl",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "block text-[10px] text-slate-400 font-semibold mb-1",
+                                                children: "Ahuachapán"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                                lineNumber: 415,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                type: "number",
+                                                min: "0",
+                                                value: stockAhuachapan,
+                                                onChange: (e)=>setStockAhuachapan(e.target.value === "" ? "" : parseInt(e.target.value, 10)),
+                                                className: "w-full h-8 px-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-800 focus:outline-none focus:border-sky-500"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                                lineNumber: 418,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                        lineNumber: 414,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                        className: "p-2 bg-slate-50 border border-slate-200 rounded-xl",
+                                        children: [
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "block text-[10px] text-slate-400 font-semibold mb-1",
+                                                children: "Sonsonate"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                                lineNumber: 430,
+                                                columnNumber: 15
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                type: "number",
+                                                min: "0",
+                                                value: stockSonsonate,
+                                                onChange: (e)=>setStockSonsonate(e.target.value === "" ? "" : parseInt(e.target.value, 10)),
+                                                className: "w-full h-8 px-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-800 focus:outline-none focus:border-sky-500"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                                lineNumber: 433,
+                                                columnNumber: 15
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                        lineNumber: 429,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                lineNumber: 398,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                        lineNumber: 394,
+                        columnNumber: 9
+                    }, this),
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "pt-3 border-t border-slate-100 flex items-center justify-end gap-2",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                type: "button",
+                                onClick: onClose,
+                                className: "px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer",
+                                children: "Cancelar"
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                lineNumber: 448,
+                                columnNumber: 11
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                type: "submit",
+                                className: "flex items-center gap-1.5 px-4 py-2 bg-[#0284C7] hover:bg-sky-700 text-white text-xs font-bold rounded-xl shadow-2xs transition-colors cursor-pointer",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$check$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Check$3e$__["Check"], {
+                                        className: "w-3.5 h-3.5"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                        lineNumber: 459,
+                                        columnNumber: 13
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        children: "Guardar Cambios"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                        lineNumber: 460,
+                                        columnNumber: 13
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/EditarProductoModal.tsx",
+                                lineNumber: 455,
+                                columnNumber: 11
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/components/EditarProductoModal.tsx",
+                        lineNumber: 447,
+                        columnNumber: 9
+                    }, this)
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/components/EditarProductoModal.tsx",
+                lineNumber: 180,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/src/components/EditarProductoModal.tsx",
+        lineNumber: 153,
+        columnNumber: 5
+    }, this);
+}
+_s(EditProductFormContent, "tuiAqISB1sXkNmF+nN5246GV6GM=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useId"]
+    ];
+});
+_c = EditProductFormContent;
+function EditProductModal({ isOpen, onClose, product, onSave }) {
+    if (!isOpen || !product) return null;
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+        className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4 select-none animate-in fade-in duration-150",
+        onClick: onClose,
+        role: "dialog",
+        "aria-modal": "true",
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(EditProductFormContent, {
+            product: product,
+            onClose: onClose,
+            onSave: onSave
+        }, product.id, false, {
             fileName: "[project]/src/components/EditarProductoModal.tsx",
-            lineNumber: 155,
+            lineNumber: 484,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/components/EditarProductoModal.tsx",
-        lineNumber: 154,
+        lineNumber: 478,
         columnNumber: 5
     }, this);
 }
-_s(EditProductModal, "Cq/1Wr4UkKdIU70FvjC4GZHrrEY=");
-_c = EditProductModal;
-var _c;
-__turbopack_context__.k.register(_c, "EditProductModal");
+_c1 = EditProductModal;
+var _c, _c1;
+__turbopack_context__.k.register(_c, "EditProductFormContent");
+__turbopack_context__.k.register(_c1, "EditProductModal");
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
 }
@@ -3654,162 +3791,270 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$shield$2d$check$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ShieldCheck$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/shield-check.mjs [app-client] (ecmascript) <export default as ShieldCheck>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$check$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Check$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/check.mjs [app-client] (ecmascript) <export default as Check>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$alert$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__AlertCircle$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/circle-alert.mjs [app-client] (ecmascript) <export default as AlertCircle>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$loader$2d$circle$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Loader2$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/loader-circle.mjs [app-client] (ecmascript) <export default as Loader2>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/supabaseClient.ts [app-client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature();
 "use client";
 ;
 ;
-const INITIAL_USERS = [
+;
+const ROLE_OPTIONS = [
     {
-        id: "u1",
-        username: "maria.g",
-        fullName: "Maria G.",
-        email: "maria.g@mariosdent.com",
-        role: "cashier",
-        branch: "Santa Ana"
+        value: "cashier",
+        label: "Cajero (Solo su sucursal)"
     },
     {
-        id: "u2",
-        username: "carlos.m",
-        fullName: "Carlos M.",
-        email: "carlos.m@mariosdent.com",
-        role: "cashier",
-        branch: "Ahuachapán"
-    },
-    {
-        id: "u3",
-        username: "manuel.r",
-        fullName: "Manuel R.",
-        email: "manuel.r@mariosdent.com",
-        role: "cashier",
-        branch: "Sonsonate"
+        value: "admin",
+        label: "Administrador (Total)"
     }
 ];
 function UserManagementModal({ isOpen, onClose }) {
     _s();
-    const [users, setUsers] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(INITIAL_USERS);
+    const [users, setUsers] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [branches, setBranches] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [isLoading, setIsLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [isSaving, setIsSaving] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [isFormOpen, setIsFormOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [editingUserId, setEditingUserId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
-    // Form states
+    // Estados del formulario
     const [fullName, setFullName] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
     const [username, setUsername] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
-    const [email, setEmail] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
     const [role, setRole] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("cashier");
-    const [branch, setBranch] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("Santa Ana");
+    const [branchId, setBranchId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
     const [password, setPassword] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
     const [error, setError] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const modalId = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useId"])();
+    // 1. Cargar usuarios y sucursales directamente desde Supabase
+    const fetchData = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
+        "UserManagementModal.useCallback[fetchData]": async ()=>{
+            try {
+                // Obtener sedes operativas
+                const { data: branchData, error: branchErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id, name").order("name");
+                if (branchErr) throw branchErr;
+                setBranches(branchData || []);
+                if (branchData && branchData.length > 0 && !branchId) {
+                    setBranchId(branchData[0].id);
+                }
+                // Obtener perfiles de usuarios con sucursal relacionada
+                const { data: profilesData, error: profilesErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("profiles").select(`
+          id,
+          username,
+          full_name,
+          role,
+          branch_id,
+          branches (
+            id,
+            name
+          )
+        `).order("created_at", {
+                    ascending: false
+                });
+                if (profilesErr) throw profilesErr;
+                const formatted = (profilesData || []).map({
+                    "UserManagementModal.useCallback[fetchData].formatted": (p)=>{
+                        const branchRecord = Array.isArray(p.branches) ? p.branches[0] : p.branches;
+                        return {
+                            id: p.id,
+                            username: p.username,
+                            fullName: p.full_name,
+                            role: p.role,
+                            branchId: p.branch_id,
+                            branchName: branchRecord?.name || "Sin Asignar"
+                        };
+                    }
+                }["UserManagementModal.useCallback[fetchData].formatted"]);
+                setUsers(formatted);
+            } catch (err) {
+                const msg = err instanceof Error ? err.message : "Error al conectar con la base de datos";
+                setError(msg);
+            } finally{
+                setIsLoading(false);
+            }
+        }
+    }["UserManagementModal.useCallback[fetchData]"], [
+        branchId
+    ]);
+    // Cargar datos al abrir de manera asíncrona segura
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "UserManagementModal.useEffect": ()=>{
+            if (!isOpen) return;
+            let isMounted = true;
+            const loadAsync = {
+                "UserManagementModal.useEffect.loadAsync": async ()=>{
+                    setIsLoading(true);
+                    setError(null);
+                    await fetchData();
+                }
+            }["UserManagementModal.useEffect.loadAsync"];
+            if (isMounted) {
+                loadAsync();
+            }
+            return ({
+                "UserManagementModal.useEffect": ()=>{
+                    isMounted = false;
+                }
+            })["UserManagementModal.useEffect"];
+        }
+    }["UserManagementModal.useEffect"], [
+        isOpen,
+        fetchData
+    ]);
     if (!isOpen) return null;
-    const handleOpenCreate = ()=>{
+    const resetForm = ()=>{
         setEditingUserId(null);
         setFullName("");
         setUsername("");
-        setEmail("");
         setRole("cashier");
-        setBranch("Santa Ana");
+        if (branches.length > 0) setBranchId(branches[0].id);
         setPassword("");
         setError(null);
+    };
+    const handleOpenCreate = ()=>{
+        resetForm();
         setIsFormOpen(true);
     };
     const handleOpenEdit = (user)=>{
         setEditingUserId(user.id);
         setFullName(user.fullName);
         setUsername(user.username);
-        setEmail(user.email);
         setRole(user.role);
-        setBranch(user.branch);
+        setBranchId(user.branchId);
         setPassword("");
         setError(null);
         setIsFormOpen(true);
     };
-    const handleDelete = (id, name)=>{
-        if (confirm(`¿Eliminar definitivamente el usuario de ${name}?`)) {
-            setUsers((prev)=>prev.filter((u)=>u.id !== id));
-        }
+    const handleCloseForm = ()=>{
+        resetForm();
+        setIsFormOpen(false);
     };
-    const handleSave = (e)=>{
+    // 2. Guardar: creación vía API / Admin Auth o actualización en profiles
+    const handleSave = async (e)=>{
         e.preventDefault();
-        if (!fullName.trim() || !username.trim()) {
-            setError("El nombre y nombre de usuario son requeridos.");
+        const cleanFullName = fullName.trim();
+        const cleanUsername = username.trim().toLowerCase();
+        if (!cleanFullName || !cleanUsername) {
+            setError("El nombre completo y el usuario para login son obligatorios.");
             return;
         }
-        if (editingUserId) {
-            setUsers((prev)=>prev.map((u)=>u.id === editingUserId ? {
-                        ...u,
-                        fullName: fullName.trim(),
-                        username: username.trim().toLowerCase(),
-                        email: email.trim() || `${username.trim().toLowerCase()}@mariosdent.com`,
-                        role,
-                        branch
-                    } : u));
-        } else {
-            const newUser = {
-                id: crypto.randomUUID(),
-                fullName: fullName.trim(),
-                username: username.trim().toLowerCase(),
-                email: email.trim() || `${username.trim().toLowerCase()}@mariosdent.com`,
-                role,
-                branch
-            };
-            setUsers((prev)=>[
-                    ...prev,
-                    newUser
-                ]);
+        if (!branchId) {
+            setError("Debes seleccionar una sucursal.");
+            return;
         }
-        setIsFormOpen(false);
+        setIsSaving(true);
+        setError(null);
+        try {
+            if (editingUserId) {
+                // Actualización de registro existente en profiles
+                const { error: updateErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("profiles").update({
+                    full_name: cleanFullName,
+                    username: cleanUsername,
+                    role,
+                    branch_id: branchId
+                }).eq("id", editingUserId);
+                if (updateErr) throw updateErr;
+            } else {
+                // Creación mediante endpoint administrativo seguro para auth.users
+                if (!password || password.length < 6) {
+                    throw new Error("La contraseña inicial debe tener al menos 6 caracteres.");
+                }
+                const res = await fetch("/api/admin/users", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        fullName: cleanFullName,
+                        username: cleanUsername,
+                        branchId,
+                        role,
+                        password
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    throw new Error(data.error || "No se pudo registrar el usuario en Supabase Auth.");
+                }
+            }
+            await fetchData();
+            handleCloseForm();
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : "Error al procesar el usuario";
+            setError(msg);
+        } finally{
+            setIsSaving(false);
+        }
+    };
+    // 3. Eliminar usuario de la base de datos
+    const handleDelete = async (id, name)=>{
+        if (!confirm(`¿Eliminar definitivamente el usuario de ${name}?`)) return;
+        try {
+            const { error: delErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("profiles").delete().eq("id", id);
+            if (delErr) throw delErr;
+            setUsers((prev)=>prev.filter((u)=>u.id !== id));
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : "Error al eliminar el usuario";
+            alert(msg);
+        }
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4 select-none animate-in fade-in duration-150",
+        onClick: (e)=>e.target === e.currentTarget && onClose(),
+        role: "dialog",
+        "aria-modal": "true",
+        "aria-labelledby": `${modalId}-title`,
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "bg-white border border-slate-200 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]",
+            className: "bg-white border border-slate-200 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-150",
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50",
+                    className: "px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "flex items-center gap-2.5",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center",
+                                    className: "w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center shrink-0",
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$users$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Users$3e$__["Users"], {
                                         className: "w-4 h-4"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                        lineNumber: 148,
+                                        lineNumber: 281,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                    lineNumber: 147,
+                                    lineNumber: 280,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                            id: `${modalId}-title`,
                                             className: "text-sm font-bold text-slate-800",
                                             children: "Gestión de Personal & Accesos"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                            lineNumber: 151,
+                                            lineNumber: 284,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                             className: "text-[11px] text-slate-400",
-                                            children: "Asignación de sucursales fijas y credenciales"
+                                            children: "Sincronización de credenciales y sedes fijas (Supabase Auth)"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                            lineNumber: 154,
+                                            lineNumber: 287,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                    lineNumber: 150,
+                                    lineNumber: 283,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                            lineNumber: 146,
+                            lineNumber: 279,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3824,563 +4069,600 @@ function UserManagementModal({ isOpen, onClose }) {
                                             className: "w-3.5 h-3.5"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                            lineNumber: 167,
+                                            lineNumber: 300,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                             children: "Nuevo Usuario"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                            lineNumber: 168,
+                                            lineNumber: 301,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                    lineNumber: 162,
+                                    lineNumber: 295,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                     type: "button",
                                     onClick: onClose,
                                     className: "p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer",
+                                    title: "Cerrar modal",
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$x$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__X$3e$__["X"], {
                                         className: "w-4 h-4"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                        lineNumber: 176,
+                                        lineNumber: 310,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                    lineNumber: 171,
+                                    lineNumber: 304,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                            lineNumber: 160,
+                            lineNumber: 293,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                    lineNumber: 145,
+                    lineNumber: 278,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "p-6 overflow-y-auto",
-                    children: isFormOpen ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
-                        onSubmit: handleSave,
-                        className: "space-y-4",
-                        children: [
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
-                                className: "text-xs font-bold text-slate-700 uppercase tracking-wider",
-                                children: editingUserId ? "Modificar Usuario" : "Registrar Nuevo Cajero / Usuario"
-                            }, void 0, false, {
-                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                lineNumber: 185,
-                                columnNumber: 15
-                            }, this),
-                            error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "p-2.5 bg-rose-50 border border-rose-200 rounded-xl text-[11px] text-rose-600 font-semibold flex items-center gap-2",
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$alert$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__AlertCircle$3e$__["AlertCircle"], {
-                                        className: "w-3.5 h-3.5"
-                                    }, void 0, false, {
-                                        fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                        lineNumber: 191,
-                                        columnNumber: 19
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                        children: error
-                                    }, void 0, false, {
-                                        fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                        lineNumber: 192,
-                                        columnNumber: 19
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                lineNumber: 190,
-                                columnNumber: 17
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "grid grid-cols-2 gap-3",
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                className: "block text-[11px] font-bold text-slate-500 uppercase mb-1",
-                                                children: "Nombre Completo"
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                lineNumber: 198,
-                                                columnNumber: 19
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                                type: "text",
-                                                required: true,
-                                                value: fullName,
-                                                onChange: (e)=>setFullName(e.target.value),
-                                                placeholder: "Ej. Maria Gonzalez",
-                                                className: "w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-sky-500"
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                lineNumber: 201,
-                                                columnNumber: 19
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                        lineNumber: 197,
-                                        columnNumber: 17
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                className: "block text-[11px] font-bold text-slate-500 uppercase mb-1",
-                                                children: "Usuario para Login"
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                lineNumber: 212,
-                                                columnNumber: 19
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                                type: "text",
-                                                required: true,
-                                                value: username,
-                                                onChange: (e)=>setUsername(e.target.value),
-                                                placeholder: "Ej. maria.g",
-                                                className: "w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-sky-500"
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                lineNumber: 215,
-                                                columnNumber: 19
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                        lineNumber: 211,
-                                        columnNumber: 17
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                lineNumber: 196,
-                                columnNumber: 15
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "grid grid-cols-2 gap-3",
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                className: "block text-[11px] font-bold text-slate-500 uppercase mb-1",
-                                                children: "Sucursal Asignada (Fija)"
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                lineNumber: 228,
-                                                columnNumber: 19
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
-                                                value: branch,
-                                                onChange: (e)=>setBranch(e.target.value),
-                                                className: "w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:bg-white focus:outline-none focus:border-sky-500 cursor-pointer",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                        value: "Santa Ana",
-                                                        children: "Santa Ana"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                        lineNumber: 236,
-                                                        columnNumber: 21
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                        value: "Ahuachapán",
-                                                        children: "Ahuachapán"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                        lineNumber: 237,
-                                                        columnNumber: 21
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                        value: "Sonsonate",
-                                                        children: "Sonsonate"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                        lineNumber: 238,
-                                                        columnNumber: 21
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                lineNumber: 231,
-                                                columnNumber: 19
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                        lineNumber: 227,
-                                        columnNumber: 17
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                className: "block text-[11px] font-bold text-slate-500 uppercase mb-1",
-                                                children: "Rol"
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                lineNumber: 243,
-                                                columnNumber: 19
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
-                                                value: role,
-                                                onChange: (e)=>setRole(e.target.value),
-                                                className: "w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:bg-white focus:outline-none focus:border-sky-500 cursor-pointer",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                        value: "cashier",
-                                                        children: "Cajero (Solo su sucursal)"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                        lineNumber: 251,
-                                                        columnNumber: 21
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                        value: "admin",
-                                                        children: "Administrador (Total)"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                        lineNumber: 252,
-                                                        columnNumber: 21
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                lineNumber: 246,
-                                                columnNumber: 19
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                        lineNumber: 242,
-                                        columnNumber: 17
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                lineNumber: 226,
-                                columnNumber: 15
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                        className: "block text-[11px] font-bold text-slate-500 uppercase mb-1",
-                                        children: [
-                                            "Contraseña ",
-                                            editingUserId && "(Dejar en blanco para no cambiar)"
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                        lineNumber: 258,
-                                        columnNumber: 17
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
-                                        type: "password",
-                                        value: password,
-                                        onChange: (e)=>setPassword(e.target.value),
-                                        placeholder: "••••••••",
-                                        className: "w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-sky-500"
-                                    }, void 0, false, {
-                                        fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                        lineNumber: 261,
-                                        columnNumber: 17
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                lineNumber: 257,
-                                columnNumber: 15
-                            }, this),
-                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "flex items-center justify-end gap-2 pt-3 border-t border-slate-100",
-                                children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                        type: "button",
-                                        onClick: ()=>setIsFormOpen(false),
-                                        className: "px-3.5 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer",
-                                        children: "Cancelar"
-                                    }, void 0, false, {
-                                        fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                        lineNumber: 271,
-                                        columnNumber: 17
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                        type: "submit",
-                                        className: "flex items-center gap-1 px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs transition-colors cursor-pointer",
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$check$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Check$3e$__["Check"], {
-                                                className: "w-3.5 h-3.5"
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                lineNumber: 282,
-                                                columnNumber: 19
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                children: editingUserId ? "Actualizar Usuario" : "Guardar Usuario"
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                lineNumber: 283,
-                                                columnNumber: 19
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                        lineNumber: 278,
-                                        columnNumber: 17
-                                    }, this)
-                                ]
-                            }, void 0, true, {
-                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                lineNumber: 270,
-                                columnNumber: 15
-                            }, this)
-                        ]
-                    }, void 0, true, {
-                        fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                        lineNumber: 184,
-                        columnNumber: 13
-                    }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "space-y-3",
-                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("table", {
-                            className: "w-full text-left text-xs border-collapse",
+                    className: "p-6 overflow-y-auto flex-1",
+                    children: [
+                        error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "p-2.5 mb-4 bg-rose-50 border border-rose-200 rounded-xl text-[11px] text-rose-600 font-semibold flex items-center gap-2",
                             children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("thead", {
-                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
-                                        className: "border-b border-slate-100 text-[10px] font-bold uppercase text-slate-400 bg-slate-50/50",
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
-                                                className: "py-2.5 px-3",
-                                                children: "Usuario / Nombre"
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                lineNumber: 292,
-                                                columnNumber: 21
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
-                                                className: "py-2.5 px-3",
-                                                children: "Sucursal Asignada"
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                lineNumber: 293,
-                                                columnNumber: 21
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
-                                                className: "py-2.5 px-3",
-                                                children: "Rol"
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                lineNumber: 294,
-                                                columnNumber: 21
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
-                                                className: "py-2.5 px-3 text-right",
-                                                children: "Acciones"
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                lineNumber: 295,
-                                                columnNumber: 21
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                        lineNumber: 291,
-                                        columnNumber: 19
-                                    }, this)
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$alert$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__AlertCircle$3e$__["AlertCircle"], {
+                                    className: "w-3.5 h-3.5 shrink-0"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                    lineNumber: 290,
-                                    columnNumber: 17
+                                    lineNumber: 319,
+                                    columnNumber: 15
                                 }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
-                                    className: "divide-y divide-slate-100 text-slate-600 font-medium",
-                                    children: users.map((u)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
-                                            className: "hover:bg-slate-50/80 transition-colors",
-                                            children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                    className: "py-2.5 px-3",
-                                                    children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                            className: "font-bold text-slate-800 text-xs",
-                                                            children: u.fullName
-                                                        }, void 0, false, {
-                                                            fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                            lineNumber: 302,
-                                                            columnNumber: 25
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                            className: "font-mono text-[10px] text-slate-400",
-                                                            children: [
-                                                                "@",
-                                                                u.username
-                                                            ]
-                                                        }, void 0, true, {
-                                                            fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                            lineNumber: 303,
-                                                            columnNumber: 25
-                                                        }, this)
-                                                    ]
-                                                }, void 0, true, {
-                                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                    lineNumber: 301,
-                                                    columnNumber: 23
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                    className: "py-2.5 px-3",
-                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        className: "inline-flex items-center gap-1 font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md text-[11px]",
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$store$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Store$3e$__["Store"], {
-                                                                className: "w-3 h-3 text-sky-600"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                                lineNumber: 307,
-                                                                columnNumber: 27
-                                                            }, this),
-                                                            u.branch
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                        lineNumber: 306,
-                                                        columnNumber: 25
-                                                    }, this)
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                    lineNumber: 305,
-                                                    columnNumber: 23
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                    className: "py-2.5 px-3",
-                                                    children: u.role === "admin" ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        className: "inline-flex items-center gap-1 text-[11px] font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-md",
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$shield$2d$check$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ShieldCheck$3e$__["ShieldCheck"], {
-                                                                className: "w-3 h-3"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                                lineNumber: 314,
-                                                                columnNumber: 29
-                                                            }, this),
-                                                            " Admin"
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                        lineNumber: 313,
-                                                        columnNumber: 27
-                                                    }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        className: "text-[11px] text-slate-600",
-                                                        children: "Cajero"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                        lineNumber: 317,
-                                                        columnNumber: 27
-                                                    }, this)
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                    lineNumber: 311,
-                                                    columnNumber: 23
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                    className: "py-2.5 px-3 text-right",
-                                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "inline-flex items-center gap-1",
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                                type: "button",
-                                                                onClick: ()=>handleOpenEdit(u),
-                                                                className: "p-1.5 text-slate-400 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-colors cursor-pointer",
-                                                                title: "Editar usuario",
-                                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$pencil$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Pencil$3e$__["Pencil"], {
-                                                                    className: "w-3.5 h-3.5"
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                                    lineNumber: 328,
-                                                                    columnNumber: 29
-                                                                }, this)
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                                lineNumber: 322,
-                                                                columnNumber: 27
-                                                            }, this),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                                type: "button",
-                                                                onClick: ()=>handleDelete(u.id, u.fullName),
-                                                                className: "p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer",
-                                                                title: "Eliminar usuario",
-                                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$trash$2d$2$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Trash2$3e$__["Trash2"], {
-                                                                    className: "w-3.5 h-3.5"
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                                    lineNumber: 336,
-                                                                    columnNumber: 29
-                                                                }, this)
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                                lineNumber: 330,
-                                                                columnNumber: 27
-                                                            }, this)
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                        lineNumber: 321,
-                                                        columnNumber: 25
-                                                    }, this)
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                                    lineNumber: 320,
-                                                    columnNumber: 23
-                                                }, this)
-                                            ]
-                                        }, u.id, true, {
-                                            fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                            lineNumber: 300,
-                                            columnNumber: 21
-                                        }, this))
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                    children: error
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                                    lineNumber: 298,
-                                    columnNumber: 17
+                                    lineNumber: 320,
+                                    columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                            lineNumber: 289,
-                            columnNumber: 15
+                            lineNumber: 318,
+                            columnNumber: 13
+                        }, this),
+                        isFormOpen ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
+                            onSubmit: handleSave,
+                            className: "space-y-4",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h4", {
+                                    className: "text-xs font-bold text-slate-700 uppercase tracking-wider",
+                                    children: editingUserId ? "Modificar Usuario" : "Registrar Nuevo Cajero / Usuario"
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                    lineNumber: 326,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "grid grid-cols-2 gap-3",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                    htmlFor: `${modalId}-name`,
+                                                    className: "block text-[11px] font-bold text-slate-500 uppercase mb-1",
+                                                    children: "Nombre Completo *"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                    lineNumber: 332,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                    id: `${modalId}-name`,
+                                                    type: "text",
+                                                    required: true,
+                                                    value: fullName,
+                                                    onChange: (e)=>setFullName(e.target.value),
+                                                    placeholder: "Ej. Maria Gonzalez",
+                                                    className: "w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-sky-500"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                    lineNumber: 338,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                            lineNumber: 331,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                    htmlFor: `${modalId}-user`,
+                                                    className: "block text-[11px] font-bold text-slate-500 uppercase mb-1",
+                                                    children: "Usuario para Login *"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                    lineNumber: 350,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                                    id: `${modalId}-user`,
+                                                    type: "text",
+                                                    required: true,
+                                                    value: username,
+                                                    onChange: (e)=>setUsername(e.target.value),
+                                                    placeholder: "Ej. maria.g",
+                                                    className: "w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-sky-500"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                    lineNumber: 356,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                            lineNumber: 349,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                    lineNumber: 330,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "grid grid-cols-2 gap-3",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                    htmlFor: `${modalId}-branch`,
+                                                    className: "block text-[11px] font-bold text-slate-500 uppercase mb-1",
+                                                    children: "Sucursal Asignada (Fija)"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                    lineNumber: 370,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                                    id: `${modalId}-branch`,
+                                                    value: branchId,
+                                                    onChange: (e)=>setBranchId(e.target.value),
+                                                    className: "w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:bg-white focus:outline-none focus:border-sky-500 cursor-pointer",
+                                                    children: branches.map((b)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                            value: b.id,
+                                                            children: b.name
+                                                        }, b.id, false, {
+                                                            fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                            lineNumber: 383,
+                                                            columnNumber: 23
+                                                        }, this))
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                    lineNumber: 376,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                            lineNumber: 369,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                                    htmlFor: `${modalId}-role`,
+                                                    className: "block text-[11px] font-bold text-slate-500 uppercase mb-1",
+                                                    children: "Rol"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                    lineNumber: 391,
+                                                    columnNumber: 19
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                                    id: `${modalId}-role`,
+                                                    value: role,
+                                                    onChange: (e)=>setRole(e.target.value),
+                                                    className: "w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:bg-white focus:outline-none focus:border-sky-500 cursor-pointer",
+                                                    children: ROLE_OPTIONS.map((r)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                            value: r.value,
+                                                            children: r.label
+                                                        }, r.value, false, {
+                                                            fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                            lineNumber: 404,
+                                                            columnNumber: 23
+                                                        }, this))
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                    lineNumber: 397,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                            lineNumber: 390,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                    lineNumber: 368,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
+                                            htmlFor: `${modalId}-pass`,
+                                            className: "block text-[11px] font-bold text-slate-500 uppercase mb-1",
+                                            children: [
+                                                "Contraseña ",
+                                                editingUserId && "(Dejar en blanco para no cambiar)"
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                            lineNumber: 413,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
+                                            id: `${modalId}-pass`,
+                                            type: "password",
+                                            value: password,
+                                            onChange: (e)=>setPassword(e.target.value),
+                                            placeholder: "••••••••",
+                                            className: "w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium focus:bg-white focus:outline-none focus:border-sky-500"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                            lineNumber: 419,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                    lineNumber: 412,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    className: "flex items-center justify-end gap-2 pt-3 border-t border-slate-100",
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                            type: "button",
+                                            onClick: handleCloseForm,
+                                            disabled: isSaving,
+                                            className: "px-3.5 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer",
+                                            children: "Cancelar"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                            lineNumber: 430,
+                                            columnNumber: 17
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                            type: "submit",
+                                            disabled: isSaving,
+                                            className: "flex items-center gap-1.5 px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-xs transition-colors cursor-pointer",
+                                            children: [
+                                                isSaving ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$loader$2d$circle$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Loader2$3e$__["Loader2"], {
+                                                    className: "w-3.5 h-3.5 animate-spin"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                    lineNumber: 444,
+                                                    columnNumber: 21
+                                                }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$check$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Check$3e$__["Check"], {
+                                                    className: "w-3.5 h-3.5"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                    lineNumber: 446,
+                                                    columnNumber: 21
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    children: editingUserId ? "Actualizar Usuario" : "Guardar Usuario"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                    lineNumber: 448,
+                                                    columnNumber: 19
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                            lineNumber: 438,
+                                            columnNumber: 17
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                    lineNumber: 429,
+                                    columnNumber: 15
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                            lineNumber: 325,
+                            columnNumber: 13
+                        }, this) : isLoading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "py-12 flex flex-col items-center justify-center text-slate-400 gap-2",
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$loader$2d$circle$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Loader2$3e$__["Loader2"], {
+                                    className: "w-6 h-6 animate-spin text-sky-600"
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                    lineNumber: 454,
+                                    columnNumber: 15
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                    className: "text-xs",
+                                    children: "Cargando personal desde la base de datos..."
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                    lineNumber: 455,
+                                    columnNumber: 15
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                            lineNumber: 453,
+                            columnNumber: 13
+                        }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "space-y-3",
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("table", {
+                                className: "w-full text-left text-xs border-collapse",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("thead", {
+                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
+                                            className: "border-b border-slate-100 text-[10px] font-bold uppercase text-slate-400 bg-slate-50/50",
+                                            children: [
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                    className: "py-2.5 px-3",
+                                                    children: "Usuario / Nombre"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                    lineNumber: 462,
+                                                    columnNumber: 21
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                    className: "py-2.5 px-3",
+                                                    children: "Sucursal Asignada"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                    lineNumber: 463,
+                                                    columnNumber: 21
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                    className: "py-2.5 px-3",
+                                                    children: "Rol"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                    lineNumber: 464,
+                                                    columnNumber: 21
+                                                }, this),
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                                    className: "py-2.5 px-3 text-right",
+                                                    children: "Acciones"
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                    lineNumber: 465,
+                                                    columnNumber: 21
+                                                }, this)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                            lineNumber: 461,
+                                            columnNumber: 19
+                                        }, this)
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                        lineNumber: 460,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
+                                        className: "divide-y divide-slate-100 text-slate-600 font-medium",
+                                        children: [
+                                            users.map((u)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
+                                                    className: "hover:bg-slate-50/80 transition-colors",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                            className: "py-2.5 px-3",
+                                                            children: [
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                    className: "font-bold text-slate-800 text-xs",
+                                                                    children: u.fullName
+                                                                }, void 0, false, {
+                                                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                                    lineNumber: 472,
+                                                                    columnNumber: 25
+                                                                }, this),
+                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                                    className: "font-mono text-[10px] text-slate-400",
+                                                                    children: [
+                                                                        "@",
+                                                                        u.username
+                                                                    ]
+                                                                }, void 0, true, {
+                                                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                                    lineNumber: 473,
+                                                                    columnNumber: 25
+                                                                }, this)
+                                                            ]
+                                                        }, void 0, true, {
+                                                            fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                            lineNumber: 471,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                            className: "py-2.5 px-3",
+                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                className: "inline-flex items-center gap-1 font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md text-[11px]",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$store$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Store$3e$__["Store"], {
+                                                                        className: "w-3 h-3 text-sky-600"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                                        lineNumber: 477,
+                                                                        columnNumber: 27
+                                                                    }, this),
+                                                                    u.branchName
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                                lineNumber: 476,
+                                                                columnNumber: 25
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                            lineNumber: 475,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                            className: "py-2.5 px-3",
+                                                            children: u.role === "admin" ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                className: "inline-flex items-center gap-1 text-[11px] font-bold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-md",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$shield$2d$check$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ShieldCheck$3e$__["ShieldCheck"], {
+                                                                        className: "w-3 h-3"
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                                        lineNumber: 484,
+                                                                        columnNumber: 29
+                                                                    }, this),
+                                                                    " Admin"
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                                lineNumber: 483,
+                                                                columnNumber: 27
+                                                            }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                className: "text-[11px] text-slate-600",
+                                                                children: "Cajero"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                                lineNumber: 487,
+                                                                columnNumber: 27
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                            lineNumber: 481,
+                                                            columnNumber: 23
+                                                        }, this),
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                            className: "py-2.5 px-3 text-right",
+                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "inline-flex items-center gap-1",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                        type: "button",
+                                                                        onClick: ()=>handleOpenEdit(u),
+                                                                        className: "p-1.5 text-slate-400 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-colors cursor-pointer",
+                                                                        title: "Editar usuario",
+                                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$pencil$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Pencil$3e$__["Pencil"], {
+                                                                            className: "w-3.5 h-3.5"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                                            lineNumber: 498,
+                                                                            columnNumber: 29
+                                                                        }, this)
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                                        lineNumber: 492,
+                                                                        columnNumber: 27
+                                                                    }, this),
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                        type: "button",
+                                                                        onClick: ()=>handleDelete(u.id, u.fullName),
+                                                                        className: "p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer",
+                                                                        title: "Eliminar usuario",
+                                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$trash$2d$2$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Trash2$3e$__["Trash2"], {
+                                                                            className: "w-3.5 h-3.5"
+                                                                        }, void 0, false, {
+                                                                            fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                                            lineNumber: 506,
+                                                                            columnNumber: 29
+                                                                        }, this)
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                                        lineNumber: 500,
+                                                                        columnNumber: 27
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                                lineNumber: 491,
+                                                                columnNumber: 25
+                                                            }, this)
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                            lineNumber: 490,
+                                                            columnNumber: 23
+                                                        }, this)
+                                                    ]
+                                                }, u.id, true, {
+                                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                    lineNumber: 470,
+                                                    columnNumber: 21
+                                                }, this)),
+                                            users.length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
+                                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                                    colSpan: 4,
+                                                    className: "py-8 text-center text-slate-400 text-xs",
+                                                    children: "No hay personal registrado en la base de datos."
+                                                }, void 0, false, {
+                                                    fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                    lineNumber: 514,
+                                                    columnNumber: 23
+                                                }, this)
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                                lineNumber: 513,
+                                                columnNumber: 21
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
+                                        fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                        lineNumber: 468,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                                lineNumber: 459,
+                                columnNumber: 15
+                            }, this)
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/GestionUsuariosModal.tsx",
+                            lineNumber: 458,
+                            columnNumber: 13
                         }, this)
-                    }, void 0, false, {
-                        fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                        lineNumber: 288,
-                        columnNumber: 13
-                    }, this)
-                }, void 0, false, {
+                    ]
+                }, void 0, true, {
                     fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-                    lineNumber: 182,
+                    lineNumber: 316,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-            lineNumber: 143,
+            lineNumber: 276,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/components/GestionUsuariosModal.tsx",
-        lineNumber: 142,
+        lineNumber: 269,
         columnNumber: 5
     }, this);
 }
-_s(UserManagementModal, "6ceLetwaxs8uOgyrOl2cokUsGR0=");
+_s(UserManagementModal, "egiJY6dINQR+iItBi7sbkyv3HWs=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useId"]
+    ];
+});
 _c = UserManagementModal;
 var _c;
 __turbopack_context__.k.register(_c, "UserManagementModal");
@@ -4485,56 +4767,53 @@ const MOCK_HISTORY = [
 ];
 function ProductHistoryModal({ isOpen, onClose, currentBranch = "Santa Ana", product }) {
     _s();
-    const isGlobalView = currentBranch === "ALL";
-    // Si la tabla ya estaba en ALL, inicia marcado; si estaba en una tienda, inicia desmarcado
-    const [showAllBranches, setShowAllBranches] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(isGlobalView);
-    // Sincronizar estado cuando cambia el prop o se abre el modal
-    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
-        "ProductHistoryModal.useEffect": ()=>{
-            if (isOpen) {
-                setShowAllBranches(currentBranch === "ALL");
-            }
-        }
-    }["ProductHistoryModal.useEffect"], [
-        isOpen,
-        currentBranch
-    ]);
+    const isGlobalBranch = currentBranch === "ALL" || currentBranch === "Todas las sedes";
+    // Estado para el checkbox interactivo
+    const [showAllOverride, setShowAllOverride] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    // Derivación directa sin useEffect ni renders en cascada
+    const isViewingAll = isGlobalBranch || showAllOverride;
     const filteredHistory = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
         "ProductHistoryModal.useMemo[filteredHistory]": ()=>{
-            if (showAllBranches || isGlobalView) return MOCK_HISTORY;
+            if (isViewingAll) return MOCK_HISTORY;
             return MOCK_HISTORY.filter({
                 "ProductHistoryModal.useMemo[filteredHistory]": (item)=>item.branch.toLowerCase().includes(currentBranch.toLowerCase())
             }["ProductHistoryModal.useMemo[filteredHistory]"]);
         }
     }["ProductHistoryModal.useMemo[filteredHistory]"], [
-        showAllBranches,
-        isGlobalView,
+        isViewingAll,
         currentBranch
     ]);
     if (!isOpen || !product) return null;
+    const handleClose = ()=>{
+        setShowAllOverride(false);
+        onClose();
+    };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4 select-none animate-in fade-in duration-150",
+        onClick: (e)=>e.target === e.currentTarget && handleClose(),
+        role: "dialog",
+        "aria-modal": "true",
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "bg-white border border-slate-200 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col",
+            className: "bg-white border border-slate-200 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-150",
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50",
+                    className: "flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50 shrink-0",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "flex items-center gap-3",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center",
+                                    className: "w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0",
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$rotate$2d$ccw$2d$clock$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__History$3e$__["History"], {
                                         className: "w-5 h-5"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                        lineNumber: 145,
+                                        lineNumber: 151,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                    lineNumber: 144,
+                                    lineNumber: 150,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -4543,11 +4822,11 @@ function ProductHistoryModal({ isOpen, onClose, currentBranch = "Santa Ana", pro
                                             className: "flex items-center gap-2",
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                                    className: "text-sm font-bold text-slate-800",
+                                                    className: "text-sm font-bold text-slate-800 leading-tight",
                                                     children: "Kardex y Trazabilidad de Stock"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                                    lineNumber: 149,
+                                                    lineNumber: 155,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4555,13 +4834,13 @@ function ProductHistoryModal({ isOpen, onClose, currentBranch = "Santa Ana", pro
                                                     children: product.sku
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                                    lineNumber: 152,
+                                                    lineNumber: 158,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                            lineNumber: 148,
+                                            lineNumber: 154,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -4575,60 +4854,61 @@ function ProductHistoryModal({ isOpen, onClose, currentBranch = "Santa Ana", pro
                                                     children: product.brand
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                                    lineNumber: 158,
+                                                    lineNumber: 164,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                            lineNumber: 156,
+                                            lineNumber: 162,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                    lineNumber: 147,
+                                    lineNumber: 153,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                            lineNumber: 143,
+                            lineNumber: 149,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                             type: "button",
-                            onClick: onClose,
+                            onClick: handleClose,
                             className: "p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer",
+                            title: "Cerrar modal",
                             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$x$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__X$3e$__["X"], {
                                 className: "w-4 h-4"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                lineNumber: 170,
+                                lineNumber: 177,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                            lineNumber: 165,
+                            lineNumber: 171,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                    lineNumber: 142,
+                    lineNumber: 148,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "px-6 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between",
+                    className: "px-6 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between shrink-0",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "flex items-center gap-2 text-xs text-slate-600",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$store$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Store$3e$__["Store"], {
-                                    className: "w-3.5 h-3.5 text-sky-600"
+                                    className: "w-3.5 h-3.5 text-sky-600 shrink-0"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                    lineNumber: 177,
+                                    lineNumber: 184,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4637,51 +4917,51 @@ function ProductHistoryModal({ isOpen, onClose, currentBranch = "Santa Ana", pro
                                         " ",
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
                                             className: "text-slate-800",
-                                            children: isGlobalView || showAllBranches ? "Toda la Red (Consolidado)" : currentBranch
+                                            children: isViewingAll ? "Toda la Red (Consolidado)" : currentBranch
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                            lineNumber: 180,
+                                            lineNumber: 187,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                    lineNumber: 178,
+                                    lineNumber: 185,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                            lineNumber: 176,
+                            lineNumber: 183,
                             columnNumber: 11
                         }, this),
-                        isGlobalView ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                        isGlobalBranch ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                             className: "inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-sky-50 text-sky-700 border border-sky-200",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$earth$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Globe2$3e$__["Globe2"], {
                                     className: "w-3.5 h-3.5"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                    lineNumber: 191,
+                                    lineNumber: 195,
                                     columnNumber: 15
                                 }, this),
                                 "Vista Global Automática"
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                            lineNumber: 190,
+                            lineNumber: 194,
                             columnNumber: 13
                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
                             className: "flex items-center gap-2 cursor-pointer bg-white border border-slate-300 hover:border-sky-400 px-3 py-1.5 rounded-xl shadow-2xs transition-all",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
                                     type: "checkbox",
-                                    checked: showAllBranches,
-                                    onChange: (e)=>setShowAllBranches(e.target.checked),
+                                    checked: showAllOverride,
+                                    onChange: (e)=>setShowAllOverride(e.target.checked),
                                     className: "w-4 h-4 rounded text-sky-600 border-slate-300 focus:ring-0 cursor-pointer"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                    lineNumber: 196,
+                                    lineNumber: 200,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4691,30 +4971,30 @@ function ProductHistoryModal({ isOpen, onClose, currentBranch = "Santa Ana", pro
                                             className: "w-3.5 h-3.5 text-sky-600"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                            lineNumber: 203,
+                                            lineNumber: 207,
                                             columnNumber: 17
                                         }, this),
                                         "Ver todas las sucursales"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                    lineNumber: 202,
+                                    lineNumber: 206,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                            lineNumber: 195,
+                            lineNumber: 199,
                             columnNumber: 13
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                    lineNumber: 175,
+                    lineNumber: 182,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "p-4 max-h-[50vh] overflow-y-auto",
+                    className: "p-4 overflow-y-auto flex-1",
                     children: filteredHistory.length > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("table", {
                         className: "w-full text-left text-xs border-collapse",
                         children: [
@@ -4727,7 +5007,7 @@ function ProductHistoryModal({ isOpen, onClose, currentBranch = "Santa Ana", pro
                                             children: "Fecha y Hora"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                            lineNumber: 216,
+                                            lineNumber: 220,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -4735,7 +5015,7 @@ function ProductHistoryModal({ isOpen, onClose, currentBranch = "Santa Ana", pro
                                             children: "Operación"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                            lineNumber: 217,
+                                            lineNumber: 221,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -4743,7 +5023,7 @@ function ProductHistoryModal({ isOpen, onClose, currentBranch = "Santa Ana", pro
                                             children: "Sede / Responsable"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                            lineNumber: 218,
+                                            lineNumber: 222,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -4751,7 +5031,7 @@ function ProductHistoryModal({ isOpen, onClose, currentBranch = "Santa Ana", pro
                                             children: "Cantidad"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                            lineNumber: 219,
+                                            lineNumber: 223,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -4759,7 +5039,7 @@ function ProductHistoryModal({ isOpen, onClose, currentBranch = "Santa Ana", pro
                                             children: "Saldo"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                            lineNumber: 220,
+                                            lineNumber: 224,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -4767,31 +5047,31 @@ function ProductHistoryModal({ isOpen, onClose, currentBranch = "Santa Ana", pro
                                             children: "Comprobante / Detalle"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                            lineNumber: 221,
+                                            lineNumber: 225,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                    lineNumber: 215,
+                                    lineNumber: 219,
                                     columnNumber: 17
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                lineNumber: 214,
+                                lineNumber: 218,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
-                                className: "divide-y divide-slate-100 text-slate-600",
+                                className: "divide-y divide-slate-100 text-slate-600 font-medium",
                                 children: filteredHistory.map((row)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
                                         className: "hover:bg-slate-50/80 transition-colors",
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                className: "py-2.5 px-3 font-mono text-[11px] text-slate-400",
+                                                className: "py-2.5 px-3 font-mono text-[11px] text-slate-400 whitespace-nowrap",
                                                 children: row.date
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                                lineNumber: 230,
+                                                lineNumber: 234,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -4804,14 +5084,14 @@ function ProductHistoryModal({ isOpen, onClose, currentBranch = "Santa Ana", pro
                                                                 className: "w-3 h-3"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                                                lineNumber: 236,
+                                                                lineNumber: 240,
                                                                 columnNumber: 27
                                                             }, this),
                                                             " Venta POS"
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                                        lineNumber: 235,
+                                                        lineNumber: 239,
                                                         columnNumber: 25
                                                     }, this),
                                                     row.type === "TRASLADO" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4821,14 +5101,14 @@ function ProductHistoryModal({ isOpen, onClose, currentBranch = "Santa Ana", pro
                                                                 className: "w-3 h-3"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                                                lineNumber: 241,
+                                                                lineNumber: 245,
                                                                 columnNumber: 27
                                                             }, this),
                                                             " Traslado"
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                                        lineNumber: 240,
+                                                        lineNumber: 244,
                                                         columnNumber: 25
                                                     }, this),
                                                     row.type === "INGRESO" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4838,14 +5118,14 @@ function ProductHistoryModal({ isOpen, onClose, currentBranch = "Santa Ana", pro
                                                                 className: "w-3 h-3"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                                                lineNumber: 246,
+                                                                lineNumber: 250,
                                                                 columnNumber: 27
                                                             }, this),
                                                             " Ingreso"
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                                        lineNumber: 245,
+                                                        lineNumber: 249,
                                                         columnNumber: 25
                                                     }, this),
                                                     row.type === "AJUSTE" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4855,20 +5135,20 @@ function ProductHistoryModal({ isOpen, onClose, currentBranch = "Santa Ana", pro
                                                                 className: "w-3 h-3"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                                                lineNumber: 251,
+                                                                lineNumber: 255,
                                                                 columnNumber: 27
                                                             }, this),
                                                             " Ajuste"
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                                        lineNumber: 250,
+                                                        lineNumber: 254,
                                                         columnNumber: 25
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                                lineNumber: 233,
+                                                lineNumber: 237,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -4879,7 +5159,7 @@ function ProductHistoryModal({ isOpen, onClose, currentBranch = "Santa Ana", pro
                                                         children: row.branch
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                                        lineNumber: 256,
+                                                        lineNumber: 260,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -4887,13 +5167,13 @@ function ProductHistoryModal({ isOpen, onClose, currentBranch = "Santa Ana", pro
                                                         children: row.user
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                                        lineNumber: 259,
+                                                        lineNumber: 263,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                                lineNumber: 255,
+                                                lineNumber: 259,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -4903,12 +5183,12 @@ function ProductHistoryModal({ isOpen, onClose, currentBranch = "Santa Ana", pro
                                                     children: row.quantity > 0 ? `+${row.quantity}` : row.quantity
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                                    lineNumber: 262,
+                                                    lineNumber: 266,
                                                     columnNumber: 23
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                                lineNumber: 261,
+                                                lineNumber: 265,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -4916,7 +5196,7 @@ function ProductHistoryModal({ isOpen, onClose, currentBranch = "Santa Ana", pro
                                                 children: row.stockAfter
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                                lineNumber: 272,
+                                                lineNumber: 276,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -4924,24 +5204,24 @@ function ProductHistoryModal({ isOpen, onClose, currentBranch = "Santa Ana", pro
                                                 children: row.reference
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                                lineNumber: 275,
+                                                lineNumber: 279,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, row.id, true, {
                                         fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                        lineNumber: 226,
+                                        lineNumber: 230,
                                         columnNumber: 19
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                lineNumber: 224,
+                                lineNumber: 228,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                        lineNumber: 213,
+                        lineNumber: 217,
                         columnNumber: 13
                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                         className: "py-12 text-center text-slate-400 text-xs",
@@ -4952,25 +5232,25 @@ function ProductHistoryModal({ isOpen, onClose, currentBranch = "Santa Ana", pro
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                        lineNumber: 283,
+                        lineNumber: 287,
                         columnNumber: 13
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                    lineNumber: 211,
+                    lineNumber: 215,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "p-3.5 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500",
+                    className: "p-3.5 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 shrink-0",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "flex items-center gap-2",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$shield$2d$alert$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ShieldAlert$3e$__["ShieldAlert"], {
-                                    className: "w-4 h-4 text-sky-600"
+                                    className: "w-4 h-4 text-sky-600 shrink-0"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                    lineNumber: 292,
+                                    lineNumber: 296,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -4978,44 +5258,44 @@ function ProductHistoryModal({ isOpen, onClose, currentBranch = "Santa Ana", pro
                                     children: "Registro de auditoría contable inalterable."
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                                    lineNumber: 293,
+                                    lineNumber: 297,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                            lineNumber: 291,
+                            lineNumber: 295,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                             type: "button",
-                            onClick: onClose,
+                            onClick: handleClose,
                             className: "px-4 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-2xs transition-colors cursor-pointer",
                             children: "Cerrar"
                         }, void 0, false, {
                             fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                            lineNumber: 297,
+                            lineNumber: 301,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/HistorialProductoModal.tsx",
-                    lineNumber: 290,
+                    lineNumber: 294,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/HistorialProductoModal.tsx",
-            lineNumber: 140,
+            lineNumber: 146,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/components/HistorialProductoModal.tsx",
-        lineNumber: 139,
+        lineNumber: 140,
         columnNumber: 5
     }, this);
 }
-_s(ProductHistoryModal, "rbm/GJTx3+rE0bd9atdXkkjrN1U=");
+_s(ProductHistoryModal, "uUoTaNEEFPDZsJnU76PaHLfe2Ac=");
 _c = ProductHistoryModal;
 var _c;
 __turbopack_context__.k.register(_c, "ProductHistoryModal");
@@ -6237,68 +6517,126 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
+const SCOPE_OPTIONS = [
+    {
+        value: "ALL",
+        label: "Todas las sucursales (Consolidado)"
+    },
+    {
+        value: "Santa Ana",
+        label: "Casa Matriz - Santa Ana"
+    },
+    {
+        value: "Ahuachapán",
+        label: "Sucursal Ahuachapán"
+    },
+    {
+        value: "Sonsonate",
+        label: "Sucursal Sonsonate"
+    }
+];
+const FISCAL_YEARS = [
+    "2026",
+    "2025",
+    "2024"
+];
 function HaciendaReportModal({ isOpen, onClose, products }) {
     _s();
     const [selectedYear, setSelectedYear] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("2026");
     const [reportScope, setReportScope] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("ALL");
-    if (!isOpen) return null;
-    // Procesar items según el alcance de sucursal
-    const processedItems = products.map((p)=>{
-        let units = 0;
-        if (reportScope === "ALL") {
-            units = p.branches.reduce((acc, curr)=>acc + curr.stock, 0);
-        } else {
-            units = p.branches.find((b)=>b.branchName === reportScope)?.stock ?? 0;
+    const modalId = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useId"])();
+    // Procesamiento memorizado: solo recalcula si cambia el alcance o la lista de productos
+    const processedItems = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
+        "HaciendaReportModal.useMemo[processedItems]": ()=>{
+            return products.map({
+                "HaciendaReportModal.useMemo[processedItems]": (p)=>{
+                    let units = 0;
+                    if (reportScope === "ALL") {
+                        units = p.branches.reduce({
+                            "HaciendaReportModal.useMemo[processedItems]": (acc, curr)=>acc + curr.stock
+                        }["HaciendaReportModal.useMemo[processedItems]"], 0);
+                    } else {
+                        units = p.branches.find({
+                            "HaciendaReportModal.useMemo[processedItems]": (b)=>b.branchName === reportScope
+                        }["HaciendaReportModal.useMemo[processedItems]"])?.stock ?? 0;
+                    }
+                    return {
+                        sku: p.sku,
+                        name: p.name,
+                        brand: p.brand,
+                        description: p.description || p.description || "Unidad",
+                        units,
+                        cost: p.cost,
+                        price: p.price
+                    };
+                }
+            }["HaciendaReportModal.useMemo[processedItems]"]);
         }
-        return {
-            sku: p.sku,
-            name: p.name,
-            brand: p.brand,
-            description: p.description,
-            units,
-            cost: p.cost,
-            price: p.price
-        };
-    });
-    const totalProductsCount = processedItems.length;
-    const totalPhysicalUnits = processedItems.reduce((acc, curr)=>acc + curr.units, 0);
-    const totalInventoryValuation = processedItems.reduce((acc, curr)=>acc + curr.units * curr.cost, 0);
+    }["HaciendaReportModal.useMemo[processedItems]"], [
+        products,
+        reportScope
+    ]);
+    // Cálculos consolidados memorizados
+    const { totalProductsCount, totalPhysicalUnits, totalInventoryValuation } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
+        "HaciendaReportModal.useMemo": ()=>{
+            let physicalUnits = 0;
+            let totalValuation = 0;
+            for(let i = 0; i < processedItems.length; i++){
+                const item = processedItems[i];
+                physicalUnits += item.units;
+                totalValuation += item.units * item.cost;
+            }
+            return {
+                totalProductsCount: processedItems.length,
+                totalPhysicalUnits: physicalUnits,
+                totalInventoryValuation: totalValuation
+            };
+        }
+    }["HaciendaReportModal.useMemo"], [
+        processedItems
+    ]);
+    if (!isOpen) return null;
     const handleExportCSV = ()=>{
         (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$utils$2f$HaciendaExport$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["exportInventoryToCSV"])(processedItems, selectedYear, reportScope === "ALL" ? "Consolidado_General" : reportScope);
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4 select-none animate-in fade-in duration-150",
+        onClick: (e)=>e.target === e.currentTarget && onClose(),
+        role: "dialog",
+        "aria-modal": "true",
+        "aria-labelledby": `${modalId}-title`,
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "bg-white border border-slate-200 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden flex flex-col",
+            className: "bg-white border border-slate-200 w-full max-w-xl rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-150",
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50",
+                    className: "px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "flex items-center gap-2.5",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center",
+                                    className: "w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0",
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$file$2d$spreadsheet$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__FileSpreadsheet$3e$__["FileSpreadsheet"], {
                                         className: "w-5 h-5"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                        lineNumber: 92,
+                                        lineNumber: 120,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                    lineNumber: 91,
+                                    lineNumber: 119,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
+                                            id: `${modalId}-title`,
                                             className: "text-sm font-bold text-slate-800 leading-tight",
                                             children: "Informe Fiscal de Inventario (Hacienda)"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 95,
+                                            lineNumber: 123,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -6306,45 +6644,46 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                             children: "Declaración Anual de Existencias y Valuación al Costo"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 98,
+                                            lineNumber: 129,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                    lineNumber: 94,
+                                    lineNumber: 122,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                            lineNumber: 90,
+                            lineNumber: 118,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                             type: "button",
                             onClick: onClose,
-                            className: "p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer",
+                            className: "p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer",
+                            title: "Cerrar modal",
                             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$x$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__X$3e$__["X"], {
                                 className: "w-4 h-4"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                lineNumber: 108,
+                                lineNumber: 140,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                            lineNumber: 103,
+                            lineNumber: 134,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                    lineNumber: 89,
+                    lineNumber: 117,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "p-6 space-y-5",
+                    className: "p-6 space-y-5 overflow-y-auto",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "grid grid-cols-2 gap-4",
@@ -6352,147 +6691,112 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                            className: "block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1",
+                                            htmlFor: `${modalId}-year`,
+                                            className: "text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1",
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$calendar$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Calendar$3e$__["Calendar"], {
-                                                    className: "w-3.5 h-3.5 text-sky-600"
+                                                    className: "w-3.5 h-3.5 text-sky-600 shrink-0"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                                    lineNumber: 118,
+                                                    lineNumber: 153,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                     children: "Ejercicio Fiscal (Corte 31/Dic)"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                                    lineNumber: 119,
+                                                    lineNumber: 154,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 117,
+                                            lineNumber: 149,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                            id: `${modalId}-year`,
                                             value: selectedYear,
                                             onChange: (e)=>setSelectedYear(e.target.value),
-                                            className: "w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-sky-500 cursor-pointer",
-                                            children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                    value: "2026",
-                                                    children: "Ejercicio 2026 (En curso)"
-                                                }, void 0, false, {
+                                            className: "w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-sky-500 focus:bg-white cursor-pointer",
+                                            children: FISCAL_YEARS.map((year)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                    value: year,
+                                                    children: [
+                                                        "Ejercicio ",
+                                                        year,
+                                                        " ",
+                                                        year === "2026" ? "(En curso)" : ""
+                                                    ]
+                                                }, year, true, {
                                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                                    lineNumber: 126,
-                                                    columnNumber: 17
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                    value: "2025",
-                                                    children: "Ejercicio 2025"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                                    lineNumber: 127,
-                                                    columnNumber: 17
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                    value: "2024",
-                                                    children: "Ejercicio 2024"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                                    lineNumber: 128,
-                                                    columnNumber: 17
-                                                }, this)
-                                            ]
-                                        }, void 0, true, {
+                                                    lineNumber: 163,
+                                                    columnNumber: 19
+                                                }, this))
+                                        }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 121,
+                                            lineNumber: 156,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                    lineNumber: 116,
+                                    lineNumber: 148,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                            className: "block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1",
+                                            htmlFor: `${modalId}-scope`,
+                                            className: "text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1",
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$building$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Building$3e$__["Building"], {
-                                                    className: "w-3.5 h-3.5 text-sky-600"
+                                                    className: "w-3.5 h-3.5 text-sky-600 shrink-0"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                                    lineNumber: 134,
+                                                    lineNumber: 175,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                     children: "Alcance / Establecimiento"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                                    lineNumber: 135,
+                                                    lineNumber: 176,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 133,
+                                            lineNumber: 171,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
+                                            id: `${modalId}-scope`,
                                             value: reportScope,
                                             onChange: (e)=>setReportScope(e.target.value),
-                                            className: "w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-sky-500 cursor-pointer",
-                                            children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                    value: "ALL",
-                                                    children: "Todas las sucursales (Consolidado)"
-                                                }, void 0, false, {
+                                            className: "w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-none focus:border-sky-500 focus:bg-white cursor-pointer",
+                                            children: SCOPE_OPTIONS.map((opt)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
+                                                    value: opt.value,
+                                                    children: opt.label
+                                                }, opt.value, false, {
                                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                                    lineNumber: 142,
-                                                    columnNumber: 17
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                    value: "Santa Ana",
-                                                    children: "Casa Matriz - Santa Ana"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                                    lineNumber: 143,
-                                                    columnNumber: 17
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                    value: "Ahuachapán",
-                                                    children: "Sucursal Ahuachapán"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                                    lineNumber: 144,
-                                                    columnNumber: 17
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                    value: "Sonsonate",
-                                                    children: "Sucursal Sonsonate"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                                    lineNumber: 145,
-                                                    columnNumber: 17
-                                                }, this)
-                                            ]
-                                        }, void 0, true, {
+                                                    lineNumber: 185,
+                                                    columnNumber: 19
+                                                }, this))
+                                        }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 137,
+                                            lineNumber: 178,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                    lineNumber: 132,
+                                    lineNumber: 170,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                            lineNumber: 115,
+                            lineNumber: 147,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6506,7 +6810,7 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                             children: "Artículos"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 153,
+                                            lineNumber: 196,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -6517,13 +6821,13 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 156,
+                                            lineNumber: 199,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                    lineNumber: 152,
+                                    lineNumber: 195,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6534,24 +6838,24 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                             children: "Unidades Físicas"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 162,
+                                            lineNumber: 205,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                             className: "text-sm font-bold text-slate-800 font-mono",
                                             children: [
-                                                totalPhysicalUnits,
+                                                totalPhysicalUnits.toLocaleString("en-US"),
                                                 " piezas"
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 165,
+                                            lineNumber: 208,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                    lineNumber: 161,
+                                    lineNumber: 204,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6562,7 +6866,7 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                             children: "Valuación al Costo"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 171,
+                                            lineNumber: 214,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -6570,24 +6874,25 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                             children: [
                                                 "$",
                                                 totalInventoryValuation.toLocaleString("en-US", {
-                                                    minimumFractionDigits: 2
+                                                    minimumFractionDigits: 2,
+                                                    maximumFractionDigits: 2
                                                 })
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 174,
+                                            lineNumber: 217,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                    lineNumber: 170,
+                                    lineNumber: 213,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                            lineNumber: 151,
+                            lineNumber: 194,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6598,7 +6903,7 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                     children: "Columnas auditables generadas:"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                    lineNumber: 182,
+                                    lineNumber: 228,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
@@ -6608,100 +6913,100 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                             children: "• Código de Barra / SKU"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 186,
+                                            lineNumber: 232,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                                             children: "• Nombre y Descripción"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 187,
+                                            lineNumber: 233,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                                             children: "• Marca / Fabricante"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 188,
+                                            lineNumber: 234,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                                             children: "• Presentación (Unidad de Medida)"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 189,
+                                            lineNumber: 235,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                                             children: "• Stock Físico al corte"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 190,
+                                            lineNumber: 236,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                                             children: "• Costo Unitario de Compra"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 191,
+                                            lineNumber: 237,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                                             children: "• Precio de Venta al Público"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 192,
+                                            lineNumber: 238,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                                             children: "• Total Valuado al Costo ($)"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 193,
+                                            lineNumber: 239,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                    lineNumber: 185,
+                                    lineNumber: 231,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                            lineNumber: 181,
+                            lineNumber: 227,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                    lineNumber: 113,
+                    lineNumber: 145,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "px-6 py-4 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between",
+                    className: "px-6 py-4 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between shrink-0",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "flex items-center gap-1.5 text-slate-500 text-[11px]",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$shield$2d$check$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ShieldCheck$3e$__["ShieldCheck"], {
-                                    className: "w-4 h-4 text-emerald-600"
+                                    className: "w-4 h-4 text-emerald-600 shrink-0"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                    lineNumber: 201,
+                                    lineNumber: 247,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                     children: "Formato listo para anexos fiscales."
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                    lineNumber: 202,
+                                    lineNumber: 248,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                            lineNumber: 200,
+                            lineNumber: 246,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6714,7 +7019,7 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                     children: "Cerrar"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                    lineNumber: 206,
+                                    lineNumber: 252,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -6726,47 +7031,51 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                             className: "w-4 h-4"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 219,
+                                            lineNumber: 265,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                             children: "Exportar Excel / CSV"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 220,
+                                            lineNumber: 266,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                    lineNumber: 214,
+                                    lineNumber: 260,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                            lineNumber: 205,
+                            lineNumber: 251,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                    lineNumber: 199,
+                    lineNumber: 245,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-            lineNumber: 87,
+            lineNumber: 115,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-        lineNumber: 86,
+        lineNumber: 108,
         columnNumber: 5
     }, this);
 }
-_s(HaciendaReportModal, "WpWoSBdwbtpYZ2f9k+nRl8eDGQQ=");
+_s(HaciendaReportModal, "UyzL+4iT1vNNAIdrG9DC4dNqfRA=", false, function() {
+    return [
+        __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useId"]
+    ];
+});
 _c = HaciendaReportModal;
 var _c;
 __turbopack_context__.k.register(_c, "HaciendaReportModal");

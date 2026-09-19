@@ -13,33 +13,41 @@ import {
   Store,
   KeyRound,
   Sparkles,
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
+import { UserRole } from "@/components/GestionUsuariosModal";
 
 export default function LoginPage() {
   const { login } = useAuth();
-  const [role, setRole] = useState<"cashier" | "admin">("cashier");
-  const [username, setUsername] = useState("maria.g");
-  const [password, setPassword] = useState("••••••••");
+  const [role, setRole] = useState<UserRole>("cashier");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleRoleChange = (newRole: "cashier" | "admin") => {
     setRole(newRole);
-    if (newRole === "cashier") {
-      setUsername("maria.g");
-    } else {
+    if (newRole === "admin") {
       setUsername("admin@mariosdent.com");
+    } else {
+      setUsername("");
     }
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage(null);
     setIsLoading(true);
+    
+    const result = await login(username, password, role);
 
-    setTimeout(() => {
+    if (result.error) {
+      setErrorMessage(result.error);
       setIsLoading(false);
-      login(role, username);
-    }, 600);
+    }
+
   };
 
   return (
@@ -128,6 +136,13 @@ export default function LoginPage() {
             </button>
           </div>
 
+          {errorMessage && (
+            <div className="flex items-center gap-2 p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs font-semibold text-rose-600">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{errorMessage}</span>
+            </div>
+          )}
+
           <form onSubmit={handleLogin} className="space-y-4">
             {/* Campo Usuario */}
             <div className="space-y-1.5">
@@ -163,6 +178,7 @@ export default function LoginPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
                   className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 transition-all font-mono"
                 />
                 <button
@@ -180,7 +196,7 @@ export default function LoginPage() {
               <span>
                 {role === "cashier"
                   ? "La sucursal de atención será asignada según tu cuenta."
-                  : "Acceso con control total de las 3 sucursales e inventario general[cite: 1, 2]."}
+                  : "Acceso con control total de las 3 sucursales e inventario general."}
               </span>
             </div>
 

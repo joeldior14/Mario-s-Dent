@@ -114,13 +114,15 @@ export default function Navbar() {
         <div className="flex items-center gap-4 text-xs">
           {user?.role !== "admin" && (
             <>
-              <div className="flex items-center gap-1.5 text-slate-600 font-medium">
+              <div className="flex items-center gap-2" suppressHydrationWarning>
                 <span
                   className={`w-2 h-2 rounded-full inline-block ${
                     isShiftOpen ? "bg-emerald-500" : "bg-amber-400"
                   }`}
                 />
-                <span>{isShiftOpen ? "Turno en curso" : "Sin turno"}</span>
+                <span suppressHydrationWarning> 
+                  {isShiftOpen ? "Turno en curso" : "Sin turno"}
+                </span>
               </div>
               <span className="text-slate-300">|</span>
             </>

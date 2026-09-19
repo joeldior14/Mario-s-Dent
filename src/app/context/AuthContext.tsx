@@ -1,119 +1,194 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabaseClient";
 
 export type UserRole = "admin" | "cashier";
 export type BranchName = "Santa Ana" | "Ahuachapán" | "Sonsonate";
 
 export interface UserSession {
-  id?: string;
+  id: string;
   name: string;
   email: string;
   role: UserRole;
   branch: BranchName;
+  branchId: string;
 }
 
 interface AuthContextType {
   user: UserSession | null;
-  login: (role: UserRole, usernameInput?: string) => void;
-  logout: () => void;
+  isLoading: boolean;
+  login: (
+    identifier: string,
+    pass: string,
+    expectedRole: UserRole
+  ) => Promise<{ error?: string }>;
+  logout: () => Promise<void>;
 }
-
-const STORAGE_KEY = "marios_dent_session";
-
-const REGISTERED_USERS: Record<
-  string,
-  { name: string; email: string; branch: BranchName }
-> = {
-  "maria.g": {
-    name: "Maria G.",
-    email: "maria.g@mariosdent.com",
-    branch: "Santa Ana",
-  },
-  "carlos.m": {
-    name: "Carlos M.",
-    email: "carlos.m@mariosdent.com",
-    branch: "Ahuachapán",
-  },
-  "manuel.r": {
-    name: "Manuel R.",
-    email: "manuel.r@mariosdent.com",
-    branch: "Sonsonate",
-  },
-};
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-
-  // 1. Estado inicial idéntico en Servidor y Cliente (evita el error de hidratación)
   const [user, setUser] = useState<UserSession | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // 2. Carga en cliente sin provocar error de render síncrono
-  useEffect(() => {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
+  // Consulta el perfil del usuario en la tabla profiles
+  const loadProfile = useCallback(
+    async (userId: string, emailStr: string): Promise<UserSession | null> => {
       try {
-        const parsed = JSON.parse(raw) as UserSession;
-        // Se difiere en la cola de eventos para evitar la advertencia de cascading render
-        queueMicrotask(() => {
-          setUser(parsed);
-        });
+        const { data, error } = await supabase
+          .from("profiles")
+          .select(`
+            id,
+            username,
+            full_name,
+            role,
+            branch_id,
+            branches (
+              id,
+              name
+            )
+          `)
+          .eq("id", userId)
+          .single();
+
+        if (error || !data) return null;
+
+        const branchRecord = Array.isArray(data.branches)
+          ? data.branches[0]
+          : data.branches;
+
+        return {
+          id: data.id,
+          name: data.full_name,
+          email: emailStr,
+          role: data.role as UserRole,
+          branch: (branchRecord?.name as BranchName) || "Santa Ana",
+          branchId: data.branch_id,
+        };
       } catch {
-        localStorage.removeItem(STORAGE_KEY);
+        return null;
+      }
+    },
+    []
+  );
+
+  // Sincroniza la sesión persistente de Supabase
+  useEffect(() => {
+    let mounted = true;
+
+    async function checkSession() {
+      try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (session?.user && mounted) {
+          const profile = await loadProfile(
+            session.user.id,
+            session.user.email || ""
+          );
+          if (mounted) setUser(profile);
+        }
+      } catch {
+        if (mounted) setUser(null);
+      } finally {
+        if (mounted) setIsLoading(false);
       }
     }
-  }, []);
+
+    checkSession();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        if (session?.user) {
+          const profile = await loadProfile(
+            session.user.id,
+            session.user.email || ""
+          );
+          setUser(profile);
+        } else {
+          setUser(null);
+        }
+        setIsLoading(false);
+      }
+    );
+
+    return () => {
+      mounted = false;
+      authListener.subscription.unsubscribe();
+    };
+  }, [loadProfile]);
 
   const login = useCallback(
-    (role: UserRole, usernameInput: string = "maria.g") => {
-      let sessionData: UserSession;
+    async (
+      identifier: string,
+      pass: string,
+      expectedRole: UserRole
+    ): Promise<{ error?: string }> => {
+      let emailToAuth = identifier.trim().toLowerCase();
 
-      if (role === "admin") {
-        sessionData = {
-          name: "Mario Administrador",
-          email: "admin@mariosdent.com",
-          role: "admin",
-          branch: "Santa Ana",
-        };
-      } else {
-        const normalized = usernameInput.trim().toLowerCase();
-        const profile = REGISTERED_USERS[normalized] || {
-          name: usernameInput,
-          email: `${normalized}@mariosdent.com`,
-          branch: "Santa Ana" as BranchName,
-        };
+      // Si se ingresó un nombre de usuario (ej. 'admin'), se completa con el dominio
+      if (!emailToAuth.includes("@")) {
+        emailToAuth = `${emailToAuth}@mariosdent.com`;
+      }
 
-        sessionData = {
-          name: profile.name,
-          email: profile.email,
-          role: "cashier",
-          branch: profile.branch,
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: emailToAuth,
+        password: pass,
+      });
+
+      if (error || !data.user) {
+        return { error: "Credenciales incorrectas o usuario no registrado." };
+      }
+
+      const profile = await loadProfile(
+        data.user.id,
+        data.user.email || emailToAuth
+      );
+
+      if (!profile) {
+        return {
+          error: "El usuario existe pero no tiene un perfil asignado en la base de datos.",
         };
       }
 
-      setUser(sessionData);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(sessionData));
+      if (expectedRole === "admin" && profile.role !== "admin") {
+        await supabase.auth.signOut();
+        return {
+          error: "Acceso denegado: Esta cuenta no posee permisos de Administrador.",
+        };
+      }
 
-      if (role === "admin") {
+      setUser(profile);
+
+      if (profile.role === "admin") {
         router.push("/dashboard");
       } else {
         router.push("/caja");
       }
+
+      return {};
     },
-    [router]
+    [loadProfile, router]
   );
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    await supabase.auth.signOut();
     setUser(null);
-    localStorage.removeItem(STORAGE_KEY);
     router.push("/login");
   }, [router]);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

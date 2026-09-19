@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useId, useCallback } from "react";
 import {
   X,
   History,
@@ -11,102 +11,23 @@ import {
   SlidersHorizontal,
   Globe2,
   Store,
+  Loader2,
+  AlertCircle,
+  PackageOpen,
 } from "lucide-react";
-
-export interface StockMovement {
-  id: string;
-  date: string;
-  type: "VENTA_POS" | "TRASLADO" | "INGRESO" | "AJUSTE";
-  branch: string;
-  user: string;
-  quantity: number;
-  stockAfter: number;
-  reference: string;
-}
+import { fetchProductKardex, KardexMovementRecord } from "@/app/services/inventoryService";
 
 interface ProductHistoryModalProps {
   isOpen: boolean;
   onClose: () => void;
-  currentBranch?: string; // Puede ser "Santa Ana", "Ahuachapán", "Sonsonate" o "ALL"
+  currentBranch?: string; // "Santa Ana", "Ahuachapán", "Sonsonate" o "ALL"
   product: {
+    id?: string;
     sku: string;
     name: string;
     brand: string;
   } | null;
 }
-
-const MOCK_HISTORY: StockMovement[] = [
-  {
-    id: "m1",
-    date: "2026-09-08 10:14 AM",
-    type: "VENTA_POS",
-    branch: "Santa Ana",
-    user: "Maria G.",
-    quantity: -2,
-    stockAfter: 0,
-    reference: "Ticket #T-SA-1045",
-  },
-  {
-    id: "m2",
-    date: "2026-09-06 03:40 PM",
-    type: "VENTA_POS",
-    branch: "Santa Ana",
-    user: "Maria G.",
-    quantity: -5,
-    stockAfter: 2,
-    reference: "Ticket #T-SA-1020",
-  },
-  {
-    id: "m3",
-    date: "2026-09-05 02:15 PM",
-    type: "VENTA_POS",
-    branch: "Sonsonate",
-    user: "Manuel R.",
-    quantity: -3,
-    stockAfter: 25,
-    reference: "Ticket #T-SO-0891",
-  },
-  {
-    id: "m4",
-    date: "2026-09-04 11:20 AM",
-    type: "TRASLADO",
-    branch: "Sonsonate",
-    user: "Mario (Admin)",
-    quantity: +14,
-    stockAfter: 28,
-    reference: "Traspaso desde Santa Ana",
-  },
-  {
-    id: "m5",
-    date: "2026-09-04 11:20 AM",
-    type: "TRASLADO",
-    branch: "Santa Ana",
-    user: "Mario (Admin)",
-    quantity: -14,
-    stockAfter: 7,
-    reference: "Traspaso hacia Sonsonate",
-  },
-  {
-    id: "m6",
-    date: "2026-09-03 04:30 PM",
-    type: "VENTA_POS",
-    branch: "Ahuachapán",
-    user: "Carlos M.",
-    quantity: -2,
-    stockAfter: 14,
-    reference: "Ticket #T-AH-0412",
-  },
-  {
-    id: "m7",
-    date: "2026-09-01 09:00 AM",
-    type: "INGRESO",
-    branch: "Santa Ana",
-    user: "Mario (Admin)",
-    quantity: +50,
-    stockAfter: 50,
-    reference: "Lote de Compra Factura #F-440",
-  },
-];
 
 export default function ProductHistoryModal({
   isOpen,
@@ -114,39 +35,85 @@ export default function ProductHistoryModal({
   currentBranch = "Santa Ana",
   product,
 }: ProductHistoryModalProps) {
-  const isGlobalView = currentBranch === "ALL";
+  const isGlobalBranch = currentBranch === "ALL" || currentBranch === "Todas las sedes";
+  
+  const [movements, setMovements] = useState<KardexMovementRecord[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [showAllOverride, setShowAllOverride] = useState<boolean>(false);
 
-  // Si la tabla ya estaba en ALL, inicia marcado; si estaba en una tienda, inicia desmarcado
-  const [showAllBranches, setShowAllBranches] = useState<boolean>(isGlobalView);
+  const modalId = useId();
+  const isViewingAll = isGlobalBranch || showAllOverride;
 
-  // Sincronizar estado cuando cambia el prop o se abre el modal
-  useEffect(() => {
-    if (isOpen) {
-      setShowAllBranches(currentBranch === "ALL");
+  // Extraemos la variable primitiva para preservar la memorización en React 19
+  const productId = product?.id;
+
+  const loadMovements = useCallback(async () => {
+    if (!productId) {
+      setMovements([]);
+      setIsLoading(false);
+      return;
     }
-  }, [isOpen, currentBranch]);
 
-  const filteredHistory = useMemo(() => {
-    if (showAllBranches || isGlobalView) return MOCK_HISTORY;
-    return MOCK_HISTORY.filter((item) =>
-      item.branch.toLowerCase().includes(currentBranch.toLowerCase())
-    );
-  }, [showAllBranches, isGlobalView, currentBranch]);
+    try {
+      setIsLoading(true);
+      setErrorMessage(null);
+
+      const filterBranch = isViewingAll ? undefined : currentBranch;
+      const data = await fetchProductKardex(productId, filterBranch);
+      setMovements(data);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Error al cargar movimientos de Kardex";
+      setErrorMessage(msg);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [productId, isViewingAll, currentBranch]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    let isMounted = true;
+    const fetchAsync = async () => {
+      if (isMounted) {
+        await loadMovements();
+      }
+    };
+
+    fetchAsync();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isOpen, loadMovements]);
+
+  // handleClose declarado en el cuerpo del componente antes del guard return
+  const handleClose = () => {
+    setShowAllOverride(false);
+    setErrorMessage(null);
+    onClose();
+  };
 
   if (!isOpen || !product) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4 select-none animate-in fade-in duration-150">
-      <div className="bg-white border border-slate-200 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col">
-        {/* CABECERA */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4 select-none animate-in fade-in duration-150"
+      onClick={(e) => e.target === e.currentTarget && handleClose()}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={`${modalId}-title`}
+    >
+      <div className="bg-white border border-slate-200 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-150">
+        {/* Cabecera */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
               <History className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-bold text-slate-800">
+                <h3 id={`${modalId}-title`} className="text-sm font-bold text-slate-800 leading-tight">
                   Kardex y Trazabilidad de Stock
                 </h3>
                 <span className="font-mono text-[10px] bg-slate-200/80 font-bold text-slate-700 px-1.5 py-0.5 rounded">
@@ -154,39 +121,34 @@ export default function ProductHistoryModal({
                 </span>
               </div>
               <p className="text-[11px] text-slate-400">
-                {product.name} •{" "}
-                <span className="text-slate-600 font-medium">
-                  {product.brand}
-                </span>
+                {product.name} • <span className="text-slate-600 font-medium">{product.brand}</span>
               </p>
             </div>
           </div>
 
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+            title="Cerrar modal"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        {/* BARRA DE FILTRO CON CONTEXTO INTELIGENTE */}
-        <div className="px-6 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+        {/* Barra de contexto y filtro */}
+        <div className="px-6 py-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between shrink-0">
           <div className="flex items-center gap-2 text-xs text-slate-600">
-            <Store className="w-3.5 h-3.5 text-sky-600" />
+            <Store className="w-3.5 h-3.5 text-sky-600 shrink-0" />
             <span>
               Mostrando movimientos de:{" "}
               <strong className="text-slate-800">
-                {isGlobalView || showAllBranches
-                  ? "Toda la Red (Consolidado)"
-                  : currentBranch}
+                {isViewingAll ? "Toda la Red (Consolidado)" : currentBranch}
               </strong>
             </span>
           </div>
 
-          {/* Si ya venía de vista global "ALL", se muestra como etiqueta fija; si venía de una sucursal, se habilita el checkbox */}
-          {isGlobalView ? (
+          {isGlobalBranch ? (
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-sky-50 text-sky-700 border border-sky-200">
               <Globe2 className="w-3.5 h-3.5" />
               Vista Global Automática
@@ -195,8 +157,8 @@ export default function ProductHistoryModal({
             <label className="flex items-center gap-2 cursor-pointer bg-white border border-slate-300 hover:border-sky-400 px-3 py-1.5 rounded-xl shadow-2xs transition-all">
               <input
                 type="checkbox"
-                checked={showAllBranches}
-                onChange={(e) => setShowAllBranches(e.target.checked)}
+                checked={showAllOverride}
+                onChange={(e) => setShowAllOverride(e.target.checked)}
                 className="w-4 h-4 rounded text-sky-600 border-slate-300 focus:ring-0 cursor-pointer"
               />
               <span className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
@@ -207,9 +169,22 @@ export default function ProductHistoryModal({
           )}
         </div>
 
-        {/* TABLA DE MOVIMIENTOS */}
-        <div className="p-4 max-h-[50vh] overflow-y-auto">
-          {filteredHistory.length > 0 ? (
+        {/* Alerta de error si ocurre */}
+        {errorMessage && (
+          <div className="m-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{errorMessage}</span>
+          </div>
+        )}
+
+        {/* Tabla de movimientos */}
+        <div className="p-4 overflow-y-auto flex-1">
+          {isLoading ? (
+            <div className="py-16 flex flex-col items-center justify-center text-slate-400 gap-2">
+              <Loader2 className="w-6 h-6 animate-spin text-sky-600" />
+              <span className="text-xs font-medium">Cargando registros de auditoría...</span>
+            </div>
+          ) : movements.length > 0 ? (
             <table className="w-full text-left text-xs border-collapse">
               <thead>
                 <tr className="border-b border-slate-100 text-[10px] font-bold uppercase tracking-wider text-slate-400 pb-2 bg-slate-50/30">
@@ -221,13 +196,10 @@ export default function ProductHistoryModal({
                   <th className="py-2.5 px-3">Comprobante / Detalle</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 text-slate-600">
-                {filteredHistory.map((row) => (
-                  <tr
-                    key={row.id}
-                    className="hover:bg-slate-50/80 transition-colors"
-                  >
-                    <td className="py-2.5 px-3 font-mono text-[11px] text-slate-400">
+              <tbody className="divide-y divide-slate-100 text-slate-600 font-medium">
+                {movements.map((row) => (
+                  <tr key={row.id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="py-2.5 px-3 font-mono text-[11px] text-slate-400 whitespace-nowrap">
                       {row.date}
                     </td>
                     <td className="py-2.5 px-3">
@@ -253,19 +225,11 @@ export default function ProductHistoryModal({
                       )}
                     </td>
                     <td className="py-2.5 px-3">
-                      <p className="font-bold text-slate-800 text-[11px]">
-                        {row.branch}
-                      </p>
+                      <p className="font-bold text-slate-800 text-[11px]">{row.branch}</p>
                       <p className="text-[10px] text-slate-400">{row.user}</p>
                     </td>
                     <td className="py-2.5 px-3 text-right font-mono font-bold">
-                      <span
-                        className={
-                          row.quantity < 0
-                            ? "text-rose-600"
-                            : "text-emerald-600"
-                        }
-                      >
+                      <span className={row.quantity < 0 ? "text-rose-600" : "text-emerald-600"}>
                         {row.quantity > 0 ? `+${row.quantity}` : row.quantity}
                       </span>
                     </td>
@@ -280,23 +244,28 @@ export default function ProductHistoryModal({
               </tbody>
             </table>
           ) : (
-            <div className="py-12 text-center text-slate-400 text-xs">
-              No hay movimientos registrados para este producto en {currentBranch}.
+            <div className="py-16 flex flex-col items-center justify-center text-center text-slate-400 gap-2">
+              <PackageOpen className="w-8 h-8 text-slate-300" />
+              <p className="text-xs font-semibold text-slate-600">Sin movimientos registrados</p>
+              <p className="text-[11px] text-slate-400">
+                No hay ingresos, traslados ni ajustes asentados para este producto en{" "}
+                {isViewingAll ? "ninguna sucursal" : currentBranch}.
+              </p>
             </div>
           )}
         </div>
 
-        {/* PIE DE AUDITORÍA */}
-        <div className="p-3.5 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+        {/* Pie de auditoría */}
+        <div className="p-3.5 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 shrink-0">
           <div className="flex items-center gap-2">
-            <ShieldAlert className="w-4 h-4 text-sky-600" />
+            <ShieldAlert className="w-4 h-4 text-sky-600 shrink-0" />
             <span className="text-[11px]">
-              Registro de auditoría contable inalterable.
+              Registro de auditoría contable inalterable en PostgreSQL.
             </span>
           </div>
           <button
             type="button"
-            onClick={onClose}
+            onClick={handleClose}
             className="px-4 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-2xs transition-colors cursor-pointer"
           >
             Cerrar

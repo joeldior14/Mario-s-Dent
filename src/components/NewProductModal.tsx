@@ -24,11 +24,11 @@ interface NewProductModalProps {
 }
 
 const CATEGORIES = [
-  "Resins",
+  "Resinas",
   "Endo",
-  "Ortho",
-  "Instruments",
-  "Disposables",
+  "Orto",
+  "Instrumentos",
+  "Desechables",
 ] as const;
 
 export default function NewProductModal({

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useId, useCallback } from "react";
 import {
   X,
   Users,
@@ -11,75 +11,159 @@ import {
   ShieldCheck,
   Check,
   AlertCircle,
+  Loader2,
 } from "lucide-react";
+import { supabase } from "@/lib/supabaseClient";
 
-interface AppUser {
+export type UserRole = "admin" | "cashier";
+export type BranchName = "Santa Ana" | "Ahuachapán" | "Sonsonate";
+
+export interface DBBranch {
+  id: string;
+  name: BranchName | string;
+}
+
+export interface AppUser {
   id: string;
   username: string;
   fullName: string;
-  email: string;
-  role: "admin" | "cashier";
-  branch: "Santa Ana" | "Ahuachapán" | "Sonsonate";
+  email?: string;
+  role: UserRole;
+  branchId: string;
+  branchName: string;
 }
 
-const INITIAL_USERS: AppUser[] = [
-  {
-    id: "u1",
-    username: "maria.g",
-    fullName: "Maria G.",
-    email: "maria.g@mariosdent.com",
-    role: "cashier",
-    branch: "Santa Ana",
-  },
-  {
-    id: "u2",
-    username: "carlos.m",
-    fullName: "Carlos M.",
-    email: "carlos.m@mariosdent.com",
-    role: "cashier",
-    branch: "Ahuachapán",
-  },
-  {
-    id: "u3",
-    username: "manuel.r",
-    fullName: "Manuel R.",
-    email: "manuel.r@mariosdent.com",
-    role: "cashier",
-    branch: "Sonsonate",
-  },
+const ROLE_OPTIONS: readonly { value: UserRole; label: string }[] = [
+  { value: "cashier", label: "Cajero (Solo su sucursal)" },
+  { value: "admin", label: "Administrador (Total)" },
 ];
+
+interface UserManagementModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+interface ProfileQueryResult {
+  id: string;
+  username: string;
+  full_name: string;
+  role: string;
+  branch_id: string;
+  branches: { id: string; name: string } | { id: string; name: string }[] | null;
+}
 
 export default function UserManagementModal({
   isOpen,
   onClose,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-}) {
-  const [users, setUsers] = useState<AppUser[]>(INITIAL_USERS);
-  const [isFormOpen, setIsFormOpen] = useState(false);
+}: UserManagementModalProps) {
+  const [users, setUsers] = useState<AppUser[]>([]);
+  const [branches, setBranches] = useState<DBBranch[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSaving, setIsSaving] = useState<boolean>(false);
+
+  const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
 
-  // Form states
-  const [fullName, setFullName] = useState("");
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState<"admin" | "cashier">("cashier");
-  const [branch, setBranch] = useState<"Santa Ana" | "Ahuachapán" | "Sonsonate">("Santa Ana");
-  const [password, setPassword] = useState("");
+  // Estados del formulario
+  const [fullName, setFullName] = useState<string>("");
+  const [username, setUsername] = useState<string>("");
+  const [role, setRole] = useState<UserRole>("cashier");
+  const [branchId, setBranchId] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+
+  const modalId = useId();
+
+// 1. Cargar usuarios y sucursales directamente desde Supabase
+  const fetchData = useCallback(async () => {
+    try {
+      // Obtener sedes operativas
+      const { data: branchData, error: branchErr } = await supabase
+        .from("branches")
+        .select("id, name")
+        .order("name");
+
+      if (branchErr) throw branchErr;
+      setBranches(branchData || []);
+
+      if (branchData && branchData.length > 0 && !branchId) {
+        setBranchId(branchData[0].id);
+      }
+
+      // Obtener perfiles de usuarios con sucursal relacionada
+      const { data: profilesData, error: profilesErr } = await supabase
+        .from("profiles")
+        .select(`
+          id,
+          username,
+          full_name,
+          role,
+          branch_id,
+          branches (
+            id,
+            name
+          )
+        `)
+        .order("created_at", { ascending: false });
+
+      if (profilesErr) throw profilesErr;
+
+      const formatted: AppUser[] = ((profilesData as unknown as ProfileQueryResult[]) || []).map((p) => {
+        const branchRecord = Array.isArray(p.branches) ? p.branches[0] : p.branches;
+        return {
+          id: p.id,
+          username: p.username,
+          fullName: p.full_name,
+          role: p.role as UserRole,
+          branchId: p.branch_id,
+          branchName: branchRecord?.name || "Sin Asignar",
+        };
+      });
+
+      setUsers(formatted);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Error al conectar con la base de datos";
+      setError(msg);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [branchId]);
+
+  // Cargar datos al abrir de manera asíncrona segura
+  useEffect(() => {
+    if (!isOpen) return;
+
+    let isMounted = true;
+
+    const loadAsync = async () => {
+      setIsLoading(true);
+      setError(null);
+      await fetchData();
+    };
+
+    if (isMounted) {
+      loadAsync();
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isOpen, fetchData]);
 
   if (!isOpen) return null;
 
-  const handleOpenCreate = () => {
+  const resetForm = () => {
     setEditingUserId(null);
     setFullName("");
     setUsername("");
-    setEmail("");
     setRole("cashier");
-    setBranch("Santa Ana");
+    if (branches.length > 0) setBranchId(branches[0].id);
     setPassword("");
     setError(null);
+  };
+
+  const handleOpenCreate = () => {
+    resetForm();
     setIsFormOpen(true);
   };
 
@@ -87,72 +171,121 @@ export default function UserManagementModal({
     setEditingUserId(user.id);
     setFullName(user.fullName);
     setUsername(user.username);
-    setEmail(user.email);
     setRole(user.role);
-    setBranch(user.branch);
+    setBranchId(user.branchId);
     setPassword("");
     setError(null);
     setIsFormOpen(true);
   };
 
-  const handleDelete = (id: string, name: string) => {
-    if (confirm(`¿Eliminar definitivamente el usuario de ${name}?`)) {
-      setUsers((prev) => prev.filter((u) => u.id !== id));
-    }
-  };
-
-  const handleSave = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!fullName.trim() || !username.trim()) {
-      setError("El nombre y nombre de usuario son requeridos.");
-      return;
-    }
-
-    if (editingUserId) {
-      setUsers((prev) =>
-        prev.map((u) =>
-          u.id === editingUserId
-            ? {
-                ...u,
-                fullName: fullName.trim(),
-                username: username.trim().toLowerCase(),
-                email: email.trim() || `${username.trim().toLowerCase()}@mariosdent.com`,
-                role,
-                branch,
-              }
-            : u
-        )
-      );
-    } else {
-      const newUser: AppUser = {
-        id: crypto.randomUUID(),
-        fullName: fullName.trim(),
-        username: username.trim().toLowerCase(),
-        email: email.trim() || `${username.trim().toLowerCase()}@mariosdent.com`,
-        role,
-        branch,
-      };
-      setUsers((prev) => [...prev, newUser]);
-    }
-
+  const handleCloseForm = () => {
+    resetForm();
     setIsFormOpen(false);
   };
 
+  // 2. Guardar: creación vía API / Admin Auth o actualización en profiles
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanFullName = fullName.trim();
+    const cleanUsername = username.trim().toLowerCase();
+
+    if (!cleanFullName || !cleanUsername) {
+      setError("El nombre completo y el usuario para login son obligatorios.");
+      return;
+    }
+
+    if (!branchId) {
+      setError("Debes seleccionar una sucursal.");
+      return;
+    }
+
+    setIsSaving(true);
+    setError(null);
+
+    try {
+      if (editingUserId) {
+        // Actualización de registro existente en profiles
+        const { error: updateErr } = await supabase
+          .from("profiles")
+          .update({
+            full_name: cleanFullName,
+            username: cleanUsername,
+            role,
+            branch_id: branchId,
+          })
+          .eq("id", editingUserId);
+
+        if (updateErr) throw updateErr;
+      } else {
+        // Creación mediante endpoint administrativo seguro para auth.users
+        if (!password || password.length < 6) {
+          throw new Error("La contraseña inicial debe tener al menos 6 caracteres.");
+        }
+
+        const res = await fetch("/api/admin/users", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fullName: cleanFullName,
+            username: cleanUsername,
+            branchId,
+            role,
+            password,
+          }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || "No se pudo registrar el usuario en Supabase Auth.");
+        }
+      }
+
+      await fetchData();
+      handleCloseForm();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Error al procesar el usuario";
+      setError(msg);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // 3. Eliminar usuario de la base de datos
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`¿Eliminar definitivamente el usuario de ${name}?`)) return;
+
+    try {
+      const { error: delErr } = await supabase.from("profiles").delete().eq("id", id);
+      if (delErr) throw delErr;
+
+      setUsers((prev) => prev.filter((u) => u.id !== id));
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Error al eliminar el usuario";
+      alert(msg);
+    }
+  };
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4 select-none animate-in fade-in duration-150">
-      <div className="bg-white border border-slate-200 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4 select-none animate-in fade-in duration-150"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby={`${modalId}-title`}
+    >
+      <div className="bg-white border border-slate-200 w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] animate-in zoom-in-95 duration-150">
         {/* Cabecera */}
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/50 shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
               <Users className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-800">
+              <h3 id={`${modalId}-title`} className="text-sm font-bold text-slate-800">
                 Gestión de Personal & Accesos
               </h3>
               <p className="text-[11px] text-slate-400">
-                Asignación de sucursales fijas y credenciales
+                Sincronización de credenciales y sedes fijas (Supabase Auth)
               </p>
             </div>
           </div>
@@ -172,33 +305,38 @@ export default function UserManagementModal({
               type="button"
               onClick={onClose}
               className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+              title="Cerrar modal"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
         </div>
 
-        {/* Contenido */}
-        <div className="p-6 overflow-y-auto">
+        {/* Contenido principal */}
+        <div className="p-6 overflow-y-auto flex-1">
+          {error && (
+            <div className="p-2.5 mb-4 bg-rose-50 border border-rose-200 rounded-xl text-[11px] text-rose-600 font-semibold flex items-center gap-2">
+              <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+
           {isFormOpen ? (
             <form onSubmit={handleSave} className="space-y-4">
               <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
                 {editingUserId ? "Modificar Usuario" : "Registrar Nuevo Cajero / Usuario"}
               </h4>
 
-              {error && (
-                <div className="p-2.5 bg-rose-50 border border-rose-200 rounded-xl text-[11px] text-rose-600 font-semibold flex items-center gap-2">
-                  <AlertCircle className="w-3.5 h-3.5" />
-                  <span>{error}</span>
-                </div>
-              )}
-
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">
-                    Nombre Completo
+                  <label
+                    htmlFor={`${modalId}-name`}
+                    className="block text-[11px] font-bold text-slate-500 uppercase mb-1"
+                  >
+                    Nombre Completo *
                   </label>
                   <input
+                    id={`${modalId}-name`}
                     type="text"
                     required
                     value={fullName}
@@ -209,10 +347,14 @@ export default function UserManagementModal({
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">
-                    Usuario para Login
+                  <label
+                    htmlFor={`${modalId}-user`}
+                    className="block text-[11px] font-bold text-slate-500 uppercase mb-1"
+                  >
+                    Usuario para Login *
                   </label>
                   <input
+                    id={`${modalId}-user`}
                     type="text"
                     required
                     value={username}
@@ -225,40 +367,57 @@ export default function UserManagementModal({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">
+                  <label
+                    htmlFor={`${modalId}-branch`}
+                    className="block text-[11px] font-bold text-slate-500 uppercase mb-1"
+                  >
                     Sucursal Asignada (Fija)
                   </label>
                   <select
-                    value={branch}
-                    onChange={(e) => setBranch(e.target.value as any)}
+                    id={`${modalId}-branch`}
+                    value={branchId}
+                    onChange={(e) => setBranchId(e.target.value)}
                     className="w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:bg-white focus:outline-none focus:border-sky-500 cursor-pointer"
                   >
-                    <option value="Santa Ana">Santa Ana</option>
-                    <option value="Ahuachapán">Ahuachapán</option>
-                    <option value="Sonsonate">Sonsonate</option>
+                    {branches.map((b) => (
+                      <option key={b.id} value={b.id}>
+                        {b.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">
+                  <label
+                    htmlFor={`${modalId}-role`}
+                    className="block text-[11px] font-bold text-slate-500 uppercase mb-1"
+                  >
                     Rol
                   </label>
                   <select
+                    id={`${modalId}-role`}
                     value={role}
-                    onChange={(e) => setRole(e.target.value as any)}
+                    onChange={(e) => setRole(e.target.value as UserRole)}
                     className="w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:bg-white focus:outline-none focus:border-sky-500 cursor-pointer"
                   >
-                    <option value="cashier">Cajero (Solo su sucursal)</option>
-                    <option value="admin">Administrador (Total)</option>
+                    {ROLE_OPTIONS.map((r) => (
+                      <option key={r.value} value={r.value}>
+                        {r.label}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-slate-500 uppercase mb-1">
+                <label
+                  htmlFor={`${modalId}-pass`}
+                  className="block text-[11px] font-bold text-slate-500 uppercase mb-1"
+                >
                   Contraseña {editingUserId && "(Dejar en blanco para no cambiar)"}
                 </label>
                 <input
+                  id={`${modalId}-pass`}
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -270,20 +429,31 @@ export default function UserManagementModal({
               <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
                 <button
                   type="button"
-                  onClick={() => setIsFormOpen(false)}
+                  onClick={handleCloseForm}
+                  disabled={isSaving}
                   className="px-3.5 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="flex items-center gap-1 px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-xs transition-colors cursor-pointer"
+                  disabled={isSaving}
+                  className="flex items-center gap-1.5 px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl text-xs font-bold shadow-xs transition-colors cursor-pointer"
                 >
-                  <Check className="w-3.5 h-3.5" />
+                  {isSaving ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Check className="w-3.5 h-3.5" />
+                  )}
                   <span>{editingUserId ? "Actualizar Usuario" : "Guardar Usuario"}</span>
                 </button>
               </div>
             </form>
+          ) : isLoading ? (
+            <div className="py-12 flex flex-col items-center justify-center text-slate-400 gap-2">
+              <Loader2 className="w-6 h-6 animate-spin text-sky-600" />
+              <span className="text-xs">Cargando personal desde la base de datos...</span>
+            </div>
           ) : (
             <div className="space-y-3">
               <table className="w-full text-left text-xs border-collapse">
@@ -305,7 +475,7 @@ export default function UserManagementModal({
                       <td className="py-2.5 px-3">
                         <span className="inline-flex items-center gap-1 font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md text-[11px]">
                           <Store className="w-3 h-3 text-sky-600" />
-                          {u.branch}
+                          {u.branchName}
                         </span>
                       </td>
                       <td className="py-2.5 px-3">
@@ -339,6 +509,13 @@ export default function UserManagementModal({
                       </td>
                     </tr>
                   ))}
+                  {users.length === 0 && (
+                    <tr>
+                      <td colSpan={4} className="py-8 text-center text-slate-400 text-xs">
+                        No hay personal registrado en la base de datos.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>

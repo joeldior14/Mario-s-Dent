@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import Navbar from "@/components/Navbar";
 import HaciendaReportModal from "@/components/ReporteHaciendaModal";
 import DeleteProductModal from "@/components/BorrarProductoModal";
@@ -11,6 +11,13 @@ import TransferStockModal from "@/components/TransferStockModal";
 import BranchStockModal from "@/components/BranchStockModal";
 import StockAdjustmentModal from "@/components/AjusteStockModal";
 import { useAuth } from "@/app/context/AuthContext";
+import { supabase } from "@/lib/supabaseClient";
+import { 
+  createProductInDB, 
+  adjustProductStockInDB, 
+  updateProductInDB, 
+  transferProductStockInDB 
+} from "@/app/services/inventoryService";
 import {
   Search,
   Plus,
@@ -23,6 +30,9 @@ import {
   History,
   SlidersHorizontal,
   FileSpreadsheet,
+  Loader2,
+  AlertCircle,
+  PackageX,
 } from "lucide-react";
 
 export interface BranchStock {
@@ -35,7 +45,7 @@ export interface BranchStock {
 export interface InventoryItem {
   id: string;
   sku: string;
-  barcode?: string;
+  barcode?: string | null;
   name: string;
   brand: string;
   category: string;
@@ -46,169 +56,30 @@ export interface InventoryItem {
   branches: BranchStock[];
 }
 
-const INVENTORY_DATA: InventoryItem[] = [
-  {
-    id: "1",
-    sku: "RS-305A",
-    barcode: "770201103051",
-    name: "Resina Universal A2",
-    brand: "3M Filtek Z350",
-    category: "Resins",
-    description: "Jeringa (4g)",
-    cost: 550.0,
-    price: 850.0,
-    branches: [
-      { branchId: "santa-ana", branchName: "Santa Ana", stock: 0, phone: "2440-1234" },
-      { branchId: "ahuachapan", branchName: "Ahuachapán", stock: 14, phone: "2413-5678" },
-      { branchId: "sonsonate", branchName: "Sonsonate", stock: 28, phone: "2451-9012" },
-    ],
-  },
-  {
-    id: "2",
-    sku: "AN-1024",
-    barcode: "340104561024",
-    name: "Articaina 4% 1:100k",
-    brand: "Septodont",
-    category: "Endo",
-    description: "Caja (50 Cartuchos)",
-    cost: 620.0,
-    price: 920.0,
-    branches: [
-      { branchId: "santa-ana", branchName: "Santa Ana", stock: 3, phone: "2440-1234" },
-      { branchId: "ahuachapan", branchName: "Ahuachapán", stock: 0, phone: "2413-5678" },
-      { branchId: "sonsonate", branchName: "Sonsonate", stock: 12, phone: "2451-9012" },
-    ],
-  },
-  {
-    id: "3",
-    sku: "DP-8820",
-    barcode: "084201882011",
-    name: "Guantes Nitrilo Med",
-    brand: "Cranberry",
-    category: "Disposables",
-    description: "Caja (100 pcs)",
-    cost: 130.0,
-    price: 210.0,
-    branches: [
-      { branchId: "santa-ana", branchName: "Santa Ana", stock: 120, phone: "2440-1234" },
-      { branchId: "ahuachapan", branchName: "Ahuachapán", stock: 45, phone: "2413-5678" },
-      { branchId: "sonsonate", branchName: "Sonsonate", stock: 60, phone: "2451-9012" },
-    ],
-  },
-  {
-    id: "4",
-    sku: "OR-9002",
-    barcode: "072049900254",
-    name: "Opalescence Go 15%",
-    brand: "Ultradent",
-    category: "Ortho",
-    description: "Kit (10 Blísteres)",
-    cost: 980.0,
-    price: 1450.0,
-    image: "/diente.jpg",
-    branches: [
-      { branchId: "santa-ana", branchName: "Santa Ana", stock: 15, phone: "2440-1234" },
-      { branchId: "ahuachapan", branchName: "Ahuachapán", stock: 5, phone: "2413-5678" },
-      { branchId: "sonsonate", branchName: "Sonsonate", stock: 10, phone: "2451-9012" },
-    ],
-  },
-  {
-    id: "5",
-    sku: "EN-5510",
-    barcode: "497401551091",
-    name: "Limas K-Files 25mm #15-40",
-    brand: "Mani",
-    category: "Endo",
-    description: "Caja (6 pcs)",
-    cost: 105.0,
-    price: 165.0,
-    branches: [
-      { branchId: "santa-ana", branchName: "Santa Ana", stock: 28, phone: "2440-1234" },
-      { branchId: "ahuachapan", branchName: "Ahuachapán", stock: 12, phone: "2413-5678" },
-      { branchId: "sonsonate", branchName: "Sonsonate", stock: 16, phone: "2451-9012" },
-    ],
-  },
-  {
-    id: "6",
-    sku: "OR-7721",
-    barcode: "089123772102",
-    name: "Brackets Mini Diamond Roth .022",
-    brand: "Ormco",
-    category: "Ortho",
-    description: "Caso (20 pcs)",
-    cost: 420.0,
-    price: 680.0,
-    branches: [
-      { branchId: "santa-ana", branchName: "Santa Ana", stock: 9, phone: "2440-1234" },
-      { branchId: "ahuachapan", branchName: "Ahuachapán", stock: 4, phone: "2413-5678" },
-      { branchId: "sonsonate", branchName: "Sonsonate", stock: 8, phone: "2451-9012" },
-    ],
-  },
-  {
-    id: "7",
-    sku: "RS-9912",
-    barcode: "761239912045",
-    name: "Tetric N-Ceram Bulk Fill IVA",
-    brand: "Ivoclar Vivadent",
-    category: "Resins",
-    description: "Jeringa (3.5g)",
-    cost: 510.0,
-    price: 790.0,
-    branches: [
-      { branchId: "santa-ana", branchName: "Santa Ana", stock: 4, phone: "2440-1234" },
-      { branchId: "ahuachapan", branchName: "Ahuachapán", stock: 2, phone: "2413-5678" },
-      { branchId: "sonsonate", branchName: "Sonsonate", stock: 6, phone: "2451-9012" },
-    ],
-  },
-  {
-    id: "8",
-    sku: "IN-3301",
-    barcode: "045612330188",
-    name: "Fórceps 150 Universal Superior",
-    brand: "Hu-Friedy",
-    category: "Instruments",
-    description: "Unidad Quirúrgica",
-    cost: 1250.0,
-    price: 1850.0,
-    branches: [
-      { branchId: "santa-ana", branchName: "Santa Ana", stock: 6, phone: "2440-1234" },
-      { branchId: "ahuachapan", branchName: "Ahuachapán", stock: 2, phone: "2413-5678" },
-      { branchId: "sonsonate", branchName: "Sonsonate", stock: 4, phone: "2451-9012" },
-    ],
-  },
-  {
-    id: "9",
-    sku: "EN-4420",
-    barcode: "078910442031",
-    name: "Puntas de Gutapercha ProTaper F1-F3",
-    brand: "Dentsply Sirona",
-    category: "Endo",
-    description: "Caja (60 pcs)",
-    cost: 155.0,
-    price: 240.0,
-    branches: [
-      { branchId: "santa-ana", branchName: "Santa Ana", stock: 34, phone: "2440-1234" },
-      { branchId: "ahuachapan", branchName: "Ahuachapán", stock: 15, phone: "2413-5678" },
-      { branchId: "sonsonate", branchName: "Sonsonate", stock: 20, phone: "2451-9012" },
-    ],
-  },
-  {
-    id: "10",
-    sku: "DP-1105",
-    barcode: "750100110542",
-    name: "Baberos Odontológicos 3 Capas (x500)",
-    brand: "Mediclinic",
-    category: "Disposables",
-    description: "Paquete (500 pcs)",
-    cost: 115.0,
-    price: 180.0,
-    branches: [
-      { branchId: "santa-ana", branchName: "Santa Ana", stock: 65, phone: "2440-1234" },
-      { branchId: "ahuachapan", branchName: "Ahuachapán", stock: 30, phone: "2413-5678" },
-      { branchId: "sonsonate", branchName: "Sonsonate", stock: 40, phone: "2451-9012" },
-    ],
-  },
-];
+interface DBBranchRelation {
+  id: string;
+  name: string;
+  phone: string | null;
+}
+
+interface DBBranchInventoryItem {
+  stock: number;
+  branches: DBBranchRelation | null;
+}
+
+interface DBProductQuery {
+  id: string;
+  sku: string;
+  barcode: string | null;
+  name: string;
+  brand: string;
+  category: string;
+  description: string;
+  cost: number;
+  price: number;
+  image_url?: string | null;
+  branch_inventory?: DBBranchInventoryItem[] | null;
+}
 
 export default function InventoryPage() {
   const { user } = useAuth();
@@ -221,7 +92,10 @@ export default function InventoryPage() {
 
   const isAdmin = currentUser.role === "admin";
 
-  const [items, setItems] = useState<InventoryItem[]>(INVENTORY_DATA);
+  const [items, setItems] = useState<InventoryItem[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
 
@@ -239,46 +113,173 @@ export default function InventoryPage() {
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
   const [adjustingProduct, setAdjustingProduct] = useState<InventoryItem | null>(null);
 
-  const handleUpdateProduct = useCallback((updated: EditProductFormData) => {
-    setItems((prev) =>
-      prev.map((item) => (item.id === updated.id ? { ...item, ...updated } : item))
-    );
+  const loadInventory = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const { data, error: fetchError } = await supabase
+        .from("products")
+        .select(`
+          id,
+          sku,
+          barcode,
+          name,
+          brand,
+          category,
+          description,
+          cost,
+          price,
+          image_url,
+          branch_inventory (
+            stock,
+            branches (
+              id,
+              name,
+              phone
+            )
+          )
+        `)
+        .order("created_at", { ascending: false });
+
+      if (fetchError) throw fetchError;
+
+      const queryData = (data ?? []) as unknown as DBProductQuery[];
+
+      const formatted: InventoryItem[] = queryData.map((item) => ({
+        id: item.id,
+        sku: item.sku,
+        barcode: item.barcode,
+        name: item.name,
+        brand: item.brand,
+        category: item.category,
+        description: item.description,
+        cost: Number(item.cost),
+        price: Number(item.price),
+        image: item.image_url ?? undefined,
+        branches: (item.branch_inventory ?? []).map((bi) => {
+          const branchName = bi.branches?.name ?? "Sin sede";
+          const branchSlug = branchName
+            .toLowerCase()
+            .replace(/á/g, "a")
+            .replace(/ /g, "-") as "santa-ana" | "ahuachapan" | "sonsonate";
+
+          return {
+            branchId: branchSlug,
+            branchName,
+            stock: bi.stock ?? 0,
+            phone: bi.branches?.phone ?? "",
+          };
+        }),
+      }));
+
+      setItems(formatted);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Error al cargar el inventario";
+      setError(msg);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
-  const handleSaveNewProduct = useCallback((newProd: NewProductFormData) => {
-    const itemToAdd: InventoryItem = {
-      id: crypto.randomUUID(),
-      ...newProd,
+  useEffect(() => {
+    let isMounted = true;
+
+    const initLoad = async () => {
+      if (isMounted) {
+        await loadInventory();
+      }
     };
-    setItems((prev) => [itemToAdd, ...prev]);
-  }, []);
+
+    initLoad();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [loadInventory]);
+
+  const handleUpdateProduct = useCallback(
+    async (updated: EditProductFormData) => {
+      await updateProductInDB({
+        id: updated.id,
+        sku: updated.sku,
+        barcode: updated.barcode,
+        name: updated.name,
+        brand: updated.brand,
+        category: updated.category,
+        description: updated.description,
+        cost: updated.cost,
+        price: updated.price,
+        image: updated.image,
+        branches: updated.branches,
+      });
+
+      // Refrescar el inventario en tiempo real desde Supabase
+      await loadInventory();
+    },
+    [loadInventory]
+  );
+
+  const handleSaveNewProduct = useCallback(
+    async (newProd: NewProductFormData) => {
+      try {
+        setIsLoading(true);
+
+        const prodWithStock = newProd as unknown as {
+          stockSantaAna?: number;
+          stockAhuachapan?: number;
+          stockSonsonate?: number;
+          stock?: number;
+        };
+
+        await createProductInDB({
+          sku: newProd.sku,
+          barcode: newProd.barcode,
+          name: newProd.name,
+          brand: newProd.brand || "Genérico",
+          category: newProd.category,
+          description: newProd.description || "",
+          cost: Number(newProd.cost),
+          price: Number(newProd.price),
+          image: newProd.image,
+          initialStock: {
+            santaAna: prodWithStock.stockSantaAna ?? prodWithStock.stock ?? 0,
+            ahuachapan: prodWithStock.stockAhuachapan ?? 0,
+            sonsonate: prodWithStock.stockSonsonate ?? 0,
+          },
+        });
+
+        await loadInventory();
+        setIsNewProductOpen(false);
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "Error al registrar el producto";
+        alert(msg);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [loadInventory]
+  );
 
   const handleConfirmTransfer = useCallback(
-    (
+    async (
       productId: string,
       sourceBranch: string,
       targetBranch: string,
       qty: number
     ) => {
-      setItems((prev) =>
-        prev.map((item) => {
-          if (item.id !== productId) return item;
+      await transferProductStockInDB({
+        productId,
+        sourceBranchName: sourceBranch,
+        targetBranchName: targetBranch,
+        quantity: qty,
+        userId: user?.id,
+      });
 
-          const updatedBranches = item.branches.map((b) => {
-            if (b.branchName === sourceBranch) {
-              return { ...b, stock: Math.max(0, b.stock - qty) };
-            }
-            if (b.branchName === targetBranch) {
-              return { ...b, stock: b.stock + qty };
-            }
-            return b;
-          });
-
-          return { ...item, branches: updatedBranches };
-        })
-      );
+      // Refrescar existencias reales en vivo
+      await loadInventory();
     },
-    []
+    [user?.id, loadInventory]
   );
 
   const getStockDisplay = useCallback(
@@ -304,31 +305,23 @@ export default function InventoryPage() {
   );
 
   const handleConfirmAdjustment = useCallback(
-    (
-      type: "add" | "remove",
-      quantity: number,
-    ) => {
+    async (type: "add" | "remove", quantity: number, reason: string) => {
       if (!adjustingProduct) return;
 
       const targetBranch = selectedBranch === "ALL" ? "Santa Ana" : selectedBranch;
-      const delta = type === "add" ? quantity : -quantity;
 
-      setItems((prev) =>
-        prev.map((it) => {
-          if (it.id !== adjustingProduct.id) return it;
-
-          const updatedBranches = it.branches.map((b) => {
-            if (b.branchName === targetBranch) {
-              return { ...b, stock: Math.max(0, b.stock + delta) };
-            }
-            return b;
-          });
-
-          return { ...it, branches: updatedBranches };
-        })
-      );
+      await adjustProductStockInDB({
+        productId: adjustingProduct.id,
+        branchName: targetBranch,
+        type,
+        quantity,
+        reason,
+        userId: user?.id,
+      });
+      // Refrescar el inventario completo desde la base de datos
+      await loadInventory();
     },
-    [adjustingProduct, selectedBranch]
+    [adjustingProduct, selectedBranch, user?.id, loadInventory]
   );
 
   const handleConfirmDelete = useCallback(() => {
@@ -378,12 +371,12 @@ export default function InventoryPage() {
                 onChange={(e) => setCategory(e.target.value)}
                 className="appearance-none h-[38px] bg-white border border-slate-200 rounded-xl pl-3.5 pr-8 text-xs font-semibold text-slate-600 focus:outline-none focus:border-sky-500 shadow-2xs cursor-pointer"
               >
-                <option value="All">Todas las categorías</option>
-                <option value="Resins">Resinas</option>
+                <option value="Todas">Todas las categorías</option>
+                <option value="Resinas">Resinas</option>
                 <option value="Endo">Endo</option>
-                <option value="Ortho">Orto</option>
-                <option value="Instruments">Instrumentos</option>
-                <option value="Disposables">Productos Desechables</option>
+                <option value="Orto">Orto</option>
+                <option value="Instrumentos">Instrumentos</option>
+                <option value="Desechables">Productos Desechables</option>
               </select>
               <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
@@ -460,185 +453,208 @@ export default function InventoryPage() {
           )}
         </div>
 
+        {/* ALERTA DE ERROR */}
+        {error && (
+          <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs font-semibold text-rose-600 flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
+
         {/* TABLA DE INVENTARIO */}
         <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
-          <table className="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr className="border-b border-slate-100 text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-50/50">
-                <th className="py-3.5 px-6">SKU / Barcode</th>
-                <th className="py-3.5 px-4">Producto / Marca</th>
-                <th className="py-3.5 px-4">Descripción</th>
-                <th className="py-3.5 px-4">Categoría</th>
+          {isLoading ? (
+            <div className="py-20 flex flex-col items-center justify-center text-slate-400 gap-2.5">
+              <Loader2 className="w-7 h-7 animate-spin text-sky-600" />
+              <span className="text-xs font-medium">Cargando inventario de sucursales...</span>
+            </div>
+          ) : (
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="border-b border-slate-100 text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-50/50">
+                  <th className="py-3.5 px-6">SKU / Barcode</th>
+                  <th className="py-3.5 px-4">Producto / Marca</th>
+                  <th className="py-3.5 px-4">Descripción</th>
+                  <th className="py-3.5 px-4">Categoría</th>
 
-                {isAdmin && selectedBranch === "ALL" ? (
-                  <>
-                    <th className="py-3.5 px-3 text-center">Santa Ana</th>
-                    <th className="py-3.5 px-3 text-center">Ahuachapán</th>
-                    <th className="py-3.5 px-3 text-center">Sonsonate</th>
-                    <th className="py-3.5 px-4 text-center font-black text-sky-700">Total Red</th>
-                  </>
-                ) : (
-                  <>
-                    <th className="py-3.5 px-4 text-center">
-                      Stock ({isAdmin ? selectedBranch : currentUser.branch})
-                    </th>
-                    <th className="py-3.5 px-4 text-center">Otras Sucursales</th>
-                  </>
-                )}
+                  {isAdmin && selectedBranch === "ALL" ? (
+                    <>
+                      <th className="py-3.5 px-3 text-center">Santa Ana</th>
+                      <th className="py-3.5 px-3 text-center">Ahuachapán</th>
+                      <th className="py-3.5 px-3 text-center">Sonsonate</th>
+                      <th className="py-3.5 px-4 text-center font-black text-sky-700">Total Red</th>
+                    </>
+                  ) : (
+                    <>
+                      <th className="py-3.5 px-4 text-center">
+                        Stock ({isAdmin ? selectedBranch : currentUser.branch})
+                      </th>
+                      <th className="py-3.5 px-4 text-center">Otras Sucursales</th>
+                    </>
+                  )}
 
-                {/* Columna de Costo: EXCLUSIVA de Admin */}
-                {isAdmin && <th className="py-3.5 px-4 text-right">Costo</th>}
+                  {/* Columna de Costo: EXCLUSIVA de Admin */}
+                  {isAdmin && <th className="py-3.5 px-4 text-right">Costo</th>}
 
-                <th className="py-3.5 px-4 text-right">Precio Venta</th>
-                {isAdmin && <th className="py-3.5 px-6 text-right">Acciones</th>}
-              </tr>
-            </thead>
+                  <th className="py-3.5 px-4 text-right">Precio Venta</th>
+                  {isAdmin && <th className="py-3.5 px-6 text-right">Acciones</th>}
+                </tr>
+              </thead>
 
-            <tbody className="divide-y divide-slate-100 font-medium text-slate-600">
-              {filteredItems.map((item) => {
-                const currentStock = getStockDisplay(item);
-                const otherStock = getOtherBranchesStock(item);
+              <tbody className="divide-y divide-slate-100 font-medium text-slate-600">
+                {filteredItems.map((item) => {
+                  const currentStock = getStockDisplay(item);
+                  const otherStock = getOtherBranchesStock(item);
 
-                return (
-                  <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-3.5 px-6">
-                      <p className="font-mono text-xs font-semibold text-slate-700">{item.sku}</p>
-                      {item.barcode && (
-                        <p className="font-mono text-[10px] text-slate-400 leading-none mt-0.5">
-                          {item.barcode}
-                        </p>
-                      )}
-                    </td>
-
-                    <td className="py-3.5 px-4">
-                      <p className="font-bold text-slate-800 text-xs">{item.name}</p>
-                      <p className="text-[10px] text-slate-400">{item.brand}</p>
-                    </td>
-
-                    <td className="py-3.5 px-4 text-slate-500">{item.description}</td>
-
-                    <td className="py-3.5 px-4">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-200/80">
-                        {item.category}
-                      </span>
-                    </td>
-
-                    {/* COLUMNAS DE STOCK */}
-                    {isAdmin && selectedBranch === "ALL" ? (
-                      <>
-                        <td className="py-3.5 px-3 text-center font-mono font-medium">
-                          {item.branches.find((b) => b.branchId === "santa-ana")?.stock ?? 0}
-                        </td>
-                        <td className="py-3.5 px-3 text-center font-mono font-medium">
-                          {item.branches.find((b) => b.branchId === "ahuachapan")?.stock ?? 0}
-                        </td>
-                        <td className="py-3.5 px-3 text-center font-mono font-medium">
-                          {item.branches.find((b) => b.branchId === "sonsonate")?.stock ?? 0}
-                        </td>
-                        <td className="py-3.5 px-4 text-center">
-                          <span className="inline-block px-2.5 py-0.5 rounded-md font-mono font-bold bg-sky-50 text-sky-700 border border-sky-200">
-                            {currentStock}
-                          </span>
-                        </td>
-                      </>
-                    ) : (
-                      <>
-                        <td className="py-3.5 px-4 text-center">
-                          <span
-                            className={`font-bold tabular-nums px-2 py-0.5 rounded-md ${
-                              currentStock === 0
-                                ? "bg-rose-50 text-rose-600 border border-rose-100"
-                                : currentStock <= 5
-                                ? "bg-amber-50 text-amber-600"
-                                : "text-slate-700"
-                            }`}
-                          >
-                            {currentStock === 0 ? "Agotado" : currentStock}
-                          </span>
-                        </td>
-
-                        <td className="py-3.5 px-4 text-center">
-                          <button
-                            type="button"
-                            onClick={() => setSelectedProduct(item)}
-                            className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border transition-all ${
-                              otherStock > 0
-                                ? "border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100 cursor-pointer shadow-2xs active:scale-95"
-                                : "border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed"
-                            }`}
-                          >
-                            <Building2 className="w-3.5 h-3.5" />
-                            <span>{otherStock > 0 ? `${otherStock} en red` : "Sin stock"}</span>
-                          </button>
-                        </td>
-                      </>
-                    )}
-
-                    {/* Celda de Costo: Oculta para cajeros */}
-                    {isAdmin && (
-                      <td className="py-3.5 px-4 text-right font-mono font-medium text-slate-500">
-                        ${item.cost.toFixed(2)}
+                  return (
+                    <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="py-3.5 px-6">
+                        <p className="font-mono text-xs font-semibold text-slate-700">{item.sku}</p>
+                        {item.barcode && (
+                          <p className="font-mono text-[10px] text-slate-400 leading-none mt-0.5">
+                            {item.barcode}
+                          </p>
+                        )}
                       </td>
-                    )}
 
-                    <td className="py-3.5 px-4 text-right font-mono font-bold text-slate-800">
-                      ${item.price.toFixed(2)}
-                    </td>
+                      <td className="py-3.5 px-4">
+                        <p className="font-bold text-slate-800 text-xs">{item.name}</p>
+                        <p className="text-[10px] text-slate-400">{item.brand}</p>
+                      </td>
 
-                    {/* Acciones: Exclusivo Admin */}
-                    {isAdmin && (
-                      <td className="py-3.5 px-6 text-right">
-                        <div className="inline-flex items-center gap-1.5">
-                          {selectedBranch !== "ALL" && (
+                      <td className="py-3.5 px-4 text-slate-500">{item.description}</td>
+
+                      <td className="py-3.5 px-4">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold bg-slate-100 text-slate-700 border border-slate-200/80">
+                          {item.category}
+                        </span>
+                      </td>
+
+                      {/* COLUMNAS DE STOCK */}
+                      {isAdmin && selectedBranch === "ALL" ? (
+                        <>
+                          <td className="py-3.5 px-3 text-center font-mono font-medium">
+                            {item.branches.find((b) => b.branchId === "santa-ana")?.stock ?? 0}
+                          </td>
+                          <td className="py-3.5 px-3 text-center font-mono font-medium">
+                            {item.branches.find((b) => b.branchId === "ahuachapan")?.stock ?? 0}
+                          </td>
+                          <td className="py-3.5 px-3 text-center font-mono font-medium">
+                            {item.branches.find((b) => b.branchId === "sonsonate")?.stock ?? 0}
+                          </td>
+                          <td className="py-3.5 px-4 text-center">
+                            <span className="inline-block px-2.5 py-0.5 rounded-md font-mono font-bold bg-sky-50 text-sky-700 border border-sky-200">
+                              {currentStock}
+                            </span>
+                          </td>
+                        </>
+                      ) : (
+                        <>
+                          <td className="py-3.5 px-4 text-center">
+                            <span
+                              className={`font-bold tabular-nums px-2 py-0.5 rounded-md ${
+                                currentStock === 0
+                                  ? "bg-rose-50 text-rose-600 border border-rose-100"
+                                  : currentStock <= 5
+                                  ? "bg-amber-50 text-amber-600"
+                                  : "text-slate-700"
+                              }`}
+                            >
+                              {currentStock === 0 ? "Agotado" : currentStock}
+                            </span>
+                          </td>
+
+                          <td className="py-3.5 px-4 text-center">
                             <button
                               type="button"
-                              onClick={() => setAdjustingProduct(item)}
-                              title="Ajustar existencias (Entrada / Salida)"
-                              className="inline-flex items-center gap-1 px-2 py-1 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-[11px] rounded-lg border border-slate-200 transition-colors shadow-2xs cursor-pointer mr-1"
+                              onClick={() => setSelectedProduct(item)}
+                              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border transition-all ${
+                                otherStock > 0
+                                  ? "border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100 cursor-pointer shadow-2xs active:scale-95"
+                                  : "border-slate-200 bg-slate-50 text-slate-400 cursor-not-allowed"
+                              }`}
                             >
-                              <SlidersHorizontal className="w-3 h-3 text-sky-600" />
-                              <span>± Stock</span>
+                              <Building2 className="w-3.5 h-3.5" />
+                              <span>{otherStock > 0 ? `${otherStock} en red` : "Sin stock"}</span>
                             </button>
-                          )}
+                          </td>
+                        </>
+                      )}
 
-                          <button
-                            type="button"
-                            onClick={() => setHistoryProduct(item)}
-                            title="Auditar Kardex / Historial de Movimientos"
-                            className="p-1.5 text-slate-400 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-colors cursor-pointer"
-                          >
-                            <History className="w-3.5 h-3.5" />
-                          </button>
+                      {/* Celda de Costo: Oculta para cajeros */}
+                      {isAdmin && (
+                        <td className="py-3.5 px-4 text-right font-mono font-medium text-slate-500">
+                          ${item.cost.toFixed(2)}
+                        </td>
+                      )}
 
-                          <button
-                            type="button"
-                            onClick={() => setEditingProduct(item)}
-                            title="Editar producto"
-                            className="p-1.5 text-slate-400 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-colors cursor-pointer"
-                          >
-                            <Pencil className="w-3.5 h-3.5" />
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => setDeletingProduct(item)}
-                            title="Eliminar producto"
-                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
+                      <td className="py-3.5 px-4 text-right font-mono font-bold text-slate-800">
+                        ${item.price.toFixed(2)}
                       </td>
-                    )}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
 
-          {filteredItems.length === 0 && (
-            <div className="p-8 text-center text-xs text-slate-400">
-              No se encontraron productos coincidentes con los filtros seleccionados.
+                      {/* Acciones: Exclusivo Admin */}
+                      {isAdmin && (
+                        <td className="py-3.5 px-6 text-right">
+                          <div className="inline-flex items-center gap-1.5">
+                            {selectedBranch !== "ALL" && (
+                              <button
+                                type="button"
+                                onClick={() => setAdjustingProduct(item)}
+                                title="Ajustar existencias (Entrada / Salida)"
+                                className="inline-flex items-center gap-1 px-2 py-1 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-[11px] rounded-lg border border-slate-200 transition-colors shadow-2xs cursor-pointer mr-1"
+                              >
+                                <SlidersHorizontal className="w-3 h-3 text-sky-600" />
+                                <span>± Stock</span>
+                              </button>
+                            )}
+
+                            <button
+                              type="button"
+                              onClick={() => setHistoryProduct(item)}
+                              title="Auditar Kardex / Historial de Movimientos"
+                              className="p-1.5 text-slate-400 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-colors cursor-pointer"
+                            >
+                              <History className="w-3.5 h-3.5" />
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => setEditingProduct(item)}
+                              title="Editar producto"
+                              className="p-1.5 text-slate-400 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-colors cursor-pointer"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => setDeletingProduct(item)}
+                              title="Eliminar producto"
+                              className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </td>
+                      )}
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
+
+          {!isLoading && filteredItems.length === 0 && (
+            <div className="py-16 flex flex-col items-center justify-center text-center text-slate-400 gap-2">
+              <PackageX className="w-8 h-8 text-slate-300" />
+              <p className="text-xs font-semibold text-slate-600">
+                No hay productos en inventario
+              </p>
+              <p className="text-[11px] text-slate-400 max-w-sm">
+                {search || category !== "All"
+                  ? "No se encontraron coincidencias para los filtros aplicados."
+                  : "El catálogo está vacío. Utiliza el botón \"Nuevo Producto\" para comenzar a poblar la base de datos."}
+              </p>
             </div>
           )}
         </div>
@@ -693,12 +709,14 @@ export default function InventoryPage() {
               product={editingProduct}
               onSave={handleUpdateProduct}
             />
+
             <DeleteProductModal
               isOpen={!!deletingProduct}
               onClose={() => setDeletingProduct(null)}
               onConfirm={handleConfirmDelete}
               product={deletingProduct}
             />
+
             <HaciendaReportModal
               isOpen={isHaciendaModalOpen}
               onClose={() => setIsHaciendaModalOpen(false)}

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
-import { X, ArrowRightLeft, CheckCircle2, Search, ChevronDown } from "lucide-react";
+import { X, ArrowRightLeft, CheckCircle2, Search, ChevronDown, Loader2 } from "lucide-react";
 import { InventoryItem } from "@/app/inventario/page";
 
 interface TransferStockModalProps {
@@ -13,7 +13,7 @@ interface TransferStockModalProps {
     sourceBranch: string,
     targetBranch: string,
     quantity: number
-  ) => void;
+  ) => Promise<void> | void;
 }
 
 const BRANCHES = ["Santa Ana", "Ahuachapán", "Sonsonate"] as const;
@@ -24,7 +24,6 @@ export default function TransferStockModal({
   products,
   onConfirmTransfer,
 }: TransferStockModalProps) {
-  // Iniciar sin producto preseleccionado
   const [selectedProductId, setSelectedProductId] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -33,20 +32,20 @@ export default function TransferStockModal({
   const [targetBranch, setTargetBranch] = useState("Santa Ana");
   const [quantity, setQuantity] = useState<number>(1);
   const [error, setError] = useState<string | null>(null);
+  const [isTransferring, setIsTransferring] = useState<boolean>(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Cierre seguro con limpieza de formulario
   const handleCleanClose = useCallback(() => {
+    if (isTransferring) return;
     setSelectedProductId("");
     setSearchTerm("");
     setIsDropdownOpen(false);
     setError(null);
     setQuantity(1);
     onClose();
-  }, [onClose]);
+  }, [onClose, isTransferring]);
 
-  // Manejo de clic fuera del menú desplegable y tecla Escape
   useEffect(() => {
     if (!isOpen) return;
 
@@ -69,7 +68,6 @@ export default function TransferStockModal({
     };
   }, [isOpen, handleCleanClose]);
 
-  // Filtrado reactivo según caracteres digitados
   const filteredProducts = useMemo(() => {
     const query = searchTerm.trim().toLowerCase();
     if (!query) return products;
@@ -102,7 +100,7 @@ export default function TransferStockModal({
     setError(null);
   };
 
-  const handleTransfer = useCallback(() => {
+  const handleTransfer = async () => {
     if (!selectedProductId) {
       setError("Por favor escribe y selecciona un producto a trasladar.");
       return;
@@ -120,18 +118,18 @@ export default function TransferStockModal({
       return;
     }
 
-    setError(null);
-    onConfirmTransfer(selectedProductId, sourceBranch, targetBranch, quantity);
-    handleCleanClose();
-  }, [
-    selectedProductId,
-    sourceBranch,
-    targetBranch,
-    quantity,
-    availableInSource,
-    onConfirmTransfer,
-    handleCleanClose,
-  ]);
+    try {
+      setIsTransferring(true);
+      setError(null);
+      await onConfirmTransfer(selectedProductId, sourceBranch, targetBranch, quantity);
+      handleCleanClose();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Error al procesar el traslado";
+      setError(msg);
+    } finally {
+      setIsTransferring(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -160,8 +158,9 @@ export default function TransferStockModal({
           <button
             type="button"
             onClick={handleCleanClose}
+            disabled={isTransferring}
             aria-label="Cerrar"
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+            className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer disabled:opacity-40"
           >
             <X className="w-4 h-4" />
           </button>
@@ -180,6 +179,7 @@ export default function TransferStockModal({
               <input
                 type="text"
                 value={searchTerm}
+                disabled={isTransferring}
                 onFocus={() => setIsDropdownOpen(true)}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
@@ -188,7 +188,7 @@ export default function TransferStockModal({
                   setError(null);
                 }}
                 placeholder="Escribe el nombre, marca o SKU..."
-                className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-8 py-2 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:border-sky-500 shadow-2xs transition-colors"
+                className="w-full bg-white border border-slate-200 rounded-xl pl-9 pr-8 py-2 text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:border-sky-500 shadow-2xs transition-colors disabled:opacity-50"
               />
               <ChevronDown
                 className={`w-3.5 h-3.5 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 transition-transform duration-200 pointer-events-none ${
@@ -240,11 +240,12 @@ export default function TransferStockModal({
               </label>
               <select
                 value={sourceBranch}
+                disabled={isTransferring}
                 onChange={(e) => {
                   setSourceBranch(e.target.value);
                   setError(null);
                 }}
-                className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:border-sky-500 shadow-2xs cursor-pointer"
+                className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:border-sky-500 shadow-2xs cursor-pointer disabled:opacity-50"
               >
                 {BRANCHES.map((b) => (
                   <option key={b} value={b}>
@@ -267,11 +268,12 @@ export default function TransferStockModal({
               </label>
               <select
                 value={targetBranch}
+                disabled={isTransferring}
                 onChange={(e) => {
                   setTargetBranch(e.target.value);
                   setError(null);
                 }}
-                className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:border-sky-500 shadow-2xs cursor-pointer"
+                className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-semibold text-slate-800 focus:outline-none focus:border-sky-500 shadow-2xs cursor-pointer disabled:opacity-50"
               >
                 {BRANCHES.map((b) => (
                   <option key={b} value={b}>
@@ -292,11 +294,12 @@ export default function TransferStockModal({
               min="1"
               max={availableInSource > 0 ? availableInSource : undefined}
               value={quantity}
+              disabled={isTransferring}
               onChange={(e) => {
-                setQuantity(Math.max(1, parseInt(e.target.value) || 0));
+                setQuantity(Math.max(1, parseInt(e.target.value, 10) || 0));
                 setError(null);
               }}
-              className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:border-sky-500 shadow-2xs"
+              className="w-full bg-white border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:outline-none focus:border-sky-500 shadow-2xs disabled:opacity-50"
             />
           </div>
 
@@ -312,17 +315,23 @@ export default function TransferStockModal({
           <button
             type="button"
             onClick={handleCleanClose}
-            className="px-3.5 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
+            disabled={isTransferring}
+            className="px-3.5 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer disabled:opacity-40"
           >
             Cancelar
           </button>
           <button
             type="button"
             onClick={handleTransfer}
-            className="flex items-center gap-1.5 px-4 py-2 bg-sky-600 hover:bg-sky-700 active:scale-[0.98] text-white text-xs font-bold rounded-xl shadow-2xs transition-all cursor-pointer"
+            disabled={isTransferring || !selectedProductId}
+            className="flex items-center gap-1.5 px-4 py-2 bg-sky-600 hover:bg-sky-700 active:scale-[0.98] text-white text-xs font-bold rounded-xl shadow-2xs transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <CheckCircle2 className="w-3.5 h-3.5" />
-            <span>Confirmar Traslado</span>
+            {isTransferring ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <CheckCircle2 className="w-3.5 h-3.5" />
+            )}
+            <span>{isTransferring ? "Trasladando..." : "Confirmar Traslado"}</span>
           </button>
         </div>
       </div>

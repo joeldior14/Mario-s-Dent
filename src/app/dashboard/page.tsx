@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useCallback, useEffect } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { useShift } from "@/app/context/ShiftContext";
@@ -17,11 +17,25 @@ import {
   Printer,
   X,
   Eye,
-  AlertCircle,
-  ExternalLink,
+  Loader2,
 } from "lucide-react";
 
-interface BranchMetric {
+// ==========================================
+// CONTRATOS DE DATOS (LISTOS PARA BACKEND)
+// ==========================================
+export interface PaymentMethodsBreakdown {
+  card: number;
+  transfer: number;
+  cash: number;
+}
+
+export interface CashDiscrepancy {
+  hasIssue: boolean;
+  amount: number;
+  type: "shortage" | "surplus" | "balanced";
+}
+
+export interface BranchMetric {
   id: string;
   name: string;
   isOpen: boolean;
@@ -29,27 +43,47 @@ interface BranchMetric {
   trend: string;
   transactionsCount: number;
   estimatedProfit: number;
-  paymentMethods: {
-    card: number;
-    transfer: number;
-    cash: number;
-  };
-  cashDiscrepancy: {
-    hasIssue: boolean;
-    amount: number;
-    type: "shortage" | "surplus" | "balanced";
-  };
+  paymentMethods: PaymentMethodsBreakdown;
+  cashDiscrepancy: CashDiscrepancy;
 }
 
-interface StockAlertItem {
+export interface StockAlertItem {
   id: string;
   name: string;
   brand: string;
-  branch: "Santa Ana" | "Ahuachapán" | "Sonsonate";
+  branch: string;
   stock: number;
 }
 
-const BRANCHES_DATA: Record<string, BranchMetric> = {
+export interface TicketItem {
+  name: string;
+  qty: number;
+  price: number;
+}
+
+export interface TicketRecord {
+  id: string;
+  ticketNumber: string;
+  branch: string;
+  cashier: string;
+  time: string;
+  total: number;
+  method: string;
+  items: TicketItem[];
+}
+
+export interface CatalogQuickItem {
+  sku: string;
+  name: string;
+  brand: string;
+  price: number;
+  stock: number;
+}
+
+// ==========================================
+// DATA MOCK BASE (FALLBACK INICIAL)
+// ==========================================
+const INITIAL_BRANCHES_DATA: Record<string, BranchMetric> = {
   "santa-ana": {
     id: "santa-ana",
     name: "Santa Ana (Matriz)",
@@ -85,20 +119,16 @@ const BRANCHES_DATA: Record<string, BranchMetric> = {
   },
 };
 
-// Catálogo de alertas de inventario (Stock bajo: 1 a 5 uds | Agotados: 0 uds)
-const MOCK_STOCK_ALERTS: StockAlertItem[] = [
-  // Productos Bajos en Stock (Ámbar)
+const INITIAL_STOCK_ALERTS: StockAlertItem[] = [
   { id: "sb1", name: "Articaina 4% 1:100k", brand: "Septodont", branch: "Santa Ana", stock: 3 },
   { id: "sb2", name: "Tetric N-Ceram Bulk Fill IVA", brand: "Ivoclar", branch: "Ahuachapán", stock: 2 },
   { id: "sb3", name: "Fórceps 150 Universal", brand: "Hu-Friedy", branch: "Sonsonate", stock: 4 },
   { id: "sb4", name: "Brackets Mini Diamond Roth", brand: "Ormco", branch: "Ahuachapán", stock: 4 },
-
-  // Productos Agotados (Rojo)
   { id: "ag1", name: "Resina Universal A2", brand: "3M Filtek Z350", branch: "Santa Ana", stock: 0 },
   { id: "ag2", name: "Articaina 4% 1:100k", brand: "Septodont", branch: "Ahuachapán", stock: 0 },
 ];
 
-const MOCK_TICKETS = [
+const INITIAL_TICKETS: TicketRecord[] = [
   {
     id: "t1",
     ticketNumber: "T-SA-1045",
@@ -134,7 +164,7 @@ const MOCK_TICKETS = [
   },
 ];
 
-const SEARCH_CATALOG = [
+const INITIAL_CATALOG: CatalogQuickItem[] = [
   { sku: "RS-305A", name: "Resina Universal A2", brand: "3M Filtek", price: 850.0, stock: 42 },
   { sku: "AN-1024", name: "Articaina 4% 1:100k", brand: "Septodont", price: 920.0, stock: 3 },
   { sku: "DP-8820", name: "Guantes Nitrilo Med", brand: "Cranberry", price: 210.0, stock: 120 },
@@ -142,23 +172,86 @@ const SEARCH_CATALOG = [
 ];
 
 export default function DashboardPage() {
-  const { auditStatus } = useShift(); // Consume el estado global
-  const [selectedBranchKey, setSelectedBranchKey] = useState<string>("ALL");
-  const [selectedDate, setSelectedDate] = useState<string>("2026-10-24");
-  const [quickSearch, setQuickSearch] = useState<string>("");
-  const [isDetailModalOpen, setIsDetailModalOpen] = useState<boolean>(false);
-  const [activeTicket, setActiveTicket] = useState<(typeof MOCK_TICKETS)[0] | null>(null);
+  const { auditStatus } = useShift();
 
-  // Métricas financieras calculadas según la sucursal seleccionada
+  // Estados de control de vista y filtros
+  const [selectedBranchKey, setSelectedBranchKey] = useState<string>("ALL");
+  const [selectedDate, setSelectedDate] = useState<string>(() => new Date().toISOString().split("T")[0]);
+  const [lastSyncTime, setLastSyncTime] = useState<string>("10:42 AM");
+  const [quickSearch, setQuickSearch] = useState<string>("");
+
+  // Estados reactivos alimentados desde API
+  const [branchesData, setBranchesData] = useState<Record<string, BranchMetric>>(INITIAL_BRANCHES_DATA);
+  const [stockAlerts, setStockAlerts] = useState<StockAlertItem[]>(INITIAL_STOCK_ALERTS);
+  const [ticketsList, setTicketsList] = useState<TicketRecord[]>(INITIAL_TICKETS);
+  const [catalogSearchList, setCatalogSearchList] = useState<CatalogQuickItem[]>(INITIAL_CATALOG);
+
+  // Estados de interfaz y modales
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState<boolean>(false);
+  const [activeTicket, setActiveTicket] = useState<TicketRecord | null>(null);
+
+  // ==========================================
+  // CARGA Y SINCRONIZACIÓN ASÍNCRONA (API READY)
+  // ==========================================
+  const fetchDashboardData = useCallback(async (isManualRefresh = false) => {
+    if (isManualRefresh) setIsRefreshing(true);
+
+    try {
+      // TODO: Conectar con backend real:
+      // const res = await fetch(`/api/dashboard?date=${selectedDate}&branch=${selectedBranchKey}`);
+      // const payload = await res.json();
+      if (isManualRefresh) {
+        await new Promise((resolve) => setTimeout(resolve, 400));
+      }
+
+      const now = new Date();
+      setLastSyncTime(
+        now.toLocaleTimeString("es-SV", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        })
+      );
+    } catch (err) {
+      console.error("Error al sincronizar dashboard:", err);
+    } finally {
+      if (isManualRefresh) setIsRefreshing(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    let isSubscribed = true;
+
+    const loadInitialData = async () => {
+      try {
+        // Al conectar con endpoints, aquí se actualizan los estados:
+        // const res = await fetch(`/api/dashboard?date=${selectedDate}&branch=${selectedBranchKey}`);
+        // if (isSubscribed) { ... }
+      } catch (err) {
+        if (isSubscribed) console.error("Error cargando dashboard:", err);
+      }
+    };
+
+    loadInitialData();
+
+    return () => {
+      isSubscribed = false;
+    };
+  }, [selectedDate, selectedBranchKey]);
+
+  // ==========================================
+  // CÁLCULO ATÓMICO DE MÉTRICAS (MEMOIZADO)
+  // ==========================================
   const activeMetrics = useMemo(() => {
-    if (selectedBranchKey !== "ALL") {
-      return BRANCHES_DATA[selectedBranchKey];
+    if (selectedBranchKey !== "ALL" && branchesData[selectedBranchKey]) {
+      return branchesData[selectedBranchKey];
     }
 
-    const branches = Object.values(BRANCHES_DATA);
-    const totalIncome = branches.reduce((acc, b) => acc + b.incomeToday, 0);
-    const totalTx = branches.reduce((acc, b) => acc + b.transactionsCount, 0);
-    const totalProfit = branches.reduce((acc, b) => acc + b.estimatedProfit, 0);
+    const branches = Object.values(branchesData);
+    const totalIncome = branches.reduce((acc, b) => acc + (b.incomeToday || 0), 0);
+    const totalTx = branches.reduce((acc, b) => acc + (b.transactionsCount || 0), 0);
+    const totalProfit = branches.reduce((acc, b) => acc + (b.estimatedProfit || 0), 0);
     const anyDiscrepancy = branches.find((b) => b.cashDiscrepancy.hasIssue);
 
     return {
@@ -174,43 +267,55 @@ export default function DashboardPage() {
         ? anyDiscrepancy.cashDiscrepancy
         : { hasIssue: false, amount: 0, type: "balanced" as const },
     };
-  }, [selectedBranchKey]);
+  }, [selectedBranchKey, branchesData]);
 
-  // Filtrado de alertas según la tienda elegida
-  const branchNameFilter = useMemo(() => {
-    if (selectedBranchKey === "santa-ana") return "Santa Ana";
-    if (selectedBranchKey === "ahuachapan") return "Ahuachapán";
-    if (selectedBranchKey === "sonsonate") return "Sonsonate";
-    return "ALL";
+  // Nombre representativo para filtros cruzados de inventario y tickets
+  const currentBranchLabel = useMemo(() => {
+    switch (selectedBranchKey) {
+      case "santa-ana":
+        return "Santa Ana";
+      case "ahuachapan":
+        return "Ahuachapán";
+      case "sonsonate":
+        return "Sonsonate";
+      default:
+        return "ALL";
+    }
   }, [selectedBranchKey]);
 
   const lowStockList = useMemo(() => {
-    return MOCK_STOCK_ALERTS.filter(
+    return stockAlerts.filter(
       (item) =>
         item.stock > 0 &&
         item.stock <= 5 &&
-        (branchNameFilter === "ALL" || item.branch === branchNameFilter)
+        (currentBranchLabel === "ALL" || item.branch.toLowerCase() === currentBranchLabel.toLowerCase())
     );
-  }, [branchNameFilter]);
+  }, [stockAlerts, currentBranchLabel]);
 
   const outOfStockList = useMemo(() => {
-    return MOCK_STOCK_ALERTS.filter(
+    return stockAlerts.filter(
       (item) =>
         item.stock === 0 &&
-        (branchNameFilter === "ALL" || item.branch === branchNameFilter)
+        (currentBranchLabel === "ALL" || item.branch.toLowerCase() === currentBranchLabel.toLowerCase())
     );
-  }, [branchNameFilter]);
+  }, [stockAlerts, currentBranchLabel]);
 
-  // Búsqueda rápida
-  const quickSearchResults = useMemo(() => {
-    if (!quickSearch.trim()) return [];
-    return SEARCH_CATALOG.filter(
-      (it) =>
-        it.name.toLowerCase().includes(quickSearch.toLowerCase()) ||
-        it.sku.toLowerCase().includes(quickSearch.toLowerCase()) ||
-        it.brand.toLowerCase().includes(quickSearch.toLowerCase())
+  const filteredTickets = useMemo(() => {
+    return ticketsList.filter(
+      (ticket) => currentBranchLabel === "ALL" || ticket.branch.toLowerCase() === currentBranchLabel.toLowerCase()
     );
-  }, [quickSearch]);
+  }, [ticketsList, currentBranchLabel]);
+
+  const quickSearchResults = useMemo(() => {
+    const q = quickSearch.trim().toLowerCase();
+    if (!q) return [];
+    return catalogSearchList.filter(
+      (it) =>
+        it.name.toLowerCase().includes(q) ||
+        it.sku.toLowerCase().includes(q) ||
+        it.brand.toLowerCase().includes(q)
+    );
+  }, [quickSearch, catalogSearchList]);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-700 flex flex-col font-sans select-none">
@@ -218,8 +323,7 @@ export default function DashboardPage() {
 
       <main className="flex-1 p-6 md:p-8 max-w-5xl mx-auto w-full space-y-6">
         <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-6">
-          
-          {/* ENCABEZADO: Selector de Sucursal y Filtro de Fecha */}
+          {/* ENCABEZADO */}
           <div className="flex items-start justify-between flex-wrap gap-4 border-b border-slate-100 pb-5">
             <div className="space-y-2">
               <div className="flex items-center gap-3">
@@ -243,7 +347,6 @@ export default function DashboardPage() {
                 </span>
               </div>
 
-              {/* Filtro de Fecha */}
               <div className="flex items-center gap-2 text-xs text-slate-500">
                 <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-200 px-2.5 py-1 rounded-lg">
                   <Calendar className="w-3.5 h-3.5 text-slate-400" />
@@ -255,7 +358,7 @@ export default function DashboardPage() {
                   />
                 </div>
                 <span className="text-[11px] text-slate-400">
-                  Última sincronización: 10:42 AM
+                  Última sincronización: {lastSyncTime}
                 </span>
               </div>
             </div>
@@ -263,16 +366,17 @@ export default function DashboardPage() {
             <div className="flex items-center gap-3">
               <button
                 type="button"
-                onClick={() => alert("Sincronizando métricas en tiempo real...")}
-                className="p-2 border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-500 transition-colors"
-                title="Refrescar métricas"
+                onClick={() => fetchDashboardData(true)}
+                disabled={isRefreshing}
+                className="p-2 border border-slate-200 rounded-xl hover:bg-slate-50 text-slate-500 transition-colors disabled:opacity-50 cursor-pointer"
+                title="Sincronizar métricas en tiempo real"
               >
-                <RotateCw className="w-4 h-4" />
+                <RotateCw className={`w-4 h-4 ${isRefreshing ? "animate-spin text-sky-600" : ""}`} />
               </button>
             </div>
           </div>
 
-          {/* BUSCADOR RÁPIDO DE INVENTARIO */}
+          {/* BUSCADOR RÁPIDO */}
           <div className="relative">
             <div className="relative">
               <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -281,26 +385,25 @@ export default function DashboardPage() {
                 placeholder="Consultar Stock/Precio rápido por nombre o SKU..."
                 value={quickSearch}
                 onChange={(e) => setQuickSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs placeholder-slate-400 focus:outline-none focus:border-sky-500 transition-colors"
+                className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs placeholder-slate-400 focus:outline-none focus:border-sky-500 transition-colors"
               />
               {quickSearch && (
                 <button
                   type="button"
                   onClick={() => setQuickSearch("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
               )}
             </div>
 
-            {/* Desplegable de Resultados Rápidos */}
             {quickSearchResults.length > 0 && (
               <div className="absolute top-12 left-0 right-0 z-20 bg-white border border-slate-200 rounded-xl shadow-lg divide-y divide-slate-100 overflow-hidden">
                 {quickSearchResults.map((prod) => (
                   <div
                     key={prod.sku}
-                    className="p-3 flex items-center justify-between hover:bg-slate-50 text-xs"
+                    className="p-3 flex items-center justify-between hover:bg-slate-50 text-xs transition-colors"
                   >
                     <div>
                       <span className="font-bold text-slate-800 mr-2">{prod.name}</span>
@@ -327,33 +430,33 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {/* ALERTA DE DESCUADRE: Desaparece automáticamente cuando auditStatus es "reviewed" */}
-        {auditStatus === "pending_review" && (
-          <div className="bg-rose-50 border border-rose-200 rounded-2xl p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
-                <AlertTriangle className="w-5 h-5" />
+          {/* ALERTA DE DESCUADRE DE CAJA */}
+          {auditStatus === "pending_review" && (
+            <div className="bg-rose-50 border border-rose-200 rounded-2xl p-4 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center shrink-0">
+                  <AlertTriangle className="w-5 h-5" />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-rose-900">
+                    Alerta de Descuadre en Corte Z: Sucursal Santa Ana
+                  </p>
+                  <p className="text-[11px] text-rose-700 mt-0.5">
+                    Faltante registrado de -$50.00 en el turno de Maria G. Pendiente de resolución contable.
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-xs font-bold text-rose-900">
-                  Alerta de Descuadre en Corte Z: Sucursal Santa Ana
-                </p>
-                <p className="text-[11px] text-rose-700 mt-0.5">
-                  Faltante registrado de -$50.00 en el turno de Maria G. Pendiente de resolución contable.
-                </p>
-              </div>
+
+              <Link
+                href="/caja"
+                className="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition-colors shadow-2xs shrink-0"
+              >
+                Auditar caja
+              </Link>
             </div>
+          )}
 
-            <Link
-              href="/caja"
-              className="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition-colors shadow-2xs shrink-0"
-            >
-              Auditar caja
-            </Link>
-          </div>
-        )}
-
-          {/* TARJETA HERO: INGRESOS Y CONTADOR DE TRANSACCIONES */}
+          {/* TARJETA HERO */}
           <div className="border border-slate-200 rounded-xl p-5 bg-white shadow-2xs">
             <div className="flex items-start justify-between">
               <div>
@@ -387,29 +490,30 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* ENLACE INTERACTIVO: [Ver detalle de tickets] */}
             <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-100 text-xs">
               <span className="text-slate-400 text-[11px]">
-                {selectedBranchKey === "ALL" ? "Consolidado de 3 sucursales" : activeMetrics.name}
+                {selectedBranchKey === "ALL" ? "Consolidado de red (3 sucursales)" : activeMetrics.name}
               </span>
               <button
                 type="button"
-                onClick={() => setIsDetailModalOpen(true)}
-                className="text-sky-600 hover:text-sky-700 text-xs font-bold px-2.5 py-1 border border-dashed border-sky-300 rounded-lg hover:bg-sky-50 transition-colors"
+                onClick={() => {
+                  setActiveTicket(filteredTickets[0] || null);
+                  setIsDetailModalOpen(true);
+                }}
+                className="text-sky-600 hover:text-sky-700 text-xs font-bold px-2.5 py-1 border border-dashed border-sky-300 rounded-lg hover:bg-sky-50 transition-colors cursor-pointer"
               >
                 [Ver detalle de tickets]
               </button>
             </div>
           </div>
 
-          {/* SECCIÓN MÉTODOS DE PAGO: GRÁFICO CIRCULAR */}
+          {/* DISTRIBUCIÓN DE MÉTODOS DE PAGO */}
           <div className="border border-slate-200 rounded-xl p-5 bg-white shadow-2xs">
             <h3 className="text-xs font-bold text-slate-800 mb-4 uppercase tracking-wider">
               Distribución por Métodos de Pago
             </h3>
 
             <div className="flex items-center justify-between gap-6 flex-wrap">
-              {/* Gráfico circular SVG Donut */}
               <div className="relative w-24 h-24 shrink-0 flex items-center justify-center">
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                   <path
@@ -452,16 +556,13 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* Leyendas y porcentajes */}
               <div className="flex-1 min-w-[200px] space-y-2 text-xs">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-sky-500 inline-block" />
                     <span className="text-slate-600 font-medium">Tarjeta</span>
                   </div>
-                  <span className="font-bold text-slate-800">
-                    {activeMetrics.paymentMethods.card}%
-                  </span>
+                  <span className="font-bold text-slate-800">{activeMetrics.paymentMethods.card}%</span>
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -469,9 +570,7 @@ export default function DashboardPage() {
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" />
                     <span className="text-slate-600 font-medium">Transferencia</span>
                   </div>
-                  <span className="font-bold text-slate-800">
-                    {activeMetrics.paymentMethods.transfer}%
-                  </span>
+                  <span className="font-bold text-slate-800">{activeMetrics.paymentMethods.transfer}%</span>
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -479,31 +578,27 @@ export default function DashboardPage() {
                     <span className="w-2.5 h-2.5 rounded-full bg-slate-400 inline-block" />
                     <span className="text-slate-600 font-medium">Efectivo</span>
                   </div>
-                  <span className="font-bold text-slate-800">
-                    {activeMetrics.paymentMethods.cash}%
-                  </span>
+                  <span className="font-bold text-slate-800">{activeMetrics.paymentMethods.cash}%</span>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* ALERTAS OPERATIVAS: STOCK BAJO (ÁMBAR) Y AGOTADOS (ROJO) */}
+          {/* ALERTAS OPERATIVAS */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            
-            {/* Alerta Ámbar: Stock Bajo (1 a 5 piezas) */}
+            {/* Stock Bajo */}
             <div className="border border-amber-200 bg-amber-50/50 rounded-xl p-4 flex flex-col justify-between">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-amber-800 text-xs font-bold">
                     <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-                    <span>Productos Bajos en Stock</span>
+                    <span>Productos Bajos en Stock (1-5 uds)</span>
                   </div>
                   <span className="text-[11px] font-bold text-amber-800 bg-amber-100 border border-amber-200 px-2 py-0.5 rounded-md">
                     {lowStockList.length} Items
                   </span>
                 </div>
 
-                {/* Listado con Nombre de Producto y Sucursal */}
                 <div className="divide-y divide-amber-200/50 bg-white/80 rounded-lg border border-amber-200/60 overflow-hidden">
                   {lowStockList.length > 0 ? (
                     lowStockList.map((item) => (
@@ -539,7 +634,7 @@ export default function DashboardPage() {
               </Link>
             </div>
 
-            {/* Alerta Roja: Productos Agotados (Stock 0) */}
+            {/* Stock Agotado */}
             <div className="border border-rose-200 bg-rose-50/50 rounded-xl p-4 flex flex-col justify-between">
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
@@ -552,7 +647,6 @@ export default function DashboardPage() {
                   </span>
                 </div>
 
-                {/* Listado con Nombre de Producto y Sucursal */}
                 <div className="divide-y divide-rose-200/50 bg-white/80 rounded-lg border border-rose-200/60 overflow-hidden">
                   {outOfStockList.length > 0 ? (
                     outOfStockList.map((item) => (
@@ -587,9 +681,7 @@ export default function DashboardPage() {
                 <ChevronDown className="w-3.5 h-3.5 text-rose-600 -rotate-90" />
               </Link>
             </div>
-
           </div>
-
         </div>
       </main>
 
@@ -614,7 +706,7 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => setIsDetailModalOpen(false)}
-                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -622,40 +714,46 @@ export default function DashboardPage() {
 
             <div className="flex-1 grid grid-cols-12 overflow-hidden">
               <div className="col-span-7 border-r border-slate-100 overflow-y-auto divide-y divide-slate-100">
-                {MOCK_TICKETS.map((sale) => (
-                  <div
-                    key={sale.id}
-                    onClick={() => setActiveTicket(sale)}
-                    className={`p-3.5 flex items-center justify-between cursor-pointer transition-colors ${
-                      activeTicket?.id === sale.id
-                        ? "bg-sky-50/60 border-l-4 border-l-sky-600"
-                        : "hover:bg-slate-50"
-                    }`}
-                  >
-                    <div>
-                      <div className="flex items-center gap-2 mb-0.5">
-                        <span className="font-mono font-bold text-xs text-slate-800">
-                          {sale.ticketNumber}
+                {filteredTickets.length > 0 ? (
+                  filteredTickets.map((sale) => (
+                    <div
+                      key={sale.id}
+                      onClick={() => setActiveTicket(sale)}
+                      className={`p-3.5 flex items-center justify-between cursor-pointer transition-colors ${
+                        activeTicket?.id === sale.id
+                          ? "bg-sky-50/60 border-l-4 border-l-sky-600"
+                          : "hover:bg-slate-50"
+                      }`}
+                    >
+                      <div>
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <span className="font-mono font-bold text-xs text-slate-800">
+                            {sale.ticketNumber}
+                          </span>
+                          <span className="text-[10px] px-1.5 py-0.2 rounded font-medium bg-slate-100 text-slate-600">
+                            {sale.branch}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-400">
+                          {sale.time} • Cajero: <strong className="text-slate-600">{sale.cashier}</strong>
+                        </p>
+                      </div>
+
+                      <div className="text-right">
+                        <span className="text-xs font-mono font-bold text-slate-800 block">
+                          ${sale.total.toFixed(2)}
                         </span>
-                        <span className="text-[10px] px-1.5 py-0.2 rounded font-medium bg-slate-100 text-slate-600">
-                          {sale.branch}
+                        <span className="text-[10px] font-bold text-slate-400 uppercase">
+                          {sale.method}
                         </span>
                       </div>
-                      <p className="text-[11px] text-slate-400">
-                        {sale.time} • Cajero: <strong className="text-slate-600">{sale.cashier}</strong>
-                      </p>
                     </div>
-
-                    <div className="text-right">
-                      <span className="text-xs font-mono font-bold text-slate-800 block">
-                        ${sale.total.toFixed(2)}
-                      </span>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase">
-                        {sale.method}
-                      </span>
-                    </div>
+                  ))
+                ) : (
+                  <div className="p-8 text-center text-xs text-slate-400">
+                    No hay comprobantes registrados en esta jornada para la sucursal seleccionada.
                   </div>
-                ))}
+                )}
               </div>
 
               <div className="col-span-5 p-4 bg-slate-50/40 flex flex-col justify-between overflow-y-auto">
@@ -663,7 +761,7 @@ export default function DashboardPage() {
                   <div className="space-y-3">
                     <div className="p-3 bg-white border border-slate-200 rounded-xl shadow-2xs font-mono text-[11px] text-slate-600 space-y-2">
                       <div className="text-center pb-2 border-b border-dashed border-slate-200">
-                        <p className="font-bold text-slate-800">MARIOS DENT</p>
+                        <p className="font-bold text-slate-800">MARIO&apos;S DENT</p>
                         <p className="text-[10px] text-slate-400">Sucursal {activeTicket.branch}</p>
                         <p className="text-[10px] text-slate-500 mt-1">Ticket: {activeTicket.ticketNumber}</p>
                       </div>
@@ -686,7 +784,7 @@ export default function DashboardPage() {
                     <button
                       type="button"
                       onClick={() => alert(`Reimprimiendo ticket ${activeTicket.ticketNumber}...`)}
-                      className="w-full flex items-center justify-center gap-1.5 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl shadow-2xs transition-colors"
+                      className="w-full flex items-center justify-center gap-1.5 py-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl shadow-2xs transition-colors cursor-pointer"
                     >
                       <Printer className="w-3.5 h-3.5 text-sky-600" />
                       <span>Reimprimir Comprobante</span>
@@ -700,7 +798,6 @@ export default function DashboardPage() {
                 )}
               </div>
             </div>
-
           </div>
         </div>
       )}
