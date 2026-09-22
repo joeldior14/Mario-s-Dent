@@ -9,6 +9,7 @@ __turbopack_context__.s([
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/jsx-dev-runtime.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Navbar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/Navbar.tsx [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$cashService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/app/services/cashService.ts [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ConfirmarModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/ConfirmarModal.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$GastoMenorModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/GastoMenorModal.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$CortePDF$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/CortePDF.tsx [app-client] (ecmascript)");
@@ -43,11 +44,23 @@ var _s = __turbopack_context__.k.signature();
 ;
 ;
 ;
+;
 function CajaPage() {
     _s();
     const { isShiftOpen, cashierName, initialCash, openShift, closeShift, auditStatus, resolveAudit } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$context$2f$ShiftContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useShift"])();
     const { user } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$context$2f$AuthContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useAuth"])();
     const isAdmin = user?.role === "admin";
+    // Fecha actual en formato legible para el cajero (Zona horaria de El Salvador)
+    const currentDateDisplay = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
+        "CajaPage.useMemo[currentDateDisplay]": ()=>{
+            return new Intl.DateTimeFormat("es-SV", {
+                timeZone: "America/El_Salvador",
+                day: "numeric",
+                month: "short",
+                year: "numeric"
+            }).format(new Date());
+        }
+    }["CajaPage.useMemo[currentDateDisplay]"], []);
     // Nombre reactivo del operador derivado de la sesión activa
     const activeOperatorName = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
         "CajaPage.useMemo[activeOperatorName]": ()=>{
@@ -58,6 +71,13 @@ function CajaPage() {
         cashierName
     ]);
     const [isProcessing, setIsProcessing] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    // Ventas totales y desglose
+    const [salesBreakdown, setSalesBreakdown] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({
+        cash: 0,
+        card: 0,
+        transfer: 0,
+        total: 0
+    });
     // Control de Modales Operativos
     const [isModalOpen, setIsModalOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [isTicketAuditOpen, setIsTicketAuditOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
@@ -72,10 +92,17 @@ function CajaPage() {
             "CajaPage.useState": ()=>{}
         }["CajaPage.useState"]
     });
-    // Filtros de Auditoría (Admin)
+    // Filtros de Auditoría (Admin) fijando la zona horaria en America/El_Salvador (en-CA da formato YYYY-MM-DD)
     const [selectedBranch, setSelectedBranch] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("Santa Ana");
     const [selectedDate, setSelectedDate] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({
-        "CajaPage.useState": ()=>new Date().toISOString().split("T")[0]
+        "CajaPage.useState": ()=>{
+            return new Intl.DateTimeFormat("en-CA", {
+                timeZone: "America/El_Salvador",
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit"
+            }).format(new Date());
+        }
     }["CajaPage.useState"]);
     // Resolución Contable (Admin)
     const isAudited = auditStatus === "reviewed";
@@ -95,30 +122,67 @@ function CajaPage() {
         operatorNotes: "",
         operatorName: "Sin operador"
     });
-    // Carga asíncrona no bloqueante (preparada para backend / Supabase)
+    // Carga los datos de ventas totales y su desglose
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "CajaPage.useEffect": ()=>{
+            let isMounted = true;
+            async function loadSales() {
+                if (!isShiftOpen) {
+                    if (isMounted) {
+                        setSalesBreakdown({
+                            cash: 0,
+                            card: 0,
+                            transfer: 0,
+                            total: 0
+                        });
+                    }
+                    return;
+                }
+                const breakdown = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$cashService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getShiftSalesBreakdown"])(selectedBranch);
+                if (isMounted) {
+                    setSalesBreakdown(breakdown);
+                }
+            }
+            loadSales();
+            return ({
+                "CajaPage.useEffect": ()=>{
+                    isMounted = false;
+                }
+            })["CajaPage.useEffect"];
+        }
+    }["CajaPage.useEffect"], [
+        selectedBranch,
+        isShiftOpen
+    ]);
+    // Carga asíncrona para el Administrador (Prueba aislada de Fondo Inicial por fecha)
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "CajaPage.useEffect": ()=>{
             if (!isAdmin) return;
             let isMounted = true;
-            async function loadShiftData() {
+            async function loadAdminShift() {
                 try {
-                    await Promise.resolve();
+                    const fund = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$cashService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getShiftInitialFundByDate"])(selectedBranch, selectedDate);
                     if (isMounted) {
                         setSalesMetrics({
-                            initialFund: 0.0,
-                            cash: 0.0,
-                            card: 0.0,
-                            transfer: 0.0,
-                            reportedCountedCash: 0.0,
-                            operatorNotes: "",
-                            operatorName: activeOperatorName
-                        });
+                            "CajaPage.useEffect.loadAdminShift": (prev)=>({
+                                    ...prev,
+                                    initialFund: fund
+                                })
+                        }["CajaPage.useEffect.loadAdminShift"]);
                     }
                 } catch (error) {
-                    console.error("Error al cargar auditoría de turno:", error);
+                    console.error("Error al cargar fondo inicial histórico:", error);
+                    if (isMounted) {
+                        setSalesMetrics({
+                            "CajaPage.useEffect.loadAdminShift": (prev)=>({
+                                    ...prev,
+                                    initialFund: 0.0
+                                })
+                        }["CajaPage.useEffect.loadAdminShift"]);
+                    }
                 }
             }
-            loadShiftData();
+            loadAdminShift();
             return ({
                 "CajaPage.useEffect": ()=>{
                     isMounted = false;
@@ -128,8 +192,36 @@ function CajaPage() {
     }["CajaPage.useEffect"], [
         isAdmin,
         selectedBranch,
-        selectedDate,
-        activeOperatorName
+        selectedDate
+    ]);
+    // Cargar los gastos registrados en la BD de forma segura para React
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "CajaPage.useEffect": ()=>{
+            let isMounted = true;
+            async function loadExpenses() {
+                if (!isShiftOpen) {
+                    if (isMounted) setExpensesList([]);
+                    return;
+                }
+                try {
+                    const dbExpenses = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$cashService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fetchCurrentShiftExpenses"])(selectedBranch);
+                    if (isMounted) {
+                        setExpensesList(dbExpenses);
+                    }
+                } catch (err) {
+                    console.error("Error al cargar gastos del turno:", err);
+                }
+            }
+            loadExpenses();
+            return ({
+                "CajaPage.useEffect": ()=>{
+                    isMounted = false;
+                }
+            })["CajaPage.useEffect"];
+        }
+    }["CajaPage.useEffect"], [
+        selectedBranch,
+        isShiftOpen
     ]);
     // Balance Financiero Dinámico
     const totals = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
@@ -138,9 +230,9 @@ function CajaPage() {
                 "CajaPage.useMemo[totals].totalExpenses": (acc, curr)=>acc + (Number(curr.amount) || 0)
             }["CajaPage.useMemo[totals].totalExpenses"], 0);
             const fund = isAdmin ? salesMetrics.initialFund : isShiftOpen ? Number(initialCash) || 0.0 : 0.0;
-            const cash = isAdmin ? salesMetrics.cash : 0.0;
-            const card = isAdmin ? salesMetrics.card : 0.0;
-            const transfer = isAdmin ? salesMetrics.transfer : 0.0;
+            const cash = isAdmin ? salesMetrics.cash : salesBreakdown.cash;
+            const card = isAdmin ? salesMetrics.card : salesBreakdown.card;
+            const transfer = isAdmin ? salesMetrics.transfer : salesBreakdown.transfer;
             const grossSales = cash + card + transfer;
             const rawExpected = fund + cash - totalExpenses;
             const expected = isShiftOpen || isAdmin ? Math.max(0, rawExpected) : 0.0;
@@ -168,31 +260,82 @@ function CajaPage() {
         isShiftOpen,
         initialCash,
         salesMetrics,
+        salesBreakdown,
         countedCash
     ]);
-    // Apertura de Turno
-    const handleOpenShiftConfirm = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
-        "CajaPage.useCallback[handleOpenShiftConfirm]": (amount)=>{
+    // Apertura de Turno conectada a Supabase
+    const handleOpenShiftConfirm = async (amount)=>{
+        try {
+            setIsProcessing(true);
+            await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$cashService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["openCashShiftInDB"])({
+                branchName: selectedBranch,
+                cashierId: user?.id || "",
+                initialCash: amount
+            });
             openShift(amount, activeOperatorName);
             setCountedCash(amount);
             setIsModalOpen(false);
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : "Error al iniciar turno en base de datos";
+            setDialogConfig({
+                isOpen: true,
+                type: "warning",
+                title: "Error de Apertura",
+                description: msg,
+                confirmText: "Aceptar",
+                onConfirm: ()=>setDialogConfig((prev)=>({
+                            ...prev,
+                            isOpen: false
+                        }))
+            });
+        } finally{
+            setIsProcessing(false);
         }
-    }["CajaPage.useCallback[handleOpenShiftConfirm]"], [
-        openShift,
-        activeOperatorName
-    ]);
-    // Guardar Gasto
-    const handleSaveExpense = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
-        "CajaPage.useCallback[handleSaveExpense]": (newExpense)=>{
-            setExpensesList({
-                "CajaPage.useCallback[handleSaveExpense]": (prev)=>[
-                        newExpense,
-                        ...prev
-                    ]
-            }["CajaPage.useCallback[handleSaveExpense]"]);
+    };
+    // Guardar Gasto Menor conectado a la tabla 'cash_movements' de Supabase
+    const handleSaveExpense = async (newExpense)=>{
+        try {
+            setIsProcessing(true);
+            await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$cashService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["recordExpenseInDB"])({
+                branchName: selectedBranch,
+                amount: newExpense.amount,
+                category: newExpense.category,
+                concept: newExpense.concept
+            });
+            setExpensesList((prev)=>[
+                    newExpense,
+                    ...prev
+                ]);
+            setIsExpenseModalOpen(false);
+            setDialogConfig({
+                isOpen: true,
+                type: "success",
+                title: "Gasto Registrado",
+                description: `Se retiraron $${Number(newExpense.amount).toFixed(2)} de gaveta exitosamente.`,
+                confirmText: "Aceptar",
+                onConfirm: ()=>setDialogConfig((prev)=>({
+                            ...prev,
+                            isOpen: false
+                        }))
+            });
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : "Error al registrar gasto";
+            setDialogConfig({
+                isOpen: true,
+                type: "warning",
+                title: "Error de Salida",
+                description: msg,
+                confirmText: "Aceptar",
+                onConfirm: ()=>setDialogConfig((prev)=>({
+                            ...prev,
+                            isOpen: false
+                        }))
+            });
+        } finally{
+            setIsProcessing(false);
         }
-    }["CajaPage.useCallback[handleSaveExpense]"], []);
-    // Cierre de Turno
+    };
+    // Cierre de Turno conectado a Supabase (Corte Z)
     const handleCloseShift = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
         "CajaPage.useCallback[handleCloseShift]": ()=>{
             if (totals.isShortage && !cashierNotes.trim()) {
@@ -217,29 +360,67 @@ function CajaPage() {
                 isOpen: true,
                 type: "warning",
                 title: "Confirmar Cierre de Turno",
-                description: "¿Confirmas el cierre de jornada (Corte Z)? Esta acción registrará el balance final del día.",
+                description: "¿Confirmas el cierre de jornada (Corte Z)? Esta acción asentará el balance final en el sistema y cerrará la caja.",
                 confirmText: "Sí, Cerrar Turno",
                 cancelText: "Cancelar",
                 onConfirm: {
-                    "CajaPage.useCallback[handleCloseShift]": ()=>{
-                        closeShift();
-                        setCashierNotes("");
-                        setCountedCash(0.0);
-                        setDialogConfig({
-                            isOpen: true,
-                            type: "success",
-                            title: "Turno Cerrado con Éxito",
-                            description: "El balance final ha sido asentado correctamente y el comprobante quedó registrado.",
-                            confirmText: "Aceptar",
-                            onConfirm: {
-                                "CajaPage.useCallback[handleCloseShift]": ()=>setDialogConfig({
-                                        "CajaPage.useCallback[handleCloseShift]": (prev)=>({
-                                                ...prev,
-                                                isOpen: false
-                                            })
-                                    }["CajaPage.useCallback[handleCloseShift]"])
-                            }["CajaPage.useCallback[handleCloseShift]"]
-                        });
+                    "CajaPage.useCallback[handleCloseShift]": async ()=>{
+                        try {
+                            setIsProcessing(true);
+                            await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$cashService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["closeCashShiftInDB"])({
+                                branchName: selectedBranch,
+                                countedCash,
+                                expectedCash: totals.expectedCash,
+                                totalSales: totals.totalSales,
+                                totalExpenses: totals.expenses,
+                                difference: totals.difference,
+                                notes: cashierNotes
+                            });
+                            closeShift();
+                            setCashierNotes("");
+                            setCountedCash(0.0);
+                            setExpensesList([]);
+                            setSalesBreakdown({
+                                cash: 0,
+                                card: 0,
+                                transfer: 0,
+                                total: 0
+                            });
+                            setDialogConfig({
+                                isOpen: true,
+                                type: "success",
+                                title: "Turno Cerrado con Éxito",
+                                description: "El balance final ha sido asentado correctamente en la base de datos (Corte Z registrado).",
+                                confirmText: "Aceptar",
+                                onConfirm: {
+                                    "CajaPage.useCallback[handleCloseShift]": ()=>setDialogConfig({
+                                            "CajaPage.useCallback[handleCloseShift]": (prev)=>({
+                                                    ...prev,
+                                                    isOpen: false
+                                                })
+                                        }["CajaPage.useCallback[handleCloseShift]"])
+                                }["CajaPage.useCallback[handleCloseShift]"]
+                            });
+                        } catch (err) {
+                            const msg = err instanceof Error ? err.message : "Error al registrar el cierre de turno";
+                            setDialogConfig({
+                                isOpen: true,
+                                type: "warning",
+                                title: "Error de Cierre",
+                                description: msg,
+                                confirmText: "Aceptar",
+                                onConfirm: {
+                                    "CajaPage.useCallback[handleCloseShift]": ()=>setDialogConfig({
+                                            "CajaPage.useCallback[handleCloseShift]": (prev)=>({
+                                                    ...prev,
+                                                    isOpen: false
+                                                })
+                                        }["CajaPage.useCallback[handleCloseShift]"])
+                                }["CajaPage.useCallback[handleCloseShift]"]
+                            });
+                        } finally{
+                            setIsProcessing(false);
+                        }
                     }
                 }["CajaPage.useCallback[handleCloseShift]"],
                 onCancel: {
@@ -253,8 +434,10 @@ function CajaPage() {
             });
         }
     }["CajaPage.useCallback[handleCloseShift]"], [
-        totals.isShortage,
+        totals,
         cashierNotes,
+        selectedBranch,
+        countedCash,
         closeShift
     ]);
     // Resolución de Auditoría (Admin)
@@ -325,7 +508,7 @@ function CajaPage() {
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Navbar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                 fileName: "[project]/src/app/caja/page.tsx",
-                lineNumber: 272,
+                lineNumber: 441,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
@@ -341,7 +524,7 @@ function CajaPage() {
                                         children: "Control de caja"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 278,
+                                        lineNumber: 447,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -349,13 +532,13 @@ function CajaPage() {
                                         children: "Cash Drawer & Daily Close (Corte Z)"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 279,
+                                        lineNumber: 448,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/caja/page.tsx",
-                                lineNumber: 277,
+                                lineNumber: 446,
                                 columnNumber: 11
                             }, this),
                             isAdmin ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -368,7 +551,7 @@ function CajaPage() {
                                                 className: "w-3.5 h-3.5 text-slate-400"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 287,
+                                                lineNumber: 456,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -381,7 +564,7 @@ function CajaPage() {
                                                         children: "Santa Ana"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 293,
+                                                        lineNumber: 462,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -389,7 +572,7 @@ function CajaPage() {
                                                         children: "Ahuachapán"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 294,
+                                                        lineNumber: 463,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -397,19 +580,19 @@ function CajaPage() {
                                                         children: "Sonsonate"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 295,
+                                                        lineNumber: 464,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 288,
+                                                lineNumber: 457,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 286,
+                                        lineNumber: 455,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -419,7 +602,7 @@ function CajaPage() {
                                                 className: "w-3.5 h-3.5 text-slate-400"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 300,
+                                                lineNumber: 469,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -429,34 +612,32 @@ function CajaPage() {
                                                 className: "text-xs font-bold text-slate-700 bg-transparent focus:outline-none cursor-pointer"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 301,
+                                                lineNumber: 470,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 299,
+                                        lineNumber: 468,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/caja/page.tsx",
-                                lineNumber: 285,
+                                lineNumber: 454,
                                 columnNumber: 13
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "flex items-center gap-4",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "text-xs text-slate-500 font-medium text-right",
+                                        className: "text-xs text-slate-500 font-medium text-right flex items-center",
                                         children: [
-                                            "Turno:",
-                                            " ",
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                                                className: isShiftOpen ? "text-emerald-600" : "text-slate-700",
-                                                children: isShiftOpen ? "En Curso" : "Cerrado"
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "text-slate-600 font-semibold capitalize",
+                                                children: currentDateDisplay
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 313,
+                                                lineNumber: 482,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -464,22 +645,56 @@ function CajaPage() {
                                                 children: "|"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 316,
+                                                lineNumber: 485,
                                                 columnNumber: 17
                                             }, this),
-                                            "Operador: ",
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                                                className: "text-slate-700",
-                                                children: activeOperatorName
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                children: [
+                                                    "Turno:",
+                                                    " ",
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                                        className: isShiftOpen ? "text-emerald-600" : "text-slate-700",
+                                                        children: isShiftOpen ? "En Curso" : "Cerrado"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/caja/page.tsx",
+                                                        lineNumber: 488,
+                                                        columnNumber: 19
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/app/caja/page.tsx",
+                                                lineNumber: 486,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                className: "mx-2 text-slate-300",
+                                                children: "|"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 317,
-                                                columnNumber: 27
+                                                lineNumber: 492,
+                                                columnNumber: 17
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                children: [
+                                                    "Operador: ",
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                                        className: "text-slate-700",
+                                                        children: activeOperatorName
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/app/caja/page.tsx",
+                                                        lineNumber: 494,
+                                                        columnNumber: 29
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/app/caja/page.tsx",
+                                                lineNumber: 493,
+                                                columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 311,
+                                        lineNumber: 481,
                                         columnNumber: 15
                                     }, this),
                                     !isShiftOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -491,32 +706,32 @@ function CajaPage() {
                                                 className: "w-4 h-4"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 326,
+                                                lineNumber: 504,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Iniciar Turno"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 327,
+                                                lineNumber: 505,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 321,
+                                        lineNumber: 499,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/caja/page.tsx",
-                                lineNumber: 310,
+                                lineNumber: 480,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/caja/page.tsx",
-                        lineNumber: 276,
+                        lineNumber: 445,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -532,20 +747,20 @@ function CajaPage() {
                                                 className: "w-3.5 h-3.5"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 338,
+                                                lineNumber: 516,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Fondo Inicial"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 339,
+                                                lineNumber: 517,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 337,
+                                        lineNumber: 515,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -558,13 +773,13 @@ function CajaPage() {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 341,
+                                        lineNumber: 519,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/caja/page.tsx",
-                                lineNumber: 336,
+                                lineNumber: 514,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -577,39 +792,37 @@ function CajaPage() {
                                                 className: "w-3.5 h-3.5"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 348,
+                                                lineNumber: 526,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Ventas Totales"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 349,
+                                                lineNumber: 527,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 347,
+                                        lineNumber: 525,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                         className: "text-xl font-bold text-sky-600",
                                         children: [
                                             "$",
-                                            totals.totalSales.toLocaleString("en-US", {
-                                                minimumFractionDigits: 2
-                                            })
+                                            salesBreakdown.total.toFixed(2)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 351,
+                                        lineNumber: 529,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/caja/page.tsx",
-                                lineNumber: 346,
+                                lineNumber: 524,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -622,20 +835,20 @@ function CajaPage() {
                                                 className: "w-3.5 h-3.5"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 358,
+                                                lineNumber: 536,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Gastos"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 359,
+                                                lineNumber: 537,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 357,
+                                        lineNumber: 535,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -645,13 +858,13 @@ function CajaPage() {
                                         })}` : "$0.00"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 361,
+                                        lineNumber: 539,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/caja/page.tsx",
-                                lineNumber: 356,
+                                lineNumber: 534,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -664,20 +877,20 @@ function CajaPage() {
                                                 className: "w-3.5 h-3.5"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 370,
+                                                lineNumber: 548,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Total Esperado"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 371,
+                                                lineNumber: 549,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 369,
+                                        lineNumber: 547,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -690,19 +903,19 @@ function CajaPage() {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 373,
+                                        lineNumber: 551,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/caja/page.tsx",
-                                lineNumber: 368,
+                                lineNumber: 546,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/caja/page.tsx",
-                        lineNumber: 335,
+                        lineNumber: 513,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -716,7 +929,7 @@ function CajaPage() {
                                         children: "Desglose de Ingresos"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 383,
+                                        lineNumber: 561,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -731,12 +944,12 @@ function CajaPage() {
                                                             className: "w-5 h-5"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                            lineNumber: 388,
+                                                            lineNumber: 566,
                                                             columnNumber: 19
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 387,
+                                                        lineNumber: 565,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -746,7 +959,7 @@ function CajaPage() {
                                                                 children: "Efectivo"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 391,
+                                                                lineNumber: 569,
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -754,38 +967,36 @@ function CajaPage() {
                                                                 children: "Ingreso a gaveta física"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 392,
+                                                                lineNumber: 570,
                                                                 columnNumber: 19
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 390,
+                                                        lineNumber: 568,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 386,
+                                                lineNumber: 564,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 className: "text-base font-bold text-slate-800",
                                                 children: [
                                                     "$",
-                                                    totals.cashSales.toLocaleString("en-US", {
-                                                        minimumFractionDigits: 2
-                                                    })
+                                                    salesBreakdown.cash.toFixed(2)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 395,
+                                                lineNumber: 573,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 385,
+                                        lineNumber: 563,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -800,12 +1011,12 @@ function CajaPage() {
                                                             className: "w-5 h-5"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                            lineNumber: 403,
+                                                            lineNumber: 581,
                                                             columnNumber: 19
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 402,
+                                                        lineNumber: 580,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -815,7 +1026,7 @@ function CajaPage() {
                                                                 children: "Tarjeta"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 406,
+                                                                lineNumber: 584,
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -823,38 +1034,36 @@ function CajaPage() {
                                                                 children: "Comprobantes de terminal"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 407,
+                                                                lineNumber: 585,
                                                                 columnNumber: 19
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 405,
+                                                        lineNumber: 583,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 401,
+                                                lineNumber: 579,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 className: "text-base font-bold text-slate-800",
                                                 children: [
                                                     "$",
-                                                    totals.cardSales.toLocaleString("en-US", {
-                                                        minimumFractionDigits: 2
-                                                    })
+                                                    salesBreakdown.card.toFixed(2)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 410,
+                                                lineNumber: 588,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 400,
+                                        lineNumber: 578,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -869,12 +1078,12 @@ function CajaPage() {
                                                             className: "w-5 h-5"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                            lineNumber: 418,
+                                                            lineNumber: 596,
                                                             columnNumber: 19
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 417,
+                                                        lineNumber: 595,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -884,7 +1093,7 @@ function CajaPage() {
                                                                 children: "Transferencia"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 421,
+                                                                lineNumber: 599,
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -892,44 +1101,42 @@ function CajaPage() {
                                                                 children: "Acreditaciones bancarias"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 422,
+                                                                lineNumber: 600,
                                                                 columnNumber: 19
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 420,
+                                                        lineNumber: 598,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 416,
+                                                lineNumber: 594,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 className: "text-base font-bold text-slate-800",
                                                 children: [
                                                     "$",
-                                                    totals.transferSales.toLocaleString("en-US", {
-                                                        minimumFractionDigits: 2
-                                                    })
+                                                    salesBreakdown.transfer.toFixed(2)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 425,
+                                                lineNumber: 603,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 415,
+                                        lineNumber: 593,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/caja/page.tsx",
-                                lineNumber: 382,
+                                lineNumber: 560,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -945,7 +1152,7 @@ function CajaPage() {
                                                         children: isAdmin ? "Auditoría de Arqueo (Corte Z)" : "Arqueo de Caja (Efectivo)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 435,
+                                                        lineNumber: 613,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -953,13 +1160,13 @@ function CajaPage() {
                                                         children: isAdmin ? "Fiscalización de valores reportados y resolución contable" : "Ingrese el conteo físico de billetes y monedas en gaveta"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 438,
+                                                        lineNumber: 616,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 434,
+                                                lineNumber: 612,
                                                 columnNumber: 15
                                             }, this),
                                             isAdmin && !totals.isBalanced && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -970,14 +1177,14 @@ function CajaPage() {
                                                             className: "w-3.5 h-3.5 text-sky-600"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                            lineNumber: 456,
+                                                            lineNumber: 634,
                                                             columnNumber: 23
                                                         }, this),
                                                         "Auditado y Resuelto"
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                    lineNumber: 455,
+                                                    lineNumber: 633,
                                                     columnNumber: 21
                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
                                                     children: [
@@ -985,25 +1192,25 @@ function CajaPage() {
                                                             className: "w-3.5 h-3.5 text-rose-600"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                            lineNumber: 461,
+                                                            lineNumber: 639,
                                                             columnNumber: 23
                                                         }, this),
                                                         "Pendiente de Resolución"
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                    lineNumber: 460,
+                                                    lineNumber: 638,
                                                     columnNumber: 21
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 447,
+                                                lineNumber: 625,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 433,
+                                        lineNumber: 611,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1016,7 +1223,7 @@ function CajaPage() {
                                                         children: "Efectivo Contado"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 471,
+                                                        lineNumber: 649,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1027,7 +1234,7 @@ function CajaPage() {
                                                                 children: "$"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 475,
+                                                                lineNumber: 653,
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1041,19 +1248,19 @@ function CajaPage() {
                                                                 className: `w-full pl-7 pr-3 py-2 border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none transition-colors ${isShiftOpen && !isAdmin ? "bg-slate-50 text-slate-800 focus:border-sky-400" : "bg-slate-100 text-slate-500 cursor-not-allowed"}`
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 478,
+                                                                lineNumber: 656,
                                                                 columnNumber: 19
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 474,
+                                                        lineNumber: 652,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 470,
+                                                lineNumber: 648,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1063,7 +1270,7 @@ function CajaPage() {
                                                         children: "Efectivo Esperado"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 502,
+                                                        lineNumber: 680,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1074,7 +1281,7 @@ function CajaPage() {
                                                                 children: "$"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 506,
+                                                                lineNumber: 684,
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1085,25 +1292,25 @@ function CajaPage() {
                                                                 className: "w-full pl-7 pr-3 py-2 bg-slate-100/70 border border-slate-200 rounded-lg text-xs font-semibold text-slate-500 cursor-not-allowed select-none"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 509,
+                                                                lineNumber: 687,
                                                                 columnNumber: 19
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 505,
+                                                        lineNumber: 683,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 501,
+                                                lineNumber: 679,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 469,
+                                        lineNumber: 647,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1116,19 +1323,19 @@ function CajaPage() {
                                                         className: "w-5 h-5 text-emerald-600 shrink-0"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 532,
+                                                        lineNumber: 710,
                                                         columnNumber: 19
                                                     }, this) : isAudited ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$shield$2d$check$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ShieldCheck$3e$__["ShieldCheck"], {
                                                         className: "w-5 h-5 text-sky-600 shrink-0"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 534,
+                                                        lineNumber: 712,
                                                         columnNumber: 19
                                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$triangle$2d$alert$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__AlertTriangle$3e$__["AlertTriangle"], {
                                                         className: "w-5 h-5 text-rose-600 shrink-0"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 536,
+                                                        lineNumber: 714,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1138,7 +1345,7 @@ function CajaPage() {
                                                                 children: totals.isBalanced ? "Cuadre Exacto" : isAudited ? "Descuadre Auditado y Resuelto" : totals.isSurplus ? "Diferencia: Sobrante en Efectivo" : "Diferencia: Faltante de Efectivo"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 539,
+                                                                lineNumber: 717,
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1146,19 +1353,19 @@ function CajaPage() {
                                                                 children: totals.isBalanced ? "El conteo físico coincide al 100% con el efectivo esperado." : isAudited ? `Discrepancia conciliada bajo el dictamen [${resolutionType}].` : totals.isSurplus ? "Hay más dinero en la gaveta de lo registrado en sistema." : "El efectivo físico es menor al balance exigido."
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 548,
+                                                                lineNumber: 726,
                                                                 columnNumber: 19
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 538,
+                                                        lineNumber: 716,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 530,
+                                                lineNumber: 708,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1166,13 +1373,13 @@ function CajaPage() {
                                                 children: totals.isBalanced ? "$0.00" : totals.isSurplus ? `+$${totals.difference.toFixed(2)}` : `-$${Math.abs(totals.difference).toFixed(2)}`
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 559,
+                                                lineNumber: 737,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 521,
+                                        lineNumber: 699,
                                         columnNumber: 13
                                     }, this),
                                     (totals.isShortage || isAdmin && !totals.isBalanced) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1187,13 +1394,13 @@ function CajaPage() {
                                                         children: "*(Obligatorio para cerrar turno)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 574,
+                                                        lineNumber: 752,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 571,
+                                                lineNumber: 749,
                                                 columnNumber: 17
                                             }, this),
                                             isAdmin ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1201,7 +1408,7 @@ function CajaPage() {
                                                 children: salesMetrics.operatorNotes ? `“${salesMetrics.operatorNotes}”` : "No se registró ninguna observación por el operador en este turno."
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 581,
+                                                lineNumber: 759,
                                                 columnNumber: 19
                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
                                                 rows: 2,
@@ -1212,13 +1419,13 @@ function CajaPage() {
                                                 className: `w-full p-2.5 border rounded-xl text-xs focus:outline-none transition-colors ${!cashierNotes.trim() ? "border-rose-300 bg-rose-50/30 placeholder-rose-400 focus:border-rose-500" : "border-slate-200 bg-slate-50 text-slate-800 focus:border-sky-400"} ${!isShiftOpen ? "bg-slate-100 cursor-not-allowed" : ""}`
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 587,
+                                                lineNumber: 765,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 570,
+                                        lineNumber: 748,
                                         columnNumber: 15
                                     }, this),
                                     isAdmin ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1239,20 +1446,20 @@ function CajaPage() {
                                                                         className: "w-3.5 h-3.5 text-slate-400"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                                        lineNumber: 615,
+                                                                        lineNumber: 793,
                                                                         columnNumber: 23
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                         children: "Descargar Corte Z"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                                        lineNumber: 616,
+                                                                        lineNumber: 794,
                                                                         columnNumber: 23
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 608,
+                                                                lineNumber: 786,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1264,26 +1471,26 @@ function CajaPage() {
                                                                         className: "w-3.5 h-3.5 text-slate-400"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                                        lineNumber: 624,
+                                                                        lineNumber: 802,
                                                                         columnNumber: 23
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                         children: "Auditar Tickets"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                                        lineNumber: 625,
+                                                                        lineNumber: 803,
                                                                         columnNumber: 23
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 619,
+                                                                lineNumber: 797,
                                                                 columnNumber: 21
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 607,
+                                                        lineNumber: 785,
                                                         columnNumber: 19
                                                     }, this),
                                                     !totals.isBalanced && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -1296,20 +1503,20 @@ function CajaPage() {
                                                                     className: "w-4 h-4"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                                    lineNumber: 637,
+                                                                    lineNumber: 815,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                     children: "Aprobar y Resolver Alerta"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                                    lineNumber: 638,
+                                                                    lineNumber: 816,
                                                                     columnNumber: 27
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                            lineNumber: 632,
+                                                            lineNumber: 810,
                                                             columnNumber: 25
                                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                             className: "text-[11px] font-bold text-sky-700 bg-sky-50 border border-sky-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5",
@@ -1318,7 +1525,7 @@ function CajaPage() {
                                                                     className: "w-4 h-4 text-sky-600"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                                    lineNumber: 642,
+                                                                    lineNumber: 820,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 " Resuelto por ",
@@ -1326,18 +1533,18 @@ function CajaPage() {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                            lineNumber: 641,
+                                                            lineNumber: 819,
                                                             columnNumber: 25
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 630,
+                                                        lineNumber: 808,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 606,
+                                                lineNumber: 784,
                                                 columnNumber: 17
                                             }, this),
                                             !totals.isBalanced && !isAudited && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1351,7 +1558,7 @@ function CajaPage() {
                                                                 children: "Dictamen Contable:"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 652,
+                                                                lineNumber: 830,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -1364,7 +1571,7 @@ function CajaPage() {
                                                                         children: "Ajuste Aceptado (Merma)"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                                        lineNumber: 660,
+                                                                        lineNumber: 838,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -1372,7 +1579,7 @@ function CajaPage() {
                                                                         children: "Cobro a Cajero / Nómina"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                                        lineNumber: 661,
+                                                                        lineNumber: 839,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -1380,19 +1587,19 @@ function CajaPage() {
                                                                         children: "Error Corregido en POS"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                                        lineNumber: 662,
+                                                                        lineNumber: 840,
                                                                         columnNumber: 25
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 655,
+                                                                lineNumber: 833,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 651,
+                                                        lineNumber: 829,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1403,19 +1610,19 @@ function CajaPage() {
                                                         className: "w-full text-xs p-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-sky-400"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 665,
+                                                        lineNumber: 843,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 650,
+                                                lineNumber: 828,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 605,
+                                        lineNumber: 783,
                                         columnNumber: 15
                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "pt-3 space-y-3",
@@ -1430,12 +1637,12 @@ function CajaPage() {
                                                     children: "Registrar Gasto Menor"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                    lineNumber: 678,
+                                                    lineNumber: 856,
                                                     columnNumber: 19
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 677,
+                                                lineNumber: 855,
                                                 columnNumber: 17
                                             }, this),
                                             isShiftOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1449,59 +1656,59 @@ function CajaPage() {
                                                             className: "w-3.5 h-3.5"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                            lineNumber: 695,
+                                                            lineNumber: 873,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                             children: "Cerrar Turno Diario (Corte Z)"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                            lineNumber: 696,
+                                                            lineNumber: 874,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                    lineNumber: 690,
+                                                    lineNumber: 868,
                                                     columnNumber: 21
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 689,
+                                                lineNumber: 867,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 676,
+                                        lineNumber: 854,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/caja/page.tsx",
-                                lineNumber: 432,
+                                lineNumber: 610,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/caja/page.tsx",
-                        lineNumber: 380,
+                        lineNumber: 558,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/caja/page.tsx",
-                lineNumber: 274,
+                lineNumber: 443,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$GastoMenorModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                 isOpen: isExpenseModalOpen,
                 onClose: ()=>setIsExpenseModalOpen(false),
                 onSaveExpense: handleSaveExpense,
-                currentAvailableCash: totals.difference >= 0 ? totals.expectedCash : totals.expectedCash + totals.difference
+                currentAvailableCash: totals.expectedCash > 0 ? totals.expectedCash : Number(initialCash) || countedCash || 0.0
             }, void 0, false, {
                 fileName: "[project]/src/app/caja/page.tsx",
-                lineNumber: 707,
+                lineNumber: 885,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$AuditTicketsModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1512,7 +1719,7 @@ function CajaPage() {
                 selectedShift: "Jornada Completa"
             }, void 0, false, {
                 fileName: "[project]/src/app/caja/page.tsx",
-                lineNumber: 714,
+                lineNumber: 896,
                 columnNumber: 7
             }, this),
             !isAdmin && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$OpenShiftModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1522,7 +1729,7 @@ function CajaPage() {
                 onConfirm: handleOpenShiftConfirm
             }, void 0, false, {
                 fileName: "[project]/src/app/caja/page.tsx",
-                lineNumber: 723,
+                lineNumber: 905,
                 columnNumber: 9
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ConfirmarModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1536,7 +1743,7 @@ function CajaPage() {
                 onCancel: dialogConfig.onCancel
             }, void 0, false, {
                 fileName: "[project]/src/app/caja/page.tsx",
-                lineNumber: 732,
+                lineNumber: 914,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$CortePDF$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1559,17 +1766,17 @@ function CajaPage() {
                 }
             }, void 0, false, {
                 fileName: "[project]/src/app/caja/page.tsx",
-                lineNumber: 743,
+                lineNumber: 925,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/app/caja/page.tsx",
-        lineNumber: 271,
+        lineNumber: 440,
         columnNumber: 5
     }, this);
 }
-_s(CajaPage, "/ZeWGhsYB+A+wGuLH1ea7Ys8ZFY=", false, function() {
+_s(CajaPage, "hUxh1d6PYmcjV5iSIAqD8rW6pyw=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$context$2f$ShiftContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useShift"],
         __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$context$2f$AuthContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useAuth"]
@@ -1578,6 +1785,210 @@ _s(CajaPage, "/ZeWGhsYB+A+wGuLH1ea7Ys8ZFY=", false, function() {
 _c = CajaPage;
 var _c;
 __turbopack_context__.k.register(_c, "CajaPage");
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/src/app/services/cashService.ts [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "closeCashShiftInDB",
+    ()=>closeCashShiftInDB,
+    "fetchCurrentShiftExpenses",
+    ()=>fetchCurrentShiftExpenses,
+    "getNextOrderNumber",
+    ()=>getNextOrderNumber,
+    "getShiftInitialFundByDate",
+    ()=>getShiftInitialFundByDate,
+    "getShiftSalesBreakdown",
+    ()=>getShiftSalesBreakdown,
+    "openCashShiftInDB",
+    ()=>openCashShiftInDB,
+    "recordExpenseInDB",
+    ()=>recordExpenseInDB
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/supabaseClient.ts [app-client] (ecmascript)");
+;
+async function openCashShiftInDB(payload) {
+    const { branchName, cashierId, initialCash } = payload;
+    // 1. Obtener la sucursal activa
+    const { data: branch, error: branchErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id").ilike("name", branchName).single();
+    if (branchErr || !branch) {
+        throw new Error(`No se encontró la sucursal: ${branchName}`);
+    }
+    // 2. Verificar si ya existe un turno abierto en la sucursal
+    const { data: existingShift } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").select("id").eq("branch_id", branch.id).eq("status", "open").maybeSingle();
+    if (existingShift) {
+        throw new Error("Ya existe un turno abierto en esta sucursal.");
+    }
+    // 3. Insertar el nuevo turno
+    const { data, error } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").insert([
+        {
+            branch_id: branch.id,
+            cashier_id: cashierId || null,
+            initial_cash: Number(initialCash),
+            status: "open",
+            opened_at: new Date().toISOString()
+        }
+    ]).select().single();
+    if (error) {
+        throw new Error(`Error al abrir turno: ${error.message}`);
+    }
+    return data;
+}
+async function recordExpenseInDB(payload) {
+    const { branchName, amount, category, concept } = payload;
+    // 1. Obtener la sucursal
+    const { data: branch, error: branchErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id").ilike("name", branchName).single();
+    if (branchErr || !branch) {
+        throw new Error(`No se encontró la sucursal: ${branchName}`);
+    }
+    // 2. Obtener el turno abierto
+    const { data: activeShift, error: shiftErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").select("id").eq("branch_id", branch.id).eq("status", "open").order("opened_at", {
+        ascending: false
+    }).limit(1).maybeSingle();
+    if (shiftErr || !activeShift) {
+        throw new Error("No hay un turno abierto para registrar gastos.");
+    }
+    // 3. Insertar el movimiento de egreso
+    const fullDescription = `${category} - ${concept}`;
+    const { data, error } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_movements").insert([
+        {
+            shift_id: activeShift.id,
+            amount: Number(amount),
+            type: "egress",
+            description: fullDescription,
+            created_at: new Date().toISOString()
+        }
+    ]).select().single();
+    if (error) {
+        throw new Error(`Error al registrar el gasto: ${error.message}`);
+    }
+    return data;
+}
+async function fetchCurrentShiftExpenses(branchName) {
+    // 1. Obtener la sucursal
+    const { data: branch } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id").ilike("name", branchName).single();
+    if (!branch) return [];
+    // 2. Obtener el turno abierto
+    const { data: activeShift } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").select("id").eq("branch_id", branch.id).eq("status", "open").order("opened_at", {
+        ascending: false
+    }).limit(1).maybeSingle();
+    if (!activeShift) return [];
+    // 3. Obtener los egresos de 'cash_movements'
+    const { data: movements, error } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_movements").select("id, amount, description, created_at").eq("shift_id", activeShift.id).order("created_at", {
+        ascending: false
+    });
+    if (error || !movements) return [];
+    // 4. Mapear a la estructura que consume el estado de la UI
+    return movements.map((m)=>{
+        const parts = (m.description || "").split(" - ");
+        return {
+            id: m.id,
+            amount: Number(m.amount),
+            category: parts[0] || "Gasto Operativo",
+            concept: parts.slice(1).join(" - ") || m.description,
+            time: new Date(m.created_at).toLocaleTimeString("es-SV", {
+                hour: "2-digit",
+                minute: "2-digit"
+            })
+        };
+    });
+}
+async function getShiftSalesBreakdown(branchName) {
+    const initial = {
+        cash: 0,
+        card: 0,
+        transfer: 0,
+        total: 0
+    };
+    // 1. Localizar sucursal
+    const { data: branch } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id").ilike("name", branchName).single();
+    if (!branch) return initial;
+    // 2. Localizar turno abierto
+    const { data: activeShift } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").select("id").eq("branch_id", branch.id).eq("status", "open").order("opened_at", {
+        ascending: false
+    }).limit(1).maybeSingle();
+    if (!activeShift) return initial;
+    // 3. Obtener ventas del turno
+    const { data: sales } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sales").select("payment_method, total").eq("shift_id", activeShift.id);
+    if (!sales || sales.length === 0) return initial;
+    // 4. Sumar por cada método de pago
+    return sales.reduce((acc, sale)=>{
+        const amount = Number(sale.total) || 0;
+        if (sale.payment_method === "cash") acc.cash += amount;
+        else if (sale.payment_method === "card") acc.card += amount;
+        else if (sale.payment_method === "transfer") acc.transfer += amount;
+        acc.total += amount;
+        return acc;
+    }, initial);
+}
+async function closeCashShiftInDB(payload) {
+    const { branchName, countedCash, expectedCash, totalSales, totalExpenses, difference, notes } = payload;
+    // 1. Obtener la sucursal activa
+    const { data: branch, error: branchErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id").ilike("name", branchName).single();
+    if (branchErr || !branch) {
+        throw new Error(`No se encontró la sucursal: ${branchName}`);
+    }
+    // 2. Buscar el turno abierto actual
+    const { data: activeShift, error: shiftErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").select("id").eq("branch_id", branch.id).eq("status", "open").order("opened_at", {
+        ascending: false
+    }).limit(1).maybeSingle();
+    if (shiftErr || !activeShift) {
+        throw new Error("No existe ningún turno activo para cerrar en esta sucursal.");
+    }
+    // 3. Asentar el cierre con los nombres exactos de tus columnas
+    const { error: updateErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").update({
+        status: "closed",
+        closed_at: new Date().toISOString(),
+        counted_cash: Number(countedCash.toFixed(2)),
+        expected_cash: Number(expectedCash.toFixed(2)),
+        total_sales: Number(totalSales.toFixed(2)),
+        total_expenses: Number(totalExpenses.toFixed(2)),
+        difference: Number(difference.toFixed(2)),
+        cashier_notes: notes?.trim() || null,
+        notes: notes?.trim() || null
+    }).eq("id", activeShift.id);
+    if (updateErr) {
+        throw new Error(`Error al registrar el Corte Z: ${updateErr.message}`);
+    }
+    return {
+        shiftId: activeShift.id
+    };
+}
+async function getNextOrderNumber(branchName) {
+    // 1. Obtener sucursal
+    const { data: branch } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id").ilike("name", branchName).single();
+    if (!branch) return 1;
+    // 2. Obtener turno abierto
+    const { data: activeShift } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").select("id").eq("branch_id", branch.id).eq("status", "open").order("opened_at", {
+        ascending: false
+    }).limit(1).maybeSingle();
+    if (!activeShift) return 1;
+    // 3. Contar ventas realizadas en este turno
+    const { count, error } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sales").select("*", {
+        count: "exact",
+        head: true
+    }).eq("shift_id", activeShift.id);
+    if (error || count === null) return 1;
+    return count + 1;
+}
+async function getShiftInitialFundByDate(branchName, dateStr) {
+    // 1. Obtener el ID de la sucursal
+    const { data: branch, error: branchErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id").ilike("name", branchName).single();
+    if (branchErr || !branch) return 0.0;
+    // 2. Definir el rango del día en hora local salvadoreña (UTC-6)
+    // "YYYY-MM-DD" -> Rango ISO completo
+    const startOfDay = `${dateStr}T00:00:00-06:00`;
+    const endOfDay = `${dateStr}T23:59:59.999-06:00`;
+    // 3. Buscar el turno registrado en ese día
+    const { data: shift, error: shiftErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").select("initial_cash").eq("branch_id", branch.id).gte("opened_at", startOfDay).lte("opened_at", endOfDay).order("opened_at", {
+        ascending: false
+    }).limit(1).maybeSingle();
+    if (shiftErr || !shift) return 0.0;
+    return Number(shift.initial_cash) || 0.0;
+}
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
 }
@@ -6548,4 +6959,4 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 }),
 ]);
 
-//# sourceMappingURL=src_1gzjmow._.js.map
+//# sourceMappingURL=src_0bdosy8._.js.map

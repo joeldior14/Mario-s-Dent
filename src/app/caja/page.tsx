@@ -2,6 +2,15 @@
 
 import React, { useState, useMemo, useCallback, useEffect } from "react";
 import Navbar from "@/components/Navbar";
+import {
+  openCashShiftInDB,
+  recordExpenseInDB,
+  fetchCurrentShiftExpenses,
+  getShiftSalesBreakdown,
+  ShiftSalesBreakdown,
+  closeCashShiftInDB,
+  getShiftInitialFundByDate,
+} from "@/app/services/cashService";
 import ConfirmarModal, { DialogType } from "@/components/ConfirmarModal";
 import ExpenseModal, { ExpenseRecord } from "@/components/GastoMenorModal";
 import CorteZPDFTemplate, { downloadCorteZPDF } from "@/components/CortePDF";
@@ -57,6 +66,31 @@ export default function CajaPage() {
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
 
+  // Fecha actual en formato legible para el cajero (Zona horaria de El Salvador)
+  const currentDateDisplay = useMemo(() => {
+    return new Intl.DateTimeFormat("es-SV", {
+      timeZone: "America/El_Salvador",
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    }).format(new Date());
+  }, []);
+
+  // Nombre reactivo del operador derivado de la sesión activa
+  const activeOperatorName = useMemo(() => {
+    return user?.name || cashierName || "Operador";
+  }, [user?.name, cashierName]);
+
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  // Ventas totales y desglose
+  const [salesBreakdown, setSalesBreakdown] = useState<ShiftSalesBreakdown>({
+    cash: 0,
+    card: 0,
+    transfer: 0,
+    total: 0,
+  });
+
   // Control de Modales Operativos
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isTicketAuditOpen, setIsTicketAuditOpen] = useState(false);
@@ -80,9 +114,16 @@ export default function CajaPage() {
     onConfirm: () => {},
   });
 
-  // Filtros de Auditoría (Admin)
+  // Filtros de Auditoría (Admin) fijando la zona horaria en America/El_Salvador (en-CA da formato YYYY-MM-DD)
   const [selectedBranch, setSelectedBranch] = useState("Santa Ana");
-  const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split("T")[0]);
+  const [selectedDate, setSelectedDate] = useState(() => {
+    return new Intl.DateTimeFormat("en-CA", {
+      timeZone: "America/El_Salvador",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+  });
 
   // Resolución Contable (Admin)
   const isAudited = auditStatus === "reviewed";
@@ -105,51 +146,101 @@ export default function CajaPage() {
     operatorName: "Sin operador",
   });
 
-  // Carga asíncrona no bloqueante (preparada para backend / Supabase)
+  // Carga los datos de ventas totales y su desglose
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadSales() {
+      if (!isShiftOpen) {
+        if (isMounted) {
+          setSalesBreakdown({ cash: 0, card: 0, transfer: 0, total: 0 });
+        }
+        return;
+      }
+
+      const breakdown = await getShiftSalesBreakdown(selectedBranch);
+      if (isMounted) {
+        setSalesBreakdown(breakdown);
+      }
+    }
+
+    loadSales();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedBranch, isShiftOpen]);
+
+  // Carga asíncrona para el Administrador (Prueba aislada de Fondo Inicial por fecha)
   useEffect(() => {
     if (!isAdmin) return;
 
     let isMounted = true;
 
-    async function loadShiftData() {
+    async function loadAdminShift() {
       try {
-        await Promise.resolve();
+        const fund = await getShiftInitialFundByDate(selectedBranch, selectedDate);
 
         if (isMounted) {
-          setSalesMetrics({
-            initialFund: 0.0,
-            cash: 0.0,
-            card: 0.0,
-            transfer: 0.0,
-            reportedCountedCash: 0.0,
-            operatorNotes: "",
-            operatorName: "Sin operador",
-          });
+          setSalesMetrics((prev) => ({
+            ...prev,
+            initialFund: fund, // 👈 Actualiza dinámicamente con la base de datos
+          }));
         }
       } catch (error) {
-        console.error("Error al cargar auditoría de turno:", error);
+        console.error("Error al cargar fondo inicial histórico:", error);
+        if (isMounted) {
+          setSalesMetrics((prev) => ({ ...prev, initialFund: 0.0 }));
+        }
       }
     }
 
-    loadShiftData();
+    loadAdminShift();
 
     return () => {
       isMounted = false;
     };
   }, [isAdmin, selectedBranch, selectedDate]);
 
+  // Cargar los gastos registrados en la BD de forma segura para React
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadExpenses() {
+      if (!isShiftOpen) {
+        if (isMounted) setExpensesList([]);
+        return;
+      }
+
+      try {
+        const dbExpenses = await fetchCurrentShiftExpenses(selectedBranch);
+        if (isMounted) {
+          setExpensesList(dbExpenses);
+        }
+      } catch (err) {
+        console.error("Error al cargar gastos del turno:", err);
+      }
+    }
+
+    loadExpenses();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedBranch, isShiftOpen]);
+
   // Balance Financiero Dinámico
   const totals: FinancialSummary = useMemo(() => {
     const totalExpenses = expensesList.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
-    
+
     const fund = isAdmin ? salesMetrics.initialFund : isShiftOpen ? Number(initialCash) || 0.0 : 0.0;
-    const cash = isAdmin ? salesMetrics.cash : 0.0;
-    const card = isAdmin ? salesMetrics.card : 0.0;
-    const transfer = isAdmin ? salesMetrics.transfer : 0.0;
+    const cash = isAdmin ? salesMetrics.cash : salesBreakdown.cash;
+    const card = isAdmin ? salesMetrics.card : salesBreakdown.card;
+    const transfer = isAdmin ? salesMetrics.transfer : salesBreakdown.transfer;
     const grossSales = cash + card + transfer;
 
     const rawExpected = fund + cash - totalExpenses;
-    const expected = (isShiftOpen || isAdmin) ? Math.max(0, rawExpected) : 0.0;
+    const expected = isShiftOpen || isAdmin ? Math.max(0, rawExpected) : 0.0;
     const totalExp = Math.max(0, fund + grossSales - totalExpenses);
 
     const actualCounted = isAdmin ? salesMetrics.reportedCountedCash : isShiftOpen ? Number(countedCash) || 0.0 : 0.0;
@@ -169,28 +260,84 @@ export default function CajaPage() {
       isShortage: diff < 0,
       isBalanced: diff === 0,
     };
-  }, [expensesList, isAdmin, isShiftOpen, initialCash, salesMetrics, countedCash]);
+  }, [expensesList, isAdmin, isShiftOpen, initialCash, salesMetrics, salesBreakdown, countedCash]);
 
-  // Apertura de Turno
-  const handleOpenShiftConfirm = useCallback((amount: number) => {
-    openShift(amount, cashierName);
-    setCountedCash(amount);
-    setIsModalOpen(false);
-  }, [openShift, cashierName]);
+  // Apertura de Turno conectada a Supabase
+  const handleOpenShiftConfirm = async (amount: number) => {
+    try {
+      setIsProcessing(true);
 
-  // Guardar Gasto
-  const handleSaveExpense = useCallback((newExpense: ExpenseRecord) => {
-    setExpensesList((prev) => [newExpense, ...prev]);
-  }, []);
+      await openCashShiftInDB({
+        branchName: selectedBranch,
+        cashierId: user?.id || "",
+        initialCash: amount,
+      });
 
-  // Cierre de Turno
+      openShift(amount, activeOperatorName);
+      setCountedCash(amount);
+      setIsModalOpen(false);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Error al iniciar turno en base de datos";
+      setDialogConfig({
+        isOpen: true,
+        type: "warning",
+        title: "Error de Apertura",
+        description: msg,
+        confirmText: "Aceptar",
+        onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // Guardar Gasto Menor conectado a la tabla 'cash_movements' de Supabase
+  const handleSaveExpense = async (newExpense: ExpenseRecord) => {
+    try {
+      setIsProcessing(true);
+
+      await recordExpenseInDB({
+        branchName: selectedBranch,
+        amount: newExpense.amount,
+        category: newExpense.category,
+        concept: newExpense.concept,
+      });
+
+      setExpensesList((prev) => [newExpense, ...prev]);
+      setIsExpenseModalOpen(false);
+
+      setDialogConfig({
+        isOpen: true,
+        type: "success",
+        title: "Gasto Registrado",
+        description: `Se retiraron $${Number(newExpense.amount).toFixed(2)} de gaveta exitosamente.`,
+        confirmText: "Aceptar",
+        onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
+      });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Error al registrar gasto";
+      setDialogConfig({
+        isOpen: true,
+        type: "warning",
+        title: "Error de Salida",
+        description: msg,
+        confirmText: "Aceptar",
+        onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
+      });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  // Cierre de Turno conectado a Supabase (Corte Z)
   const handleCloseShift = useCallback(() => {
     if (totals.isShortage && !cashierNotes.trim()) {
       setDialogConfig({
         isOpen: true,
         type: "warning",
         title: "Justificación Requerida",
-        description: "Existe un faltante en el arqueo de efectivo. Es obligatorio ingresar una justificación antes de realizar el Corte Z.",
+        description:
+          "Existe un faltante en el arqueo de efectivo. Es obligatorio ingresar una justificación antes de realizar el Corte Z.",
         confirmText: "Entendido",
         onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
       });
@@ -201,26 +348,57 @@ export default function CajaPage() {
       isOpen: true,
       type: "warning",
       title: "Confirmar Cierre de Turno",
-      description: "¿Confirmas el cierre de jornada (Corte Z)? Esta acción registrará el balance final del día.",
+      description:
+        "¿Confirmas el cierre de jornada (Corte Z)? Esta acción asentará el balance final en el sistema y cerrará la caja.",
       confirmText: "Sí, Cerrar Turno",
       cancelText: "Cancelar",
-      onConfirm: () => {
-        closeShift();
-        setCashierNotes("");
-        setCountedCash(0.0);
+      onConfirm: async () => {
+        try {
+          setIsProcessing(true);
 
-        setDialogConfig({
-          isOpen: true,
-          type: "success",
-          title: "Turno Cerrado con Éxito",
-          description: "El balance final ha sido asentado correctamente y el comprobante quedó registrado.",
-          confirmText: "Aceptar",
-          onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
-        });
+          await closeCashShiftInDB({
+            branchName: selectedBranch,
+            countedCash,
+            expectedCash: totals.expectedCash,
+            totalSales: totals.totalSales,
+            totalExpenses: totals.expenses,
+            difference: totals.difference,
+            notes: cashierNotes,
+          });
+
+          closeShift();
+          setCashierNotes("");
+          setCountedCash(0.0);
+          setExpensesList([]);
+          setSalesBreakdown({ cash: 0, card: 0, transfer: 0, total: 0 });
+
+          setDialogConfig({
+            isOpen: true,
+            type: "success",
+            title: "Turno Cerrado con Éxito",
+            description:
+              "El balance final ha sido asentado correctamente en la base de datos (Corte Z registrado).",
+            confirmText: "Aceptar",
+            onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
+          });
+        } catch (err: unknown) {
+          const msg =
+            err instanceof Error ? err.message : "Error al registrar el cierre de turno";
+          setDialogConfig({
+            isOpen: true,
+            type: "warning",
+            title: "Error de Cierre",
+            description: msg,
+            confirmText: "Aceptar",
+            onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
+          });
+        } finally {
+          setIsProcessing(false);
+        }
       },
       onCancel: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
     });
-  }, [totals.isShortage, cashierNotes, closeShift]);
+  }, [totals, cashierNotes, selectedBranch, countedCash, closeShift]);
 
   // Resolución de Auditoría (Admin)
   const handleResolveDiscrepancy = useCallback(() => {
@@ -294,18 +472,27 @@ export default function CajaPage() {
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
                   className="text-xs font-bold text-slate-700 bg-transparent focus:outline-none cursor-pointer"
-                />
+                >
+                </input>
               </div>
             </div>
           ) : (
             <div className="flex items-center gap-4">
-              <div className="text-xs text-slate-500 font-medium text-right">
-                Turno:{" "}
-                <strong className={isShiftOpen ? "text-emerald-600" : "text-slate-700"}>
-                  {isShiftOpen ? "En Curso" : "Cerrado"}
-                </strong>
+              <div className="text-xs text-slate-500 font-medium text-right flex items-center">
+                <span className="text-slate-600 font-semibold capitalize">
+                  {currentDateDisplay}
+                </span>
                 <span className="mx-2 text-slate-300">|</span>
-                Operador: <strong className="text-slate-700">{cashierName}</strong>
+                <span>
+                  Turno:{" "}
+                  <strong className={isShiftOpen ? "text-emerald-600" : "text-slate-700"}>
+                    {isShiftOpen ? "En Curso" : "Cerrado"}
+                  </strong>
+                </span>
+                <span className="mx-2 text-slate-300">|</span>
+                <span>
+                  Operador: <strong className="text-slate-700">{activeOperatorName}</strong>
+                </span>
               </div>
 
               {!isShiftOpen && (
@@ -340,7 +527,7 @@ export default function CajaPage() {
               <span>Ventas Totales</span>
             </div>
             <p className="text-xl font-bold text-sky-600">
-              ${totals.totalSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+              ${salesBreakdown.total.toFixed(2)}
             </p>
           </div>
 
@@ -384,7 +571,7 @@ export default function CajaPage() {
                 </div>
               </div>
               <span className="text-base font-bold text-slate-800">
-                ${totals.cashSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                ${salesBreakdown.cash.toFixed(2)}
               </span>
             </div>
 
@@ -399,7 +586,7 @@ export default function CajaPage() {
                 </div>
               </div>
               <span className="text-base font-bold text-slate-800">
-                ${totals.cardSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                ${salesBreakdown.card.toFixed(2)}
               </span>
             </div>
 
@@ -414,7 +601,7 @@ export default function CajaPage() {
                 </div>
               </div>
               <span className="text-base font-bold text-slate-800">
-                ${totals.transferSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                ${salesBreakdown.transfer.toFixed(2)}
               </span>
             </div>
           </div>
@@ -508,7 +695,7 @@ export default function CajaPage() {
               </div>
             </div>
 
-            {/* CUADRO DE DIFERENCIA (Verde: Cuadre exacto | Rojo: Descuadre pendiente | Azul: Descuadre resuelto) */}
+            {/* CUADRO DE DIFERENCIA */}
             <div
               className={`p-4 rounded-xl border flex items-center justify-between transition-colors ${
                 totals.isBalanced
@@ -617,7 +804,6 @@ export default function CajaPage() {
                     </button>
                   </div>
 
-                  {/* Botón de aprobar solo si hay descuadre */}
                   {!totals.isBalanced && (
                     <>
                       {!isAudited ? (
@@ -638,7 +824,6 @@ export default function CajaPage() {
                   )}
                 </div>
 
-                {/* Dictamen contable solo si hay descuadre y está pendiente */}
                 {!totals.isBalanced && !isAudited && (
                   <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
                     <div className="flex items-center justify-between">
@@ -701,7 +886,11 @@ export default function CajaPage() {
         isOpen={isExpenseModalOpen}
         onClose={() => setIsExpenseModalOpen(false)}
         onSaveExpense={handleSaveExpense}
-        currentAvailableCash={totals.difference >= 0 ? totals.expectedCash : totals.expectedCash + totals.difference}
+        currentAvailableCash={
+          totals.expectedCash > 0
+            ? totals.expectedCash
+            : Number(initialCash) || countedCash || 0.0
+        }
       />
 
       <AuditTicketsModal
@@ -715,7 +904,7 @@ export default function CajaPage() {
       {!isAdmin && (
         <OpenShiftModal
           isOpen={isModalOpen}
-          cashierName={cashierName}
+          cashierName={activeOperatorName}
           onClose={() => setIsModalOpen(false)}
           onConfirm={handleOpenShiftConfirm}
         />
@@ -738,7 +927,7 @@ export default function CajaPage() {
           folio: `Z-${selectedBranch.substring(0, 2).toUpperCase()}-${selectedDate.replace(/-/g, "")}`,
           branch: selectedBranch,
           date: selectedDate,
-          cashier: isAdmin ? salesMetrics.operatorName : cashierName || "Maria G.",
+          cashier: isAdmin ? salesMetrics.operatorName : activeOperatorName,
           adminName: user?.name || "Mario Administrador",
           initialFund: totals.initialFund,
           cashSales: totals.cashSales,

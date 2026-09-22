@@ -1597,59 +1597,71 @@ async function fetchProductKardex(productId, branchName) {
     });
 }
 async function processSaleInDB(payload) {
-    const { branchName, cashierId, paymentMethod, items, subtotal, tax, total } = payload;
-    if (items.length === 0) {
+    const { branchName, cashierId, paymentMethod, items, subtotal, tax, total, cashReceived, changeReturned } = payload;
+    if (!items || items.length === 0) {
         throw new Error("El carrito no tiene productos.");
     }
     // 1. Obtener la sucursal actual
     const { data: branch, error: branchErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id, name").ilike("name", branchName).single();
     if (branchErr || !branch) {
-        throw new Error(`No se localizó la sucursal: ${branchName}`);
+        throw new Error(`No se encontró la sucursal: ${branchName}`);
     }
-    // 2. Generar correlativo de ticket (ej. T-SA-1045)
+    // 2. Obtener el turno abierto de la sucursal
+    const { data: activeShift, error: shiftErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").select("id").eq("branch_id", branch.id).eq("status", "open").order("opened_at", {
+        ascending: false
+    }).limit(1).maybeSingle();
+    if (shiftErr || !activeShift) {
+        throw new Error("No hay un turno de caja abierto en esta sucursal para asociar la venta.");
+    }
+    // 3. Generar número de ticket único
     const branchCode = branch.name.substring(0, 2).toUpperCase();
     const ticketNumber = `T-${branchCode}-${Math.floor(1000 + Math.random() * 9000)}`;
-    // 3. Crear cabecera de venta
+    // 4. Insertar cabecera en 'sales'
     const { data: saleData, error: saleErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sales").insert([
         {
             ticket_number: ticketNumber,
             branch_id: branch.id,
-            user_id: cashierId || null,
+            shift_id: activeShift.id,
+            cashier_id: cashierId || null,
             payment_method: paymentMethod,
-            subtotal,
-            tax,
-            total
+            subtotal: Number(subtotal),
+            tax: Number(tax),
+            total: Number(total),
+            cash_received: cashReceived ? Number(cashReceived) : null,
+            change_given: changeReturned ? Number(changeReturned) : null,
+            created_at: new Date().toISOString()
         }
     ]).select("id").single();
-    // Si la tabla 'sales' aún no tiene RLS o no existe, continuamos con el inventario y Kardex
-    const saleId = saleData?.id || null;
-    if (saleErr) {
-        console.warn("Aviso en tabla sales (opcional si solo manejas inventario directo):", saleErr.message);
+    if (saleErr || !saleData) {
+        throw new Error(`Error al guardar en tabla 'sales': ${saleErr?.message || "Desconocido"}`);
     }
-    // 4. Procesar cada producto: Descontar de branch_inventory y registrar Kardex
+    const saleId = saleData.id;
+    // 5. Insertar renglones en 'sale_items', descontar stock y registrar Kardex
     for (const item of items){
-        // Consultar stock actual
-        const { data: invRecord } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").select("id, stock").eq("product_id", item.id).eq("branch_id", branch.id).single();
+        // A) Insertar detalle de venta
+        const { error: itemErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sale_items").insert([
+            {
+                sale_id: saleId,
+                product_id: item.id,
+                quantity: item.quantity,
+                unit_price: item.price,
+                subtotal: item.price * item.quantity
+            }
+        ]);
+        if (itemErr) {
+            console.error("Error al registrar renglón en sale_items:", itemErr.message);
+        }
+        // B) Consultar stock actual
+        const { data: invRecord } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").select("id, stock").eq("product_id", item.id).eq("branch_id", branch.id).maybeSingle();
         const currentStock = invRecord?.stock ?? 0;
         const newStock = Math.max(0, currentStock - item.quantity);
+        // C) Actualizar inventario de la sucursal
         if (invRecord) {
             await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").update({
                 stock: newStock
             }).eq("id", invRecord.id);
         }
-        // Insertar en sale_items si existe la venta
-        if (saleId) {
-            await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sale_items").insert([
-                {
-                    sale_id: saleId,
-                    product_id: item.id,
-                    quantity: item.quantity,
-                    unit_price: item.price,
-                    subtotal: item.price * item.quantity
-                }
-            ]);
-        }
-        // Registrar en Kardex (stock_movements)
+        // D) Registrar movimiento en Kardex (stock_movements)
         await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("stock_movements").insert([
             {
                 product_id: item.id,
@@ -1664,7 +1676,8 @@ async function processSaleInDB(payload) {
     }
     return {
         ticketNumber,
-        total
+        total,
+        saleId
     };
 }
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {

@@ -8,6 +8,7 @@ import { useShift } from "@/app/context/ShiftContext";
 import { useAuth } from "@/app/context/AuthContext";
 import { supabase } from "@/lib/supabaseClient";
 import { processSaleInDB, POSCartItem } from "@/app/services/inventoryService";
+import { getNextOrderNumber } from "@/app/services/cashService"; // 👈 Importado para la sincronización
 import {
   Scan,
   Trash2,
@@ -117,6 +118,7 @@ interface DBProductPOS {
   branch_inventory: DBBranchInventory[] | null;
 }
 
+
 const CATEGORIES = ["All", "Orto", "Endo", "Resinas", "Instrumentos", "Desechables"];
 const CASH_SUGGESTIONS = [5, 10, 20, 50, 100];
 
@@ -136,9 +138,16 @@ export default function PosPage() {
   const currentBranch = user?.branch || "Santa Ana";
   const CART_STORAGE_KEY = `pos_cart_${currentBranch}`;
 
-  const [orderNumber, setOrderNumber] = useState(1);
-  const [showShiftWarning, setShowShiftWarning] = useState(false);
+  // 1. Estado de orden inicializado leyendo localStorage por si la página recarga abruptamente
+  const [orderNumber, setOrderNumber] = useState<number>(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem(`pos_order_num_${currentBranch}`);
+      return saved ? parseInt(saved, 10) : 1;
+    }
+    return 1;
+  });
 
+  const [showShiftWarning, setShowShiftWarning] = useState(false);
   const [products, setProducts] = useState<POSProduct[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("All");
@@ -151,7 +160,33 @@ export default function PosPage() {
 
   const scanInputRef = useRef<HTMLInputElement>(null);
 
-  // Lectura reactiva del carrito desde localStorage sin useEffect ni setState síncronos
+  // 2. Efecto para asegurar la exactitud del número de orden validando con Supabase
+  useEffect(() => {
+    let isMounted = true;
+
+    async function syncOrderNum() {
+      if (!isShiftOpen) {
+        if (isMounted) setOrderNumber(1);
+        return;
+      }
+
+      const nextNum = await getNextOrderNumber(currentBranch);
+      if (isMounted) {
+        setOrderNumber(nextNum);
+        if (typeof window !== "undefined") {
+          localStorage.setItem(`pos_order_num_${currentBranch}`, nextNum.toString());
+        }
+      }
+    }
+
+    syncOrderNum();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [currentBranch, isShiftOpen]);
+
+  // Lectura reactiva del carrito desde localStorage sin renders en cascada
   const rawCart = useSyncExternalStore(
     subscribeCart,
     () => (typeof window !== "undefined" ? localStorage.getItem(CART_STORAGE_KEY) ?? "[]" : "[]"),
@@ -367,6 +402,7 @@ export default function PosPage() {
     !isProcessing &&
     (paymentMethod !== "cash" || (numericCashReceived >= total && numericCashReceived > 0));
 
+  // Manejador de cobro de orden conectado al backend
   const handleCheckout = async () => {
     if (!canCheckout) {
       if (!isShiftOpen) setShowShiftWarning(true);
@@ -386,22 +422,34 @@ export default function PosPage() {
         stock: item.stock,
       }));
 
+      // 1. Guardar la venta en Supabase y descontar stock
       const result = await processSaleInDB({
         branchName: currentBranch,
-        cashierId: user?.id,
+        cashierId: user?.id || null,
         cashierName: cashierName || user?.name || "Cajero",
         paymentMethod,
         items: cartPayload,
         subtotal,
         tax: iva,
         total,
+        cashReceived: paymentMethod === "cash" ? numericCashReceived : undefined,
+        changeReturned: paymentMethod === "cash" ? changeDue : undefined,
       });
 
+      // 2. Feedback visual y reinicio de orden (Aumentar el número correlativo)
       setTicketSuccess(result.ticketNumber);
       updateCartStorage([]);
       setCashReceived("");
-      setOrderNumber((prev) => prev + 1);
+      
+      setOrderNumber((prev) => {
+        const next = prev + 1;
+        if (typeof window !== "undefined") {
+          localStorage.setItem(`pos_order_num_${currentBranch}`, next.toString());
+        }
+        return next;
+      });
 
+      // 3. Refrescar el stock del catálogo
       await loadBranchProducts();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Error al procesar la venta";
