@@ -15,7 +15,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$context$2f$Shi
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$context$2f$AuthContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/app/context/AuthContext.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/supabaseClient.ts [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$inventoryService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/app/services/inventoryService.ts [app-client] (ecmascript)");
-var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$cashService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/app/services/cashService.ts [app-client] (ecmascript)"); // 👈 Importado para la sincronización
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$cashService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/app/services/cashService.ts [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$scan$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Scan$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/scan.mjs [app-client] (ecmascript) <export default as Scan>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$trash$2d$2$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Trash2$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/trash-2.mjs [app-client] (ecmascript) <export default as Trash2>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$x$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__X$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/x.mjs [app-client] (ecmascript) <export default as X>");
@@ -78,7 +78,7 @@ function ShiftWarningModal({ isOpen, onClose }) {
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                             className: "text-xs text-slate-500 leading-relaxed",
-                            children: "No es posible agregar artículos ni cobrar sin abrir un turno previamente. Registra tu fondo inicial para comenzar."
+                            children: "No es posible agregar artículos ni cobrar sin abrir un turno previamente. Registra tu fondo inicial para comenzar[cite: 1, 2]."
                         }, void 0, false, {
                             fileName: "[project]/src/app/pos/page.tsx",
                             lineNumber: 50,
@@ -174,9 +174,16 @@ function PosPage() {
     _s();
     const { isShiftOpen, cashierName } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$context$2f$ShiftContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useShift"])();
     const { user } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$context$2f$AuthContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useAuth"])();
-    const currentBranch = user?.branch || "Santa Ana";
+    // Garantiza que la sucursal provenga de la sesión del usuario logueado
+    const currentBranch = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
+        "PosPage.useMemo[currentBranch]": ()=>{
+            return user?.branch || "Santa Ana";
+        }
+    }["PosPage.useMemo[currentBranch]"], [
+        user?.branch
+    ]);
     const CART_STORAGE_KEY = `pos_cart_${currentBranch}`;
-    // 1. Estado de orden inicializado leyendo localStorage por si la página recarga abruptamente
+    // Estado de orden
     const [orderNumber, setOrderNumber] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({
         "PosPage.useState": ()=>{
             if ("TURBOPACK compile-time truthy", 1) {
@@ -187,6 +194,7 @@ function PosPage() {
             ;
         }
     }["PosPage.useState"]);
+    const [hasHydrated, setHasHydrated] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [showShiftWarning, setShowShiftWarning] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [products, setProducts] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
     const [isLoading, setIsLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(true);
@@ -197,7 +205,17 @@ function PosPage() {
     const [isProcessing, setIsProcessing] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [ticketSuccess, setTicketSuccess] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const scanInputRef = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRef"])(null);
-    // 2. Efecto para asegurar la exactitud del número de orden validando con Supabase
+    // Evita alertas de ESLint en React 19 / Next.js
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "PosPage.useEffect": ()=>{
+            queueMicrotask({
+                "PosPage.useEffect": ()=>{
+                    setHasHydrated(true);
+                }
+            }["PosPage.useEffect"]);
+        }
+    }["PosPage.useEffect"], []);
+    // Sincroniza el correlativo de orden con Supabase para la sucursal activa
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "PosPage.useEffect": ()=>{
             let isMounted = true;
@@ -206,12 +224,16 @@ function PosPage() {
                     if (isMounted) setOrderNumber(1);
                     return;
                 }
-                const nextNum = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$cashService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getNextOrderNumber"])(currentBranch);
-                if (isMounted) {
-                    setOrderNumber(nextNum);
-                    if ("TURBOPACK compile-time truthy", 1) {
-                        localStorage.setItem(`pos_order_num_${currentBranch}`, nextNum.toString());
+                try {
+                    const nextNum = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$cashService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getNextOrderNumber"])(currentBranch);
+                    if (isMounted) {
+                        setOrderNumber(nextNum);
+                        if ("TURBOPACK compile-time truthy", 1) {
+                            localStorage.setItem(`pos_order_num_${currentBranch}`, nextNum.toString());
+                        }
                     }
+                } catch (err) {
+                    console.error("Error al sincronizar número de orden:", err);
                 }
             }
             syncOrderNum();
@@ -225,7 +247,7 @@ function PosPage() {
         currentBranch,
         isShiftOpen
     ]);
-    // Lectura reactiva del carrito desde localStorage sin renders en cascada
+    // Lectura reactiva del carrito desde localStorage
     const rawCart = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useSyncExternalStore"])(subscribeCart, {
         "PosPage.useSyncExternalStore[rawCart]": ()=>("TURBOPACK compile-time truthy", 1) ? localStorage.getItem(CART_STORAGE_KEY) ?? "[]" : "TURBOPACK unreachable"
     }["PosPage.useSyncExternalStore[rawCart]"], {
@@ -282,7 +304,7 @@ function PosPage() {
                     "PosPage.useCallback[loadBranchProducts].formatted": (p)=>{
                         const invList = p.branch_inventory ?? [];
                         const branchMatch = invList.find({
-                            "PosPage.useCallback[loadBranchProducts].formatted.branchMatch": (b)=>b.branches?.name?.toLowerCase() === currentBranch.toLowerCase()
+                            "PosPage.useCallback[loadBranchProducts].formatted.branchMatch": (b)=>b.branches?.name?.trim().toLowerCase() === currentBranch.trim().toLowerCase()
                         }["PosPage.useCallback[loadBranchProducts].formatted.branchMatch"]);
                         return {
                             id: p.id,
@@ -449,7 +471,7 @@ function PosPage() {
                 }));
             // 1. Guardar la venta en Supabase y descontar stock
             const result = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$inventoryService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["processSaleInDB"])({
-                branchName: currentBranch,
+                branchName: currentBranch.trim(),
                 cashierId: user?.id || null,
                 cashierName: cashierName || user?.name || "Cajero",
                 paymentMethod,
@@ -485,7 +507,7 @@ function PosPage() {
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Navbar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                 fileName: "[project]/src/app/pos/page.tsx",
-                lineNumber: 464,
+                lineNumber: 481,
                 columnNumber: 7
             }, this),
             !isShiftOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -498,20 +520,20 @@ function PosPage() {
                                 className: "w-4 h-4 text-amber-600 shrink-0"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/pos/page.tsx",
-                                lineNumber: 470,
+                                lineNumber: 487,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                children: "Turno cerrado: dirígete a Caja para registrar fondo inicial y cobrar."
+                                children: "Turno cerrado: dirígete a Caja para registrar fondo inicial y cobrar[cite: 1, 2]."
                             }, void 0, false, {
                                 fileName: "[project]/src/app/pos/page.tsx",
-                                lineNumber: 471,
+                                lineNumber: 488,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/pos/page.tsx",
-                        lineNumber: 469,
+                        lineNumber: 486,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -522,26 +544,26 @@ function PosPage() {
                                 children: "Ir a Caja"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/pos/page.tsx",
-                                lineNumber: 477,
+                                lineNumber: 494,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$arrow$2d$right$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ArrowRight$3e$__["ArrowRight"], {
                                 className: "w-3.5 h-3.5"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/pos/page.tsx",
-                                lineNumber: 478,
+                                lineNumber: 495,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/pos/page.tsx",
-                        lineNumber: 473,
+                        lineNumber: 490,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/pos/page.tsx",
-                lineNumber: 468,
+                lineNumber: 485,
                 columnNumber: 9
             }, this),
             ticketSuccess && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -554,7 +576,7 @@ function PosPage() {
                                 className: "w-4 h-4"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/pos/page.tsx",
-                                lineNumber: 487,
+                                lineNumber: 504,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -564,19 +586,20 @@ function PosPage() {
                                         children: ticketSuccess
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/pos/page.tsx",
-                                        lineNumber: 489,
+                                        lineNumber: 506,
                                         columnNumber: 65
-                                    }, this)
+                                    }, this),
+                                    "[cite: 1, 4]"
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/pos/page.tsx",
-                                lineNumber: 488,
+                                lineNumber: 505,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/pos/page.tsx",
-                        lineNumber: 486,
+                        lineNumber: 503,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -587,18 +610,18 @@ function PosPage() {
                             className: "w-4 h-4"
                         }, void 0, false, {
                             fileName: "[project]/src/app/pos/page.tsx",
-                            lineNumber: 497,
+                            lineNumber: 514,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/src/app/pos/page.tsx",
-                        lineNumber: 492,
+                        lineNumber: 509,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/pos/page.tsx",
-                lineNumber: 485,
+                lineNumber: 502,
                 columnNumber: 9
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -614,7 +637,7 @@ function PosPage() {
                                         className: "w-5 h-5 text-sky-600 shrink-0"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/pos/page.tsx",
-                                        lineNumber: 506,
+                                        lineNumber: 523,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -628,7 +651,7 @@ function PosPage() {
                                         className: "w-full bg-transparent text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/pos/page.tsx",
-                                        lineNumber: 507,
+                                        lineNumber: 524,
                                         columnNumber: 13
                                     }, this),
                                     searchQuery && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -638,13 +661,13 @@ function PosPage() {
                                         children: "Limpiar"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/pos/page.tsx",
-                                        lineNumber: 518,
+                                        lineNumber: 535,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/pos/page.tsx",
-                                lineNumber: 505,
+                                lineNumber: 522,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -656,12 +679,12 @@ function PosPage() {
                                         children: cat === "All" ? "Todos" : cat
                                     }, cat, false, {
                                         fileName: "[project]/src/app/pos/page.tsx",
-                                        lineNumber: 530,
+                                        lineNumber: 547,
                                         columnNumber: 15
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/src/app/pos/page.tsx",
-                                lineNumber: 528,
+                                lineNumber: 545,
                                 columnNumber: 11
                             }, this),
                             isLoading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -671,7 +694,7 @@ function PosPage() {
                                         className: "w-7 h-7 animate-spin text-sky-600"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/pos/page.tsx",
-                                        lineNumber: 547,
+                                        lineNumber: 564,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -683,13 +706,13 @@ function PosPage() {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/pos/page.tsx",
-                                        lineNumber: 548,
+                                        lineNumber: 565,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/pos/page.tsx",
-                                lineNumber: 546,
+                                lineNumber: 563,
                                 columnNumber: 13
                             }, this) : filteredProducts.length > 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4",
@@ -710,7 +733,7 @@ function PosPage() {
                                                     className: "object-contain p-2 group-hover:scale-105 transition-transform duration-200"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/pos/page.tsx",
-                                                    lineNumber: 567,
+                                                    lineNumber: 584,
                                                     columnNumber: 25
                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                     className: "w-10 h-10 border-2 border-slate-300 border-dashed rounded-xl flex items-center justify-center opacity-40 group-hover:opacity-80 transition-opacity",
@@ -718,17 +741,17 @@ function PosPage() {
                                                         className: "w-5 h-5 text-slate-400 stroke-[1.5]"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/pos/page.tsx",
-                                                        lineNumber: 577,
+                                                        lineNumber: 594,
                                                         columnNumber: 27
                                                     }, this)
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/pos/page.tsx",
-                                                    lineNumber: 576,
+                                                    lineNumber: 593,
                                                     columnNumber: 25
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                lineNumber: 565,
+                                                lineNumber: 582,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -744,7 +767,7 @@ function PosPage() {
                                                                         children: item.brand
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/pos/page.tsx",
-                                                                        lineNumber: 585,
+                                                                        lineNumber: 602,
                                                                         columnNumber: 27
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -752,13 +775,13 @@ function PosPage() {
                                                                         children: isOutOfStock ? "Agotado" : item.stock
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/pos/page.tsx",
-                                                                        lineNumber: 588,
+                                                                        lineNumber: 605,
                                                                         columnNumber: 27
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                                lineNumber: 584,
+                                                                lineNumber: 601,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -766,13 +789,13 @@ function PosPage() {
                                                                 children: item.name
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                                lineNumber: 600,
+                                                                lineNumber: 617,
                                                                 columnNumber: 25
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/pos/page.tsx",
-                                                        lineNumber: 583,
+                                                        lineNumber: 600,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -783,25 +806,25 @@ function PosPage() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/pos/page.tsx",
-                                                        lineNumber: 604,
+                                                        lineNumber: 621,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                lineNumber: 582,
+                                                lineNumber: 599,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, item.id, true, {
                                         fileName: "[project]/src/app/pos/page.tsx",
-                                        lineNumber: 556,
+                                        lineNumber: 573,
                                         columnNumber: 19
                                     }, this);
                                 })
                             }, void 0, false, {
                                 fileName: "[project]/src/app/pos/page.tsx",
-                                lineNumber: 551,
+                                lineNumber: 568,
                                 columnNumber: 13
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "p-16 text-center text-slate-400 text-xs",
@@ -812,13 +835,13 @@ function PosPage() {
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/pos/page.tsx",
-                                lineNumber: 613,
+                                lineNumber: 630,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/pos/page.tsx",
-                        lineNumber: 504,
+                        lineNumber: 521,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("aside", {
@@ -835,24 +858,24 @@ function PosPage() {
                                                 children: "Current Order"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                lineNumber: 623,
+                                                lineNumber: 640,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 className: "text-xs font-black text-sky-600 bg-sky-50 px-2 py-0.5 rounded-md border border-sky-100",
                                                 children: [
                                                     "#",
-                                                    orderNumber
+                                                    hasHydrated ? orderNumber : "—"
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                lineNumber: 624,
+                                                lineNumber: 641,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/pos/page.tsx",
-                                        lineNumber: 622,
+                                        lineNumber: 639,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -864,18 +887,18 @@ function PosPage() {
                                             className: "w-4 h-4"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/pos/page.tsx",
-                                            lineNumber: 634,
+                                            lineNumber: 651,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/pos/page.tsx",
-                                        lineNumber: 628,
+                                        lineNumber: 645,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/pos/page.tsx",
-                                lineNumber: 621,
+                                lineNumber: 638,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -889,7 +912,7 @@ function PosPage() {
                                             children: "🛒"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/pos/page.tsx",
-                                            lineNumber: 644,
+                                            lineNumber: 661,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -897,21 +920,21 @@ function PosPage() {
                                             children: "No hay productos en la orden"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/pos/page.tsx",
-                                            lineNumber: 645,
+                                            lineNumber: 662,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                             className: "text-[10px] text-slate-400 max-w-[200px]",
-                                            children: "Selecciona un producto del catálogo o escanea su código de barras."
+                                            children: "Selecciona un producto del catálogo o escanea su código de barras[cite: 1, 6]."
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/pos/page.tsx",
-                                            lineNumber: 646,
+                                            lineNumber: 663,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/pos/page.tsx",
-                                    lineNumber: 643,
+                                    lineNumber: 660,
                                     columnNumber: 15
                                 }, this) : cart.map((item)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "py-3.5 flex items-center justify-between gap-2",
@@ -925,7 +948,7 @@ function PosPage() {
                                                         children: item.name
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/pos/page.tsx",
-                                                        lineNumber: 654,
+                                                        lineNumber: 671,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -941,19 +964,19 @@ function PosPage() {
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                                lineNumber: 661,
+                                                                lineNumber: 678,
                                                                 columnNumber: 38
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/pos/page.tsx",
-                                                        lineNumber: 660,
+                                                        lineNumber: 677,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                lineNumber: 653,
+                                                lineNumber: 670,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -968,12 +991,12 @@ function PosPage() {
                                                             className: "w-3 h-3"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/pos/page.tsx",
-                                                            lineNumber: 672,
+                                                            lineNumber: 689,
                                                             columnNumber: 23
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/pos/page.tsx",
-                                                        lineNumber: 666,
+                                                        lineNumber: 683,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -981,7 +1004,7 @@ function PosPage() {
                                                         children: item.quantity
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/pos/page.tsx",
-                                                        lineNumber: 674,
+                                                        lineNumber: 691,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -994,18 +1017,18 @@ function PosPage() {
                                                             className: "w-3 h-3"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/pos/page.tsx",
-                                                            lineNumber: 684,
+                                                            lineNumber: 701,
                                                             columnNumber: 23
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/pos/page.tsx",
-                                                        lineNumber: 677,
+                                                        lineNumber: 694,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                lineNumber: 665,
+                                                lineNumber: 682,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1018,12 +1041,12 @@ function PosPage() {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/pos/page.tsx",
-                                                    lineNumber: 689,
+                                                    lineNumber: 706,
                                                     columnNumber: 21
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                lineNumber: 688,
+                                                lineNumber: 705,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1035,23 +1058,23 @@ function PosPage() {
                                                     className: "w-3.5 h-3.5"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/pos/page.tsx",
-                                                    lineNumber: 700,
+                                                    lineNumber: 717,
                                                     columnNumber: 21
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                lineNumber: 694,
+                                                lineNumber: 711,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, item.id, true, {
                                         fileName: "[project]/src/app/pos/page.tsx",
-                                        lineNumber: 652,
+                                        lineNumber: 669,
                                         columnNumber: 17
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/src/app/pos/page.tsx",
-                                lineNumber: 638,
+                                lineNumber: 655,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1064,7 +1087,7 @@ function PosPage() {
                                                 children: "Subtotal"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                lineNumber: 709,
+                                                lineNumber: 726,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1075,13 +1098,13 @@ function PosPage() {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                lineNumber: 710,
+                                                lineNumber: 727,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/pos/page.tsx",
-                                        lineNumber: 708,
+                                        lineNumber: 725,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1091,7 +1114,7 @@ function PosPage() {
                                                 children: "IVA (13%)"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                lineNumber: 714,
+                                                lineNumber: 731,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1102,13 +1125,13 @@ function PosPage() {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                lineNumber: 715,
+                                                lineNumber: 732,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/pos/page.tsx",
-                                        lineNumber: 713,
+                                        lineNumber: 730,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1118,7 +1141,7 @@ function PosPage() {
                                                 children: "Total a Pagar"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                lineNumber: 719,
+                                                lineNumber: 736,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1129,13 +1152,13 @@ function PosPage() {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                lineNumber: 720,
+                                                lineNumber: 737,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/pos/page.tsx",
-                                        lineNumber: 718,
+                                        lineNumber: 735,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1150,20 +1173,20 @@ function PosPage() {
                                                         className: "w-4 h-4"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/pos/page.tsx",
-                                                        lineNumber: 735,
+                                                        lineNumber: 752,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                         children: "Efectivo"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/pos/page.tsx",
-                                                        lineNumber: 736,
+                                                        lineNumber: 753,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                lineNumber: 726,
+                                                lineNumber: 743,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1178,20 +1201,20 @@ function PosPage() {
                                                         className: "w-4 h-4"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/pos/page.tsx",
-                                                        lineNumber: 751,
+                                                        lineNumber: 768,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                         children: "Tarjeta"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/pos/page.tsx",
-                                                        lineNumber: 752,
+                                                        lineNumber: 769,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                lineNumber: 739,
+                                                lineNumber: 756,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1206,26 +1229,26 @@ function PosPage() {
                                                         className: "w-4 h-4"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/pos/page.tsx",
-                                                        lineNumber: 767,
+                                                        lineNumber: 784,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                         children: "Transferencia"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/pos/page.tsx",
-                                                        lineNumber: 768,
+                                                        lineNumber: 785,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                lineNumber: 755,
+                                                lineNumber: 772,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/pos/page.tsx",
-                                        lineNumber: 725,
+                                        lineNumber: 742,
                                         columnNumber: 13
                                     }, this),
                                     paymentMethod === "cash" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1241,7 +1264,7 @@ function PosPage() {
                                                                 children: "Dinero Recibido ($)"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                                lineNumber: 776,
+                                                                lineNumber: 793,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1252,7 +1275,7 @@ function PosPage() {
                                                                         children: "$"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/pos/page.tsx",
-                                                                        lineNumber: 780,
+                                                                        lineNumber: 797,
                                                                         columnNumber: 23
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1265,19 +1288,19 @@ function PosPage() {
                                                                         className: `w-full pl-6 pr-2 py-1.5 bg-white border rounded-xl text-xs font-bold font-mono text-slate-900 focus:outline-none transition-colors ${isCashInsufficient ? "border-rose-400 focus:border-rose-500 bg-rose-50/30" : "border-slate-300 focus:border-sky-500"}`
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/pos/page.tsx",
-                                                                        lineNumber: 783,
+                                                                        lineNumber: 800,
                                                                         columnNumber: 23
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                                lineNumber: 779,
+                                                                lineNumber: 796,
                                                                 columnNumber: 21
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/pos/page.tsx",
-                                                        lineNumber: 775,
+                                                        lineNumber: 792,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1287,7 +1310,7 @@ function PosPage() {
                                                                 children: "Cambio / Vuelto"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                                lineNumber: 800,
+                                                                lineNumber: 817,
                                                                 columnNumber: 21
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1297,7 +1320,7 @@ function PosPage() {
                                                                         className: "w-3.5 h-3.5 text-emerald-600 mr-1.5 shrink-0"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/pos/page.tsx",
-                                                                        lineNumber: 804,
+                                                                        lineNumber: 821,
                                                                         columnNumber: 23
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1308,25 +1331,25 @@ function PosPage() {
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/app/pos/page.tsx",
-                                                                        lineNumber: 805,
+                                                                        lineNumber: 822,
                                                                         columnNumber: 23
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                                lineNumber: 803,
+                                                                lineNumber: 820,
                                                                 columnNumber: 21
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/pos/page.tsx",
-                                                        lineNumber: 799,
+                                                        lineNumber: 816,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                lineNumber: 774,
+                                                lineNumber: 791,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1343,7 +1366,7 @@ function PosPage() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/pos/page.tsx",
-                                                        lineNumber: 813,
+                                                        lineNumber: 830,
                                                         columnNumber: 19
                                                     }, this),
                                                     CASH_SUGGESTIONS.filter((val)=>val >= total).map((val)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1356,13 +1379,13 @@ function PosPage() {
                                                             ]
                                                         }, val, true, {
                                                             fileName: "[project]/src/app/pos/page.tsx",
-                                                            lineNumber: 821,
+                                                            lineNumber: 838,
                                                             columnNumber: 21
                                                         }, this))
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                lineNumber: 812,
+                                                lineNumber: 829,
                                                 columnNumber: 17
                                             }, this),
                                             isCashInsufficient && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1374,13 +1397,13 @@ function PosPage() {
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                lineNumber: 833,
+                                                lineNumber: 850,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/pos/page.tsx",
-                                        lineNumber: 773,
+                                        lineNumber: 790,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1393,44 +1416,44 @@ function PosPage() {
                                                 className: "w-4 h-4 animate-spin"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                lineNumber: 851,
+                                                lineNumber: 868,
                                                 columnNumber: 17
                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$printer$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Printer$3e$__["Printer"], {
                                                 className: "w-4 h-4"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                lineNumber: 853,
+                                                lineNumber: 870,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: isProcessing ? "Procesando Venta..." : paymentMethod === "cash" && numericCashReceived >= total && numericCashReceived > 0 ? `Cobrar $${total.toFixed(2)} (Entregar $${changeDue.toFixed(2)})` : "Cobrar & Imprimir Ticket"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/pos/page.tsx",
-                                                lineNumber: 855,
+                                                lineNumber: 872,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/pos/page.tsx",
-                                        lineNumber: 840,
+                                        lineNumber: 857,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/pos/page.tsx",
-                                lineNumber: 707,
+                                lineNumber: 724,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/pos/page.tsx",
-                        lineNumber: 620,
+                        lineNumber: 637,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/pos/page.tsx",
-                lineNumber: 502,
+                lineNumber: 519,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(ShiftWarningModal, {
@@ -1438,17 +1461,17 @@ function PosPage() {
                 onClose: ()=>setShowShiftWarning(false)
             }, void 0, false, {
                 fileName: "[project]/src/app/pos/page.tsx",
-                lineNumber: 867,
+                lineNumber: 884,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/app/pos/page.tsx",
-        lineNumber: 463,
+        lineNumber: 480,
         columnNumber: 5
     }, this);
 }
-_s(PosPage, "8oNdM+D6f9FsIY5JOEGK+vXCwAM=", false, function() {
+_s(PosPage, "A7dq2Z/FFv8jAT7k41RT1e2ktbY=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$context$2f$ShiftContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useShift"],
         __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$context$2f$AuthContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useAuth"],
@@ -1471,16 +1494,18 @@ __turbopack_context__.s([
     ()=>closeCashShiftInDB,
     "fetchCurrentShiftExpenses",
     ()=>fetchCurrentShiftExpenses,
+    "getAdminShiftAudit",
+    ()=>getAdminShiftAudit,
     "getNextOrderNumber",
     ()=>getNextOrderNumber,
-    "getShiftInitialFundByDate",
-    ()=>getShiftInitialFundByDate,
     "getShiftSalesBreakdown",
     ()=>getShiftSalesBreakdown,
     "openCashShiftInDB",
     ()=>openCashShiftInDB,
     "recordExpenseInDB",
-    ()=>recordExpenseInDB
+    ()=>recordExpenseInDB,
+    "resolveShiftAuditInDB",
+    ()=>resolveShiftAuditInDB
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/supabaseClient.ts [app-client] (ecmascript)");
 ;
@@ -1606,29 +1631,43 @@ async function closeCashShiftInDB(payload) {
         throw new Error(`No se encontró la sucursal: ${branchName}`);
     }
     // 2. Buscar el turno abierto actual
-    const { data: activeShift, error: shiftErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").select("id").eq("branch_id", branch.id).eq("status", "open").order("opened_at", {
+    const { data: activeShift, error: shiftErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").select("id, initial_cash").eq("branch_id", branch.id).eq("status", "open").order("opened_at", {
         ascending: false
     }).limit(1).maybeSingle();
     if (shiftErr || !activeShift) {
         throw new Error("No existe ningún turno activo para cerrar en esta sucursal.");
     }
-    // 3. Asentar el cierre con los nombres exactos de tus columnas
+    // 3. CÁLCULO SEGURO DE DIFERENCIA:
+    // Si en el payload difference llegó en 0 o undefined, se calcula explícitamente:
+    const finalCounted = Number(countedCash) || 0;
+    const finalExpected = Number(expectedCash) || 0;
+    const calculatedDiff = Number((finalCounted - finalExpected).toFixed(2));
+    const finalDifference = isNaN(calculatedDiff) ? Number((difference || 0).toFixed(2)) : calculatedDiff;
+    const isExact = Math.abs(finalDifference) === 0;
+    const autoAuditStatus = isExact ? "reviewed" : "pending_review";
+    const autoResolution = isExact ? "CUADRE_EXACTO" : null;
+    const autoAuditNotes = isExact ? "Arqueo conforme: cuadre de caja exacto al 100%." : null;
+    // 4. Asentar el cierre con la diferencia real en Supabase
     const { error: updateErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").update({
         status: "closed",
         closed_at: new Date().toISOString(),
-        counted_cash: Number(countedCash.toFixed(2)),
-        expected_cash: Number(expectedCash.toFixed(2)),
-        total_sales: Number(totalSales.toFixed(2)),
-        total_expenses: Number(totalExpenses.toFixed(2)),
-        difference: Number(difference.toFixed(2)),
+        counted_cash: Number(finalCounted.toFixed(2)),
+        expected_cash: Number(finalExpected.toFixed(2)),
+        total_sales: Number((totalSales || 0).toFixed(2)),
+        total_expenses: Number((totalExpenses || 0).toFixed(2)),
+        difference: finalDifference,
         cashier_notes: notes?.trim() || null,
-        notes: notes?.trim() || null
+        notes: notes?.trim() || null,
+        audit_status: autoAuditStatus,
+        audit_resolution: autoResolution,
+        audit_notes: autoAuditNotes
     }).eq("id", activeShift.id);
     if (updateErr) {
         throw new Error(`Error al registrar el Corte Z: ${updateErr.message}`);
     }
     return {
-        shiftId: activeShift.id
+        shiftId: activeShift.id,
+        difference: finalDifference
     };
 }
 async function getNextOrderNumber(branchName) {
@@ -1648,20 +1687,91 @@ async function getNextOrderNumber(branchName) {
     if (error || count === null) return 1;
     return count + 1;
 }
-async function getShiftInitialFundByDate(branchName, dateStr) {
-    // 1. Obtener el ID de la sucursal
-    const { data: branch, error: branchErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id").ilike("name", branchName).single();
-    if (branchErr || !branch) return 0.0;
-    // 2. Definir el rango del día en hora local salvadoreña (UTC-6)
-    // "YYYY-MM-DD" -> Rango ISO completo
-    const startOfDay = `${dateStr}T00:00:00-06:00`;
-    const endOfDay = `${dateStr}T23:59:59.999-06:00`;
-    // 3. Buscar el turno registrado en ese día
-    const { data: shift, error: shiftErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").select("initial_cash").eq("branch_id", branch.id).gte("opened_at", startOfDay).lte("opened_at", endOfDay).order("opened_at", {
-        ascending: false
-    }).limit(1).maybeSingle();
-    if (shiftErr || !shift) return 0.0;
-    return Number(shift.initial_cash) || 0.0;
+async function getAdminShiftAudit(branchName, dateStr) {
+    const defaultData = {
+        shiftId: null,
+        status: "none",
+        auditStatus: "pending_review",
+        auditResolution: "MERMA_ACEPTADA",
+        auditNotes: "",
+        initialFund: 0,
+        cashSales: 0,
+        cardSales: 0,
+        transferSales: 0,
+        totalSales: 0,
+        expenses: 0,
+        reportedCountedCash: 0,
+        operatorNotes: "",
+        operatorName: "Sin operador"
+    };
+    try {
+        // 1. Localizar ID de la sucursal
+        const { data: branch, error: branchErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id").ilike("name", branchName).single();
+        if (branchErr || !branch) return defaultData;
+        // 2. Rango de 24 horas del día seleccionado (hora salvadoreña UTC-6)
+        const startOfDay = `${dateStr}T00:00:00-06:00`;
+        const endOfDay = `${dateStr}T23:59:59.999-06:00`;
+        // 3. Buscar turno registrado en esa jornada
+        const { data: shift, error: shiftErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").select("*").eq("branch_id", branch.id).gte("opened_at", startOfDay).lte("opened_at", endOfDay).order("opened_at", {
+            ascending: false
+        }).limit(1).maybeSingle();
+        if (shiftErr || !shift) return defaultData;
+        // 4. Consultar ventas y egresos vinculados al turno
+        const [salesRes, expensesRes] = await Promise.all([
+            __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sales").select("payment_method, total").eq("shift_id", shift.id),
+            __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_movements").select("amount").eq("shift_id", shift.id).eq("type", "egress")
+        ]);
+        let cash = 0;
+        let card = 0;
+        let transfer = 0;
+        let totalSales = 0;
+        if (salesRes.data && salesRes.data.length > 0) {
+            salesRes.data.forEach((s)=>{
+                const val = Number(s.total) || 0;
+                if (s.payment_method === "cash") cash += val;
+                else if (s.payment_method === "card") card += val;
+                else if (s.payment_method === "transfer") transfer += val;
+                totalSales += val;
+            });
+        } else {
+            totalSales = Number(shift.total_sales) || 0;
+        }
+        const calculatedExpenses = (expensesRes.data || []).reduce((acc, curr)=>acc + (Number(curr.amount) || 0), Number(shift.total_expenses) || 0);
+        return {
+            shiftId: shift.id,
+            status: shift.status || "closed",
+            auditStatus: shift.audit_status || "pending_review",
+            auditResolution: shift.audit_resolution || "MERMA_ACEPTADA",
+            auditNotes: shift.audit_notes || "",
+            initialFund: Number(shift.initial_cash) || 0,
+            cashSales: cash,
+            cardSales: card,
+            transferSales: transfer,
+            totalSales,
+            expenses: calculatedExpenses,
+            reportedCountedCash: Number(shift.counted_cash) || 0,
+            operatorNotes: shift.notes || shift.cashier_notes || "",
+            operatorName: shift.cashier_name || "Maria G."
+        };
+    } catch (error) {
+        console.error("Error en getAdminShiftAudit:", error);
+        return defaultData;
+    }
+}
+async function resolveShiftAuditInDB(payload) {
+    const { shiftId, resolutionType, notes } = payload;
+    if (!shiftId) {
+        throw new Error("No se especificó el identificador del turno para auditar.");
+    }
+    const { data, error } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").update({
+        audit_status: "reviewed",
+        audit_resolution: resolutionType,
+        audit_notes: notes.trim()
+    }).eq("id", shiftId).select().single();
+    if (error) {
+        throw new Error(`Error al asentar la resolución contable: ${error.message}`);
+    }
+    return data;
 }
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);

@@ -34,8 +34,32 @@ export interface CloseShiftPayload {
   notes?: string;
 }
 
+export interface ShiftAuditData {
+  shiftId: string | null;
+  status: "open" | "closed" | "none";
+  auditStatus: "pending_review" | "reviewed";    // 👈 Agregar
+  auditResolution: string;                       // 👈 Agregar
+  auditNotes: string;                            // 👈 Agregar
+  initialFund: number;
+  cashSales: number;
+  cardSales: number;
+  transferSales: number;
+  totalSales: number;
+  expenses: number;
+  reportedCountedCash: number;
+  operatorNotes: string;
+  operatorName: string;
+}
+
+export interface ResolveAuditPayload {
+  shiftId: string;
+  adminId?: string;
+  resolutionType: string;
+  notes: string;
+}
+
 // ==========================================
-// SERVICIOS DE CAJA
+// SERVICIOS OPERATIVOS DE CAJERO
 // ==========================================
 
 /**
@@ -195,7 +219,7 @@ export async function fetchCurrentShiftExpenses(branchName: string) {
 }
 
 /**
- * Consulta y desglosa las ventas del turno abierto por método de pago
+ * Consulta y desglosa las ventas del turno abierto por método de pago (Cajero en vivo)
  */
 export async function getShiftSalesBreakdown(branchName: string): Promise<ShiftSalesBreakdown> {
   const initial: ShiftSalesBreakdown = { cash: 0, card: 0, transfer: 0, total: 0 };
@@ -240,6 +264,9 @@ export async function getShiftSalesBreakdown(branchName: string): Promise<ShiftS
   }, initial);
 }
 
+/**
+ * Asienta el cierre definitivo del turno operativo (Corte Z)
+ */
 export async function closeCashShiftInDB(payload: CloseShiftPayload) {
   const {
     branchName,
@@ -265,7 +292,7 @@ export async function closeCashShiftInDB(payload: CloseShiftPayload) {
   // 2. Buscar el turno abierto actual
   const { data: activeShift, error: shiftErr } = await supabase
     .from("cash_shifts")
-    .select("id")
+    .select("id, initial_cash")
     .eq("branch_id", branch.id)
     .eq("status", "open")
     .order("opened_at", { ascending: false })
@@ -276,19 +303,34 @@ export async function closeCashShiftInDB(payload: CloseShiftPayload) {
     throw new Error("No existe ningún turno activo para cerrar en esta sucursal.");
   }
 
-  // 3. Asentar el cierre con los nombres exactos de tus columnas
+  // 3. CÁLCULO SEGURO DE DIFERENCIA:
+  // Si en el payload difference llegó en 0 o undefined, se calcula explícitamente:
+  const finalCounted = Number(countedCash) || 0;
+  const finalExpected = Number(expectedCash) || 0;
+  const calculatedDiff = Number((finalCounted - finalExpected).toFixed(2));
+  const finalDifference = isNaN(calculatedDiff) ? Number((difference || 0).toFixed(2)) : calculatedDiff;
+
+  const isExact = Math.abs(finalDifference) === 0;
+  const autoAuditStatus = isExact ? "reviewed" : "pending_review";
+  const autoResolution = isExact ? "CUADRE_EXACTO" : null;
+  const autoAuditNotes = isExact ? "Arqueo conforme: cuadre de caja exacto al 100%." : null;
+
+  // 4. Asentar el cierre con la diferencia real en Supabase
   const { error: updateErr } = await supabase
     .from("cash_shifts")
     .update({
       status: "closed",
       closed_at: new Date().toISOString(),
-      counted_cash: Number(countedCash.toFixed(2)),   // 👈 Asegúrate que diga counted_cash y NO final_cash
-      expected_cash: Number(expectedCash.toFixed(2)),
-      total_sales: Number(totalSales.toFixed(2)),
-      total_expenses: Number(totalExpenses.toFixed(2)),
-      difference: Number(difference.toFixed(2)),
+      counted_cash: Number(finalCounted.toFixed(2)),
+      expected_cash: Number(finalExpected.toFixed(2)),
+      total_sales: Number((totalSales || 0).toFixed(2)),
+      total_expenses: Number((totalExpenses || 0).toFixed(2)),
+      difference: finalDifference, // 👈 Guarda el sobrante (+) o faltante (-) real
       cashier_notes: notes?.trim() || null,
       notes: notes?.trim() || null,
+      audit_status: autoAuditStatus,
+      audit_resolution: autoResolution,
+      audit_notes: autoAuditNotes,
     })
     .eq("id", activeShift.id);
 
@@ -296,7 +338,7 @@ export async function closeCashShiftInDB(payload: CloseShiftPayload) {
     throw new Error(`Error al registrar el Corte Z: ${updateErr.message}`);
   }
 
-  return { shiftId: activeShift.id };
+  return { shiftId: activeShift.id, difference: finalDifference };
 }
 
 /**
@@ -335,33 +377,143 @@ export async function getNextOrderNumber(branchName: string): Promise<number> {
   return count + 1;
 }
 
-export async function getShiftInitialFundByDate(branchName: string, dateStr: string): Promise<number> {
-  // 1. Obtener el ID de la sucursal
-  const { data: branch, error: branchErr } = await supabase
-    .from("branches")
-    .select("id")
-    .ilike("name", branchName)
+// ==========================================
+// FUNCIÓN CONSOLIDADA DE AUDITORÍA (ADMINISTRADOR)
+// ==========================================
+
+/**
+ * Consulta unificada para alimentar de forma simultánea las cuatro tarjetas
+ * y el desglose de ingresos del Administrador por sucursal y fecha.
+ */
+export async function getAdminShiftAudit(
+  branchName: string,
+  dateStr: string
+): Promise<ShiftAuditData> {
+  const defaultData: ShiftAuditData = {
+    shiftId: null,
+    status: "none",
+    auditStatus: "pending_review",
+    auditResolution: "MERMA_ACEPTADA",
+    auditNotes: "",
+    initialFund: 0,
+    cashSales: 0,
+    cardSales: 0,
+    transferSales: 0,
+    totalSales: 0,
+    expenses: 0,
+    reportedCountedCash: 0,
+    operatorNotes: "",
+    operatorName: "Sin operador",
+  };
+
+  try {
+    // 1. Localizar ID de la sucursal
+    const { data: branch, error: branchErr } = await supabase
+      .from("branches")
+      .select("id")
+      .ilike("name", branchName)
+      .single();
+
+    if (branchErr || !branch) return defaultData;
+
+    // 2. Rango de 24 horas del día seleccionado (hora salvadoreña UTC-6)
+    const startOfDay = `${dateStr}T00:00:00-06:00`;
+    const endOfDay = `${dateStr}T23:59:59.999-06:00`;
+
+    // 3. Buscar turno registrado en esa jornada
+    const { data: shift, error: shiftErr } = await supabase
+      .from("cash_shifts")
+      .select("*")
+      .eq("branch_id", branch.id)
+      .gte("opened_at", startOfDay)
+      .lte("opened_at", endOfDay)
+      .order("opened_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (shiftErr || !shift) return defaultData;
+
+    // 4. Consultar ventas y egresos vinculados al turno
+    const [salesRes, expensesRes] = await Promise.all([
+      supabase
+        .from("sales")
+        .select("payment_method, total")
+        .eq("shift_id", shift.id),
+      supabase
+        .from("cash_movements")
+        .select("amount")
+        .eq("shift_id", shift.id)
+        .eq("type", "egress"),
+    ]);
+
+    let cash = 0;
+    let card = 0;
+    let transfer = 0;
+    let totalSales = 0;
+
+    if (salesRes.data && salesRes.data.length > 0) {
+      salesRes.data.forEach((s) => {
+        const val = Number(s.total) || 0;
+        if (s.payment_method === "cash") cash += val;
+        else if (s.payment_method === "card") card += val;
+        else if (s.payment_method === "transfer") transfer += val;
+        totalSales += val;
+      });
+    } else {
+      totalSales = Number(shift.total_sales) || 0;
+    }
+
+    const calculatedExpenses = (expensesRes.data || []).reduce(
+      (acc, curr) => acc + (Number(curr.amount) || 0),
+      Number(shift.total_expenses) || 0
+    );
+
+    return {
+      shiftId: shift.id,
+      status: (shift.status as "open" | "closed") || "closed",
+      auditStatus: (shift.audit_status as "pending_review" | "reviewed") || "pending_review",
+      auditResolution: shift.audit_resolution || "MERMA_ACEPTADA",
+      auditNotes: shift.audit_notes || "",
+      initialFund: Number(shift.initial_cash) || 0,
+      cashSales: cash,
+      cardSales: card,
+      transferSales: transfer,
+      totalSales,
+      expenses: calculatedExpenses,
+      reportedCountedCash: Number(shift.counted_cash) || 0,
+      operatorNotes: shift.notes || shift.cashier_notes || "",
+      operatorName: shift.cashier_name || "Maria G.",
+    };
+  } catch (error) {
+    console.error("Error en getAdminShiftAudit:", error);
+    return defaultData;
+  }
+}
+
+/**
+ * Registra la conciliación y dictamen contable del Administrador en 'cash_shifts'
+ */
+export async function resolveShiftAuditInDB(payload: ResolveAuditPayload) {
+  const { shiftId, resolutionType, notes } = payload;
+
+  if (!shiftId) {
+    throw new Error("No se especificó el identificador del turno para auditar.");
+  }
+
+  const { data, error } = await supabase
+    .from("cash_shifts")
+    .update({
+      audit_status: "reviewed",
+      audit_resolution: resolutionType,
+      audit_notes: notes.trim(),
+    })
+    .eq("id", shiftId)
+    .select()
     .single();
 
-  if (branchErr || !branch) return 0.0;
+  if (error) {
+    throw new Error(`Error al asentar la resolución contable: ${error.message}`);
+  }
 
-  // 2. Definir el rango del día en hora local salvadoreña (UTC-6)
-  // "YYYY-MM-DD" -> Rango ISO completo
-  const startOfDay = `${dateStr}T00:00:00-06:00`;
-  const endOfDay = `${dateStr}T23:59:59.999-06:00`;
-
-  // 3. Buscar el turno registrado en ese día
-  const { data: shift, error: shiftErr } = await supabase
-    .from("cash_shifts")
-    .select("initial_cash")
-    .eq("branch_id", branch.id)
-    .gte("opened_at", startOfDay)
-    .lte("opened_at", endOfDay)
-    .order("opened_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  if (shiftErr || !shift) return 0.0;
-
-  return Number(shift.initial_cash) || 0.0;
+  return data;
 }

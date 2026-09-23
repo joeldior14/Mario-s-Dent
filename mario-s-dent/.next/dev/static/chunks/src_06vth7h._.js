@@ -296,12 +296,14 @@ function InventoryPage() {
     ]);
     const filteredItems = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
         "InventoryPage.useMemo[filteredItems]": ()=>{
-            const q = search.trim().toLowerCase();
             return items.filter({
                 "InventoryPage.useMemo[filteredItems]": (item)=>{
+                    // 1. Coincidencia por texto en buscador
+                    const q = search.trim().toLowerCase();
                     const matchSearch = !q || item.name.toLowerCase().includes(q) || item.brand.toLowerCase().includes(q) || item.sku.toLowerCase().includes(q) || item.barcode && item.barcode.toLowerCase().includes(q);
-                    const matchCat = category === "All" || item.category === category;
-                    return matchSearch && matchCat;
+                    // 2. Coincidencia por categoría (Ignora si es "All" o "Todas las categorías")
+                    const matchCategory = !category || category === "All" || category === "Todas las categorías" || item.category?.toLowerCase() === category.toLowerCase();
+                    return matchSearch && matchCategory;
                 }
             }["InventoryPage.useMemo[filteredItems]"]);
         }
@@ -315,7 +317,7 @@ function InventoryPage() {
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Navbar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                 fileName: "[project]/src/app/inventario/page.tsx",
-                lineNumber: 349,
+                lineNumber: 357,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
@@ -334,7 +336,7 @@ function InventoryPage() {
                                                 className: "w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 357,
+                                                lineNumber: 365,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -345,13 +347,13 @@ function InventoryPage() {
                                                 className: "w-full h-[38px] pl-9 pr-4 bg-white border border-slate-200 rounded-xl text-xs font-medium focus:outline-none focus:border-sky-500 shadow-2xs transition-colors"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 358,
+                                                lineNumber: 366,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                        lineNumber: 356,
+                                        lineNumber: 364,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -363,11 +365,11 @@ function InventoryPage() {
                                                 className: "appearance-none h-[38px] bg-white border border-slate-200 rounded-xl pl-3.5 pr-8 text-xs font-semibold text-slate-600 focus:outline-none focus:border-sky-500 shadow-2xs cursor-pointer",
                                                 children: [
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
-                                                        value: "Todas",
+                                                        value: "All",
                                                         children: "Todas las categorías"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 374,
+                                                        lineNumber: 382,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -375,7 +377,7 @@ function InventoryPage() {
                                                         children: "Resinas"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 375,
+                                                        lineNumber: 383,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -383,7 +385,7 @@ function InventoryPage() {
                                                         children: "Endo"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 376,
+                                                        lineNumber: 384,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -391,7 +393,7 @@ function InventoryPage() {
                                                         children: "Orto"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 377,
+                                                        lineNumber: 385,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -399,7 +401,7 @@ function InventoryPage() {
                                                         children: "Instrumentos"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 378,
+                                                        lineNumber: 386,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -407,26 +409,26 @@ function InventoryPage() {
                                                         children: "Productos Desechables"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 379,
+                                                        lineNumber: 387,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 369,
+                                                lineNumber: 377,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$down$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDown$3e$__["ChevronDown"], {
                                                 className: "w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 381,
+                                                lineNumber: 389,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                        lineNumber: 368,
+                                        lineNumber: 376,
                                         columnNumber: 13
                                     }, this),
                                     isAdmin ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -436,7 +438,7 @@ function InventoryPage() {
                                                 className: "w-3.5 h-3.5 text-sky-600 mr-2 shrink-0"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 387,
+                                                lineNumber: 395,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -447,7 +449,7 @@ function InventoryPage() {
                                                         children: "Vista de Red"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 389,
+                                                        lineNumber: 397,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -455,13 +457,13 @@ function InventoryPage() {
                                                         children: selectedBranch === "ALL" ? "Todas las sedes" : selectedBranch
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 392,
+                                                        lineNumber: 400,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 388,
+                                                lineNumber: 396,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -474,7 +476,7 @@ function InventoryPage() {
                                                         children: "Santa Ana"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 401,
+                                                        lineNumber: 409,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -482,7 +484,7 @@ function InventoryPage() {
                                                         children: "Ahuachapán"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 402,
+                                                        lineNumber: 410,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -490,7 +492,7 @@ function InventoryPage() {
                                                         children: "Sonsonate"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 403,
+                                                        lineNumber: 411,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -498,26 +500,26 @@ function InventoryPage() {
                                                         children: "Todas las sucursales (Consolidado)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 404,
+                                                        lineNumber: 412,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 396,
+                                                lineNumber: 404,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$down$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDown$3e$__["ChevronDown"], {
                                                 className: "w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 406,
+                                                lineNumber: 414,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                        lineNumber: 386,
+                                        lineNumber: 394,
                                         columnNumber: 15
                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "flex items-center bg-slate-100/80 border border-slate-200 rounded-xl px-3 h-[38px] shadow-2xs select-none",
@@ -526,7 +528,7 @@ function InventoryPage() {
                                                 className: "w-4 h-4 text-sky-600 mr-2 shrink-0"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 410,
+                                                lineNumber: 418,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -537,7 +539,7 @@ function InventoryPage() {
                                                         children: "Sucursal Asignada"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 412,
+                                                        lineNumber: 420,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -545,25 +547,25 @@ function InventoryPage() {
                                                         children: currentUser.branch
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 415,
+                                                        lineNumber: 423,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 411,
+                                                lineNumber: 419,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                        lineNumber: 409,
+                                        lineNumber: 417,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 354,
+                                lineNumber: 362,
                                 columnNumber: 11
                             }, this),
                             isAdmin && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -578,20 +580,20 @@ function InventoryPage() {
                                                 className: "w-3.5 h-3.5 text-emerald-600"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 431,
+                                                lineNumber: 439,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Reporte Hacienda"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 432,
+                                                lineNumber: 440,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                        lineNumber: 426,
+                                        lineNumber: 434,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -603,20 +605,20 @@ function InventoryPage() {
                                                 className: "w-3.5 h-3.5 text-sky-600"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 440,
+                                                lineNumber: 448,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Traslado de Stock"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 441,
+                                                lineNumber: 449,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                        lineNumber: 435,
+                                        lineNumber: 443,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -628,32 +630,32 @@ function InventoryPage() {
                                                 className: "w-4 h-4"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 449,
+                                                lineNumber: 457,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Nuevo Producto"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 450,
+                                                lineNumber: 458,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                        lineNumber: 444,
+                                        lineNumber: 452,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 425,
+                                lineNumber: 433,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/inventario/page.tsx",
-                        lineNumber: 353,
+                        lineNumber: 361,
                         columnNumber: 9
                     }, this),
                     error && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -663,20 +665,20 @@ function InventoryPage() {
                                 className: "w-4 h-4 shrink-0"
                             }, void 0, false, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 459,
+                                lineNumber: 467,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                 children: error
                             }, void 0, false, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 460,
+                                lineNumber: 468,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/inventario/page.tsx",
-                        lineNumber: 458,
+                        lineNumber: 466,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -689,7 +691,7 @@ function InventoryPage() {
                                         className: "w-7 h-7 animate-spin text-sky-600"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                        lineNumber: 468,
+                                        lineNumber: 476,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -697,13 +699,13 @@ function InventoryPage() {
                                         children: "Cargando inventario de sucursales..."
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                        lineNumber: 469,
+                                        lineNumber: 477,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 467,
+                                lineNumber: 475,
                                 columnNumber: 13
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("table", {
                                 className: "w-full text-left text-xs border-collapse",
@@ -717,7 +719,7 @@ function InventoryPage() {
                                                     children: "SKU / Barcode"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                    lineNumber: 475,
+                                                    lineNumber: 483,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -725,7 +727,7 @@ function InventoryPage() {
                                                     children: "Producto / Marca"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                    lineNumber: 476,
+                                                    lineNumber: 484,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -733,7 +735,7 @@ function InventoryPage() {
                                                     children: "Descripción"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                    lineNumber: 477,
+                                                    lineNumber: 485,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -741,7 +743,7 @@ function InventoryPage() {
                                                     children: "Categoría"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                    lineNumber: 478,
+                                                    lineNumber: 486,
                                                     columnNumber: 19
                                                 }, this),
                                                 isAdmin && selectedBranch === "ALL" ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -751,7 +753,7 @@ function InventoryPage() {
                                                             children: "Santa Ana"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                            lineNumber: 482,
+                                                            lineNumber: 490,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -759,7 +761,7 @@ function InventoryPage() {
                                                             children: "Ahuachapán"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                            lineNumber: 483,
+                                                            lineNumber: 491,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -767,7 +769,7 @@ function InventoryPage() {
                                                             children: "Sonsonate"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                            lineNumber: 484,
+                                                            lineNumber: 492,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -775,13 +777,13 @@ function InventoryPage() {
                                                             children: "Total Red"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                            lineNumber: 485,
+                                                            lineNumber: 493,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                    lineNumber: 481,
+                                                    lineNumber: 489,
                                                     columnNumber: 21
                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
                                                     children: [
@@ -794,7 +796,7 @@ function InventoryPage() {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                            lineNumber: 489,
+                                                            lineNumber: 497,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -802,13 +804,13 @@ function InventoryPage() {
                                                             children: "Otras Sucursales"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                            lineNumber: 492,
+                                                            lineNumber: 500,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                    lineNumber: 488,
+                                                    lineNumber: 496,
                                                     columnNumber: 21
                                                 }, this),
                                                 isAdmin && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -816,7 +818,7 @@ function InventoryPage() {
                                                     children: "Costo"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                    lineNumber: 497,
+                                                    lineNumber: 505,
                                                     columnNumber: 31
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -824,7 +826,7 @@ function InventoryPage() {
                                                     children: "Precio Venta"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                    lineNumber: 499,
+                                                    lineNumber: 507,
                                                     columnNumber: 19
                                                 }, this),
                                                 isAdmin && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -832,18 +834,18 @@ function InventoryPage() {
                                                     children: "Acciones"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                    lineNumber: 500,
+                                                    lineNumber: 508,
                                                     columnNumber: 31
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                            lineNumber: 474,
+                                            lineNumber: 482,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                        lineNumber: 473,
+                                        lineNumber: 481,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
@@ -862,7 +864,7 @@ function InventoryPage() {
                                                                 children: item.sku
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                lineNumber: 512,
+                                                                lineNumber: 520,
                                                                 columnNumber: 25
                                                             }, this),
                                                             item.barcode && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -870,13 +872,13 @@ function InventoryPage() {
                                                                 children: item.barcode
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                lineNumber: 514,
+                                                                lineNumber: 522,
                                                                 columnNumber: 27
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 511,
+                                                        lineNumber: 519,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -887,7 +889,7 @@ function InventoryPage() {
                                                                 children: item.name
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                lineNumber: 521,
+                                                                lineNumber: 529,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -895,13 +897,13 @@ function InventoryPage() {
                                                                 children: item.brand
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                lineNumber: 522,
+                                                                lineNumber: 530,
                                                                 columnNumber: 25
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 520,
+                                                        lineNumber: 528,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -909,7 +911,7 @@ function InventoryPage() {
                                                         children: item.description
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 525,
+                                                        lineNumber: 533,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -919,12 +921,12 @@ function InventoryPage() {
                                                             children: item.category
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                            lineNumber: 528,
+                                                            lineNumber: 536,
                                                             columnNumber: 25
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 527,
+                                                        lineNumber: 535,
                                                         columnNumber: 23
                                                     }, this),
                                                     isAdmin && selectedBranch === "ALL" ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -934,7 +936,7 @@ function InventoryPage() {
                                                                 children: item.branches.find((b)=>b.branchId === "santa-ana")?.stock ?? 0
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                lineNumber: 536,
+                                                                lineNumber: 544,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -942,7 +944,7 @@ function InventoryPage() {
                                                                 children: item.branches.find((b)=>b.branchId === "ahuachapan")?.stock ?? 0
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                lineNumber: 539,
+                                                                lineNumber: 547,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -950,7 +952,7 @@ function InventoryPage() {
                                                                 children: item.branches.find((b)=>b.branchId === "sonsonate")?.stock ?? 0
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                lineNumber: 542,
+                                                                lineNumber: 550,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -960,18 +962,18 @@ function InventoryPage() {
                                                                     children: currentStock
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                                    lineNumber: 546,
+                                                                    lineNumber: 554,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                lineNumber: 545,
+                                                                lineNumber: 553,
                                                                 columnNumber: 27
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 535,
+                                                        lineNumber: 543,
                                                         columnNumber: 25
                                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
                                                         children: [
@@ -982,12 +984,12 @@ function InventoryPage() {
                                                                     children: currentStock === 0 ? "Agotado" : currentStock
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                                    lineNumber: 554,
+                                                                    lineNumber: 562,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                lineNumber: 553,
+                                                                lineNumber: 561,
                                                                 columnNumber: 27
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -1001,31 +1003,31 @@ function InventoryPage() {
                                                                             className: "w-3.5 h-3.5"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                                            lineNumber: 577,
+                                                                            lineNumber: 585,
                                                                             columnNumber: 31
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                             children: otherStock > 0 ? `${otherStock} en red` : "Sin stock"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                                            lineNumber: 578,
+                                                                            lineNumber: 586,
                                                                             columnNumber: 31
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                                    lineNumber: 568,
+                                                                    lineNumber: 576,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                lineNumber: 567,
+                                                                lineNumber: 575,
                                                                 columnNumber: 27
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 552,
+                                                        lineNumber: 560,
                                                         columnNumber: 25
                                                     }, this),
                                                     isAdmin && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -1036,7 +1038,7 @@ function InventoryPage() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 586,
+                                                        lineNumber: 594,
                                                         columnNumber: 25
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -1047,7 +1049,7 @@ function InventoryPage() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 591,
+                                                        lineNumber: 599,
                                                         columnNumber: 23
                                                     }, this),
                                                     isAdmin && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -1065,20 +1067,20 @@ function InventoryPage() {
                                                                             className: "w-3 h-3 text-sky-600"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                                            lineNumber: 606,
+                                                                            lineNumber: 614,
                                                                             columnNumber: 33
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                             children: "± Stock"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                                            lineNumber: 607,
+                                                                            lineNumber: 615,
                                                                             columnNumber: 33
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                                    lineNumber: 600,
+                                                                    lineNumber: 608,
                                                                     columnNumber: 31
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1090,12 +1092,12 @@ function InventoryPage() {
                                                                         className: "w-3.5 h-3.5"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                                        lineNumber: 617,
+                                                                        lineNumber: 625,
                                                                         columnNumber: 31
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                                    lineNumber: 611,
+                                                                    lineNumber: 619,
                                                                     columnNumber: 29
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1107,12 +1109,12 @@ function InventoryPage() {
                                                                         className: "w-3.5 h-3.5"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                                        lineNumber: 626,
+                                                                        lineNumber: 634,
                                                                         columnNumber: 31
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                                    lineNumber: 620,
+                                                                    lineNumber: 628,
                                                                     columnNumber: 29
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1124,41 +1126,41 @@ function InventoryPage() {
                                                                         className: "w-3.5 h-3.5"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                                        lineNumber: 635,
+                                                                        lineNumber: 643,
                                                                         columnNumber: 31
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                                    lineNumber: 629,
+                                                                    lineNumber: 637,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                            lineNumber: 598,
+                                                            lineNumber: 606,
                                                             columnNumber: 27
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 597,
+                                                        lineNumber: 605,
                                                         columnNumber: 25
                                                     }, this)
                                                 ]
                                             }, item.id, true, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 510,
+                                                lineNumber: 518,
                                                 columnNumber: 21
                                             }, this);
                                         })
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                        lineNumber: 504,
+                                        lineNumber: 512,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 472,
+                                lineNumber: 480,
                                 columnNumber: 13
                             }, this),
                             !isLoading && filteredItems.length === 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1168,7 +1170,7 @@ function InventoryPage() {
                                         className: "w-8 h-8 text-slate-300"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                        lineNumber: 649,
+                                        lineNumber: 657,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1176,7 +1178,7 @@ function InventoryPage() {
                                         children: "No hay productos en inventario"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                        lineNumber: 650,
+                                        lineNumber: 658,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1184,19 +1186,19 @@ function InventoryPage() {
                                         children: search || category !== "All" ? "No se encontraron coincidencias para los filtros aplicados." : "El catálogo está vacío. Utiliza el botón \"Nuevo Producto\" para comenzar a poblar la base de datos."
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                        lineNumber: 653,
+                                        lineNumber: 661,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 648,
+                                lineNumber: 656,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/inventario/page.tsx",
-                        lineNumber: 465,
+                        lineNumber: 473,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BranchStockModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1206,7 +1208,7 @@ function InventoryPage() {
                         product: selectedProduct
                     }, void 0, false, {
                         fileName: "[project]/src/app/inventario/page.tsx",
-                        lineNumber: 663,
+                        lineNumber: 671,
                         columnNumber: 9
                     }, this),
                     adjustingProduct && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$AjusteStockModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1219,7 +1221,7 @@ function InventoryPage() {
                         onConfirm: handleConfirmAdjustment
                     }, void 0, false, {
                         fileName: "[project]/src/app/inventario/page.tsx",
-                        lineNumber: 672,
+                        lineNumber: 680,
                         columnNumber: 11
                     }, this),
                     isAdmin && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -1230,7 +1232,7 @@ function InventoryPage() {
                                 onSave: handleSaveNewProduct
                             }, void 0, false, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 686,
+                                lineNumber: 694,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$TransferStockModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1240,7 +1242,7 @@ function InventoryPage() {
                                 onConfirmTransfer: handleConfirmTransfer
                             }, void 0, false, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 692,
+                                lineNumber: 700,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$HistorialProductoModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1250,7 +1252,7 @@ function InventoryPage() {
                                 currentBranch: selectedBranch
                             }, void 0, false, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 699,
+                                lineNumber: 707,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$EditarProductoModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1260,7 +1262,7 @@ function InventoryPage() {
                                 onSave: handleUpdateProduct
                             }, void 0, false, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 706,
+                                lineNumber: 714,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BorrarProductoModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1270,7 +1272,7 @@ function InventoryPage() {
                                 product: deletingProduct
                             }, void 0, false, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 713,
+                                lineNumber: 721,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ReporteHaciendaModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1279,25 +1281,25 @@ function InventoryPage() {
                                 products: items
                             }, void 0, false, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 720,
+                                lineNumber: 728,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/inventario/page.tsx",
-                        lineNumber: 685,
+                        lineNumber: 693,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/inventario/page.tsx",
-                lineNumber: 351,
+                lineNumber: 359,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/app/inventario/page.tsx",
-        lineNumber: 348,
+        lineNumber: 356,
         columnNumber: 5
     }, this);
 }

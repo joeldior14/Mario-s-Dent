@@ -331,16 +331,24 @@ export default function InventoryPage() {
   }, [deletingProduct]);
 
   const filteredItems = useMemo(() => {
-    const q = search.trim().toLowerCase();
     return items.filter((item) => {
+      // 1. Coincidencia por texto en buscador
+      const q = search.trim().toLowerCase();
       const matchSearch =
         !q ||
         item.name.toLowerCase().includes(q) ||
         item.brand.toLowerCase().includes(q) ||
         item.sku.toLowerCase().includes(q) ||
         (item.barcode && item.barcode.toLowerCase().includes(q));
-      const matchCat = category === "All" || item.category === category;
-      return matchSearch && matchCat;
+
+      // 2. Coincidencia por categoría (Ignora si es "All" o "Todas las categorías")
+      const matchCategory =
+        !category ||
+        category === "All" ||
+        category === "Todas las categorías" ||
+        item.category?.toLowerCase() === category.toLowerCase();
+
+      return matchSearch && matchCategory;
     });
   }, [items, search, category]);
 
@@ -371,7 +379,7 @@ export default function InventoryPage() {
                 onChange={(e) => setCategory(e.target.value)}
                 className="appearance-none h-[38px] bg-white border border-slate-200 rounded-xl pl-3.5 pr-8 text-xs font-semibold text-slate-600 focus:outline-none focus:border-sky-500 shadow-2xs cursor-pointer"
               >
-                <option value="Todas">Todas las categorías</option>
+                <option value="All">Todas las categorías</option>
                 <option value="Resinas">Resinas</option>
                 <option value="Endo">Endo</option>
                 <option value="Orto">Orto</option>

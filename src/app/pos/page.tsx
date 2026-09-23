@@ -8,7 +8,7 @@ import { useShift } from "@/app/context/ShiftContext";
 import { useAuth } from "@/app/context/AuthContext";
 import { supabase } from "@/lib/supabaseClient";
 import { processSaleInDB, POSCartItem } from "@/app/services/inventoryService";
-import { getNextOrderNumber } from "@/app/services/cashService"; // 👈 Importado para la sincronización
+import { getNextOrderNumber } from "@/app/services/cashService";
 import {
   Scan,
   Trash2,
@@ -48,7 +48,7 @@ function ShiftWarningModal({
             Turno de Caja Requerido
           </h3>
           <p className="text-xs text-slate-500 leading-relaxed">
-            No es posible agregar artículos ni cobrar sin abrir un turno previamente. Registra tu fondo inicial para comenzar.
+            No es posible agregar artículos ni cobrar sin abrir un turno previamente. Registra tu fondo inicial para comenzar[cite: 1, 2].
           </p>
         </div>
 
@@ -118,7 +118,6 @@ interface DBProductPOS {
   branch_inventory: DBBranchInventory[] | null;
 }
 
-
 const CATEGORIES = ["All", "Orto", "Endo", "Resinas", "Instrumentos", "Desechables"];
 const CASH_SUGGESTIONS = [5, 10, 20, 50, 100];
 
@@ -135,10 +134,15 @@ function subscribeCart(callback: () => void) {
 export default function PosPage() {
   const { isShiftOpen, cashierName } = useShift();
   const { user } = useAuth();
-  const currentBranch = user?.branch || "Santa Ana";
+  
+  // Garantiza que la sucursal provenga de la sesión del usuario logueado
+  const currentBranch = useMemo(() => {
+    return user?.branch || "Santa Ana";
+  }, [user?.branch]);
+
   const CART_STORAGE_KEY = `pos_cart_${currentBranch}`;
 
-  // 1. Estado de orden inicializado leyendo localStorage por si la página recarga abruptamente
+  // Estado de orden
   const [orderNumber, setOrderNumber] = useState<number>(() => {
     if (typeof window !== "undefined") {
       const saved = localStorage.getItem(`pos_order_num_${currentBranch}`);
@@ -146,6 +150,8 @@ export default function PosPage() {
     }
     return 1;
   });
+
+  const [hasHydrated, setHasHydrated] = useState(false);
 
   const [showShiftWarning, setShowShiftWarning] = useState(false);
   const [products, setProducts] = useState<POSProduct[]>([]);
@@ -160,7 +166,14 @@ export default function PosPage() {
 
   const scanInputRef = useRef<HTMLInputElement>(null);
 
-  // 2. Efecto para asegurar la exactitud del número de orden validando con Supabase
+  // Evita alertas de ESLint en React 19 / Next.js
+  useEffect(() => {
+    queueMicrotask(() => {
+      setHasHydrated(true);
+    });
+  }, []);
+
+  // Sincroniza el correlativo de orden con Supabase para la sucursal activa
   useEffect(() => {
     let isMounted = true;
 
@@ -170,12 +183,16 @@ export default function PosPage() {
         return;
       }
 
-      const nextNum = await getNextOrderNumber(currentBranch);
-      if (isMounted) {
-        setOrderNumber(nextNum);
-        if (typeof window !== "undefined") {
-          localStorage.setItem(`pos_order_num_${currentBranch}`, nextNum.toString());
+      try {
+        const nextNum = await getNextOrderNumber(currentBranch);
+        if (isMounted) {
+          setOrderNumber(nextNum);
+          if (typeof window !== "undefined") {
+            localStorage.setItem(`pos_order_num_${currentBranch}`, nextNum.toString());
+          }
         }
+      } catch (err) {
+        console.error("Error al sincronizar número de orden:", err);
       }
     }
 
@@ -186,7 +203,7 @@ export default function PosPage() {
     };
   }, [currentBranch, isShiftOpen]);
 
-  // Lectura reactiva del carrito desde localStorage sin renders en cascada
+  // Lectura reactiva del carrito desde localStorage
   const rawCart = useSyncExternalStore(
     subscribeCart,
     () => (typeof window !== "undefined" ? localStorage.getItem(CART_STORAGE_KEY) ?? "[]" : "[]"),
@@ -244,7 +261,7 @@ export default function PosPage() {
       const formatted: POSProduct[] = rawProducts.map((p) => {
         const invList = p.branch_inventory ?? [];
         const branchMatch = invList.find(
-          (b) => b.branches?.name?.toLowerCase() === currentBranch.toLowerCase()
+          (b) => b.branches?.name?.trim().toLowerCase() === currentBranch.trim().toLowerCase()
         );
 
         return {
@@ -424,7 +441,7 @@ export default function PosPage() {
 
       // 1. Guardar la venta en Supabase y descontar stock
       const result = await processSaleInDB({
-        branchName: currentBranch,
+        branchName: currentBranch.trim(),
         cashierId: user?.id || null,
         cashierName: cashierName || user?.name || "Cajero",
         paymentMethod,
@@ -468,7 +485,7 @@ export default function PosPage() {
         <div className="bg-amber-50 border-b border-amber-200 px-6 py-2.5 flex items-center justify-between text-amber-800 text-xs font-semibold">
           <div className="flex items-center gap-2">
             <Lock className="w-4 h-4 text-amber-600 shrink-0" />
-            <span>Turno cerrado: dirígete a Caja para registrar fondo inicial y cobrar.</span>
+            <span>Turno cerrado: dirígete a Caja para registrar fondo inicial y cobrar[cite: 1, 2].</span>
           </div>
           <Link
             href="/caja"
@@ -486,7 +503,7 @@ export default function PosPage() {
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4" />
             <span>
-              ¡Venta registrada con éxito! Comprobante emitido: <strong>{ticketSuccess}</strong>
+              ¡Venta registrada con éxito! Comprobante emitido: <strong>{ticketSuccess}</strong>[cite: 1, 4]
             </span>
           </div>
           <button
@@ -622,7 +639,7 @@ export default function PosPage() {
             <div className="flex items-center gap-2">
               <span className="font-bold text-xs text-slate-800">Current Order</span>
               <span className="text-xs font-black text-sky-600 bg-sky-50 px-2 py-0.5 rounded-md border border-sky-100">
-                #{orderNumber}
+                #{hasHydrated ? orderNumber : "—"}
               </span>
             </div>
             <button
@@ -644,7 +661,7 @@ export default function PosPage() {
                 <span className="text-2xl">🛒</span>
                 <p className="font-semibold text-slate-600">No hay productos en la orden</p>
                 <p className="text-[10px] text-slate-400 max-w-[200px]">
-                  Selecciona un producto del catálogo o escanea su código de barras.
+                  Selecciona un producto del catálogo o escanea su código de barras[cite: 1, 6].
                 </p>
               </div>
             ) : (

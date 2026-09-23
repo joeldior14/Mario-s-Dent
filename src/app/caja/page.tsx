@@ -9,7 +9,8 @@ import {
   getShiftSalesBreakdown,
   ShiftSalesBreakdown,
   closeCashShiftInDB,
-  getShiftInitialFundByDate,
+  getAdminShiftAudit,
+  resolveShiftAuditInDB,
 } from "@/app/services/cashService";
 import ConfirmarModal, { DialogType } from "@/components/ConfirmarModal";
 import ExpenseModal, { ExpenseRecord } from "@/components/GastoMenorModal";
@@ -17,7 +18,7 @@ import CorteZPDFTemplate, { downloadCorteZPDF } from "@/components/CortePDF";
 import OpenShiftModal from "@/components/OpenShiftModal";
 import AuditTicketsModal from "@/components/AuditTicketsModal";
 import { useShift } from "@/app/context/ShiftContext";
-import { useAuth } from "@/app/context/AuthContext";
+import { BranchName, useAuth } from "@/app/context/AuthContext";
 import {
   Banknote,
   CreditCard,
@@ -66,6 +67,8 @@ export default function CajaPage() {
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
 
+  const [currentAuditedShiftId, setCurrentAuditedShiftId] = useState<string | null>(null);
+
   // Fecha actual en formato legible para el cajero (Zona horaria de El Salvador)
   const currentDateDisplay = useMemo(() => {
     return new Intl.DateTimeFormat("es-SV", {
@@ -83,7 +86,7 @@ export default function CajaPage() {
 
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Ventas totales y desglose
+  // Ventas en tiempo real para el Cajero
   const [salesBreakdown, setSalesBreakdown] = useState<ShiftSalesBreakdown>({
     cash: 0,
     card: 0,
@@ -114,8 +117,14 @@ export default function CajaPage() {
     onConfirm: () => {},
   });
 
-  // Filtros de Auditoría (Admin) fijando la zona horaria en America/El_Salvador (en-CA da formato YYYY-MM-DD)
-  const [selectedBranch, setSelectedBranch] = useState("Santa Ana");
+  // Filtros de Auditoría (Admin)
+  const [selectedBranch, setSelectedBranch] = useState<BranchName>(() => {
+    return (user?.branch as BranchName) || "Santa Ana";
+  });
+
+  // Sucursal efectiva: Cajero toma su sede fija, Administrador la seleccionada
+  const effectiveBranch = (!isAdmin && user?.branch) ? user.branch : selectedBranch;
+
   const [selectedDate, setSelectedDate] = useState(() => {
     return new Intl.DateTimeFormat("en-CA", {
       timeZone: "America/El_Salvador",
@@ -125,8 +134,7 @@ export default function CajaPage() {
     }).format(new Date());
   });
 
-  // Resolución Contable (Admin)
-  const isAudited = auditStatus === "reviewed";
+  // Dictamen Contable (Admin)
   const [resolutionType, setResolutionType] = useState<ResolutionType>("MERMA_ACEPTADA");
   const [adminNotes, setAdminNotes] = useState("");
 
@@ -135,19 +143,32 @@ export default function CajaPage() {
   const [countedCash, setCountedCash] = useState<number>(0.0);
   const [expensesList, setExpensesList] = useState<ExpenseRecord[]>([]);
 
-  // Estado reactivo para métricas del turno / jornada (Inicializados en 0.00)
+  // Estado unificado para métricas de turno / auditoría (Admin)
   const [salesMetrics, setSalesMetrics] = useState({
+    shiftId: null as string | null,
+    auditStatus: "pending_review" as "pending_review" | "reviewed",
+    auditResolution: "MERMA_ACEPTADA",
+    auditNotes: "",
     initialFund: 0.0,
     cash: 0.0,
     card: 0.0,
     transfer: 0.0,
+    totalSales: 0.0,
+    expenses: 0.0,
     reportedCountedCash: 0.0,
     operatorNotes: "",
     operatorName: "Sin operador",
   });
 
-  // Carga los datos de ventas totales y su desglose
+  // El estado auditado ahora depende del turno que se está visualizando en pantalla
+  const isAudited = isAdmin
+    ? salesMetrics.auditStatus === "reviewed"
+    : auditStatus === "reviewed";
+
+  // Carga las ventas en vivo cuando el cajero tiene un turno abierto
   useEffect(() => {
+    if (isAdmin) return;
+
     let isMounted = true;
 
     async function loadSales() {
@@ -158,7 +179,7 @@ export default function CajaPage() {
         return;
       }
 
-      const breakdown = await getShiftSalesBreakdown(selectedBranch);
+      const breakdown = await getShiftSalesBreakdown(effectiveBranch);
       if (isMounted) {
         setSalesBreakdown(breakdown);
       }
@@ -169,41 +190,12 @@ export default function CajaPage() {
     return () => {
       isMounted = false;
     };
-  }, [selectedBranch, isShiftOpen]);
+  }, [isAdmin, effectiveBranch, isShiftOpen]);
 
-  // Carga asíncrona para el Administrador (Prueba aislada de Fondo Inicial por fecha)
+  // Carga los gastos en vivo cuando el cajero tiene un turno abierto
   useEffect(() => {
-    if (!isAdmin) return;
+    if (isAdmin) return;
 
-    let isMounted = true;
-
-    async function loadAdminShift() {
-      try {
-        const fund = await getShiftInitialFundByDate(selectedBranch, selectedDate);
-
-        if (isMounted) {
-          setSalesMetrics((prev) => ({
-            ...prev,
-            initialFund: fund, // 👈 Actualiza dinámicamente con la base de datos
-          }));
-        }
-      } catch (error) {
-        console.error("Error al cargar fondo inicial histórico:", error);
-        if (isMounted) {
-          setSalesMetrics((prev) => ({ ...prev, initialFund: 0.0 }));
-        }
-      }
-    }
-
-    loadAdminShift();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [isAdmin, selectedBranch, selectedDate]);
-
-  // Cargar los gastos registrados en la BD de forma segura para React
-  useEffect(() => {
     let isMounted = true;
 
     async function loadExpenses() {
@@ -213,7 +205,7 @@ export default function CajaPage() {
       }
 
       try {
-        const dbExpenses = await fetchCurrentShiftExpenses(selectedBranch);
+        const dbExpenses = await fetchCurrentShiftExpenses(effectiveBranch);
         if (isMounted) {
           setExpensesList(dbExpenses);
         }
@@ -227,23 +219,98 @@ export default function CajaPage() {
     return () => {
       isMounted = false;
     };
-  }, [selectedBranch, isShiftOpen]);
+  }, [isAdmin, effectiveBranch, isShiftOpen]);
 
-  // Balance Financiero Dinámico
+  // Carga Unificada de Auditoría para el Administrador
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    let isMounted = true;
+
+    async function loadAdminAudit() {
+      try {
+        const audit = await getAdminShiftAudit(selectedBranch, selectedDate);
+
+        if (isMounted) {
+          setCurrentAuditedShiftId(audit.shiftId);
+
+          setSalesMetrics({
+            shiftId: audit.shiftId,
+            auditStatus: (audit.auditStatus as "pending_review" | "reviewed") || "pending_review",
+            auditResolution: audit.auditResolution || "MERMA_ACEPTADA",
+            auditNotes: audit.auditNotes || "",
+            initialFund: audit.initialFund,
+            cash: audit.cashSales,
+            card: audit.cardSales,
+            transfer: audit.transferSales,
+            totalSales: audit.totalSales,
+            expenses: audit.expenses,
+            reportedCountedCash: audit.reportedCountedCash,
+            operatorNotes: audit.operatorNotes,
+            operatorName: audit.operatorName,
+          });
+
+          // Sincronización limpia: si ya fue resuelto muestra lo registrado; si no, queda limpio
+          if (audit.auditStatus === "reviewed") {
+            setAdminNotes(audit.auditNotes || "");
+            setResolutionType((audit.auditResolution as ResolutionType) || "MERMA_ACEPTADA");
+          } else {
+            setAdminNotes("");
+            setResolutionType("MERMA_ACEPTADA");
+          }
+        }
+      } catch (error) {
+        console.error("Error al cargar auditoría unificada:", error);
+        if (isMounted) {
+          setCurrentAuditedShiftId(null);
+          setAdminNotes("");
+          setResolutionType("MERMA_ACEPTADA");
+          setSalesMetrics({
+            shiftId: null,
+            auditStatus: "pending_review",
+            auditResolution: "MERMA_ACEPTADA",
+            auditNotes: "",
+            initialFund: 0.0,
+            cash: 0.0,
+            card: 0.0,
+            transfer: 0.0,
+            totalSales: 0.0,
+            expenses: 0.0,
+            reportedCountedCash: 0.0,
+            operatorNotes: "",
+            operatorName: "Sin operador",
+          });
+        }
+      }
+    }
+
+    loadAdminAudit();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isAdmin, selectedBranch, selectedDate]);
+
+  // Balance Financiero Dinámico sincronizado para Cajero y Administrador
   const totals: FinancialSummary = useMemo(() => {
-    const totalExpenses = expensesList.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
+    const liveExpenses = expensesList.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
+    const totalExpenses = isAdmin ? salesMetrics.expenses : liveExpenses;
 
     const fund = isAdmin ? salesMetrics.initialFund : isShiftOpen ? Number(initialCash) || 0.0 : 0.0;
     const cash = isAdmin ? salesMetrics.cash : salesBreakdown.cash;
     const card = isAdmin ? salesMetrics.card : salesBreakdown.card;
     const transfer = isAdmin ? salesMetrics.transfer : salesBreakdown.transfer;
-    const grossSales = cash + card + transfer;
+    const grossSales = isAdmin ? salesMetrics.totalSales : cash + card + transfer;
 
     const rawExpected = fund + cash - totalExpenses;
     const expected = isShiftOpen || isAdmin ? Math.max(0, rawExpected) : 0.0;
     const totalExp = Math.max(0, fund + grossSales - totalExpenses);
 
-    const actualCounted = isAdmin ? salesMetrics.reportedCountedCash : isShiftOpen ? Number(countedCash) || 0.0 : 0.0;
+    const actualCounted = isAdmin
+      ? salesMetrics.reportedCountedCash
+      : isShiftOpen
+      ? Number(countedCash) || 0.0
+      : 0.0;
     const diff = Number((actualCounted - expected).toFixed(2));
 
     return {
@@ -268,7 +335,7 @@ export default function CajaPage() {
       setIsProcessing(true);
 
       await openCashShiftInDB({
-        branchName: selectedBranch,
+        branchName: effectiveBranch,
         cashierId: user?.id || "",
         initialCash: amount,
       });
@@ -297,7 +364,7 @@ export default function CajaPage() {
       setIsProcessing(true);
 
       await recordExpenseInDB({
-        branchName: selectedBranch,
+        branchName: effectiveBranch,
         amount: newExpense.amount,
         category: newExpense.category,
         concept: newExpense.concept,
@@ -330,77 +397,81 @@ export default function CajaPage() {
   };
 
   // Cierre de Turno conectado a Supabase (Corte Z)
-  const handleCloseShift = useCallback(() => {
-    if (totals.isShortage && !cashierNotes.trim()) {
-      setDialogConfig({
-        isOpen: true,
-        type: "warning",
-        title: "Justificación Requerida",
-        description:
-          "Existe un faltante en el arqueo de efectivo. Es obligatorio ingresar una justificación antes de realizar el Corte Z.",
-        confirmText: "Entendido",
-        onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
-      });
-      return;
-    }
+ const handleCloseShift = useCallback(() => {
+  // Asegura el cálculo de la diferencia del arqueo en el momento de pulsar cerrar
+  const currentCounted = Number(countedCash) || 0;
+  const currentExpected = Number(totals.expectedCash) || 0;
+  const realDiff = Number((currentCounted - currentExpected).toFixed(2));
 
+  if (realDiff < 0 && !cashierNotes.trim()) {
     setDialogConfig({
       isOpen: true,
       type: "warning",
-      title: "Confirmar Cierre de Turno",
+      title: "Justificación Requerida",
       description:
-        "¿Confirmas el cierre de jornada (Corte Z)? Esta acción asentará el balance final en el sistema y cerrará la caja.",
-      confirmText: "Sí, Cerrar Turno",
-      cancelText: "Cancelar",
-      onConfirm: async () => {
-        try {
-          setIsProcessing(true);
-
-          await closeCashShiftInDB({
-            branchName: selectedBranch,
-            countedCash,
-            expectedCash: totals.expectedCash,
-            totalSales: totals.totalSales,
-            totalExpenses: totals.expenses,
-            difference: totals.difference,
-            notes: cashierNotes,
-          });
-
-          closeShift();
-          setCashierNotes("");
-          setCountedCash(0.0);
-          setExpensesList([]);
-          setSalesBreakdown({ cash: 0, card: 0, transfer: 0, total: 0 });
-
-          setDialogConfig({
-            isOpen: true,
-            type: "success",
-            title: "Turno Cerrado con Éxito",
-            description:
-              "El balance final ha sido asentado correctamente en la base de datos (Corte Z registrado).",
-            confirmText: "Aceptar",
-            onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
-          });
-        } catch (err: unknown) {
-          const msg =
-            err instanceof Error ? err.message : "Error al registrar el cierre de turno";
-          setDialogConfig({
-            isOpen: true,
-            type: "warning",
-            title: "Error de Cierre",
-            description: msg,
-            confirmText: "Aceptar",
-            onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
-          });
-        } finally {
-          setIsProcessing(false);
-        }
-      },
-      onCancel: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
+        "Existe un faltante en el arqueo de efectivo. Es obligatorio ingresar una justificación antes de realizar el Corte Z.",
+      confirmText: "Entendido",
+      onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
     });
-  }, [totals, cashierNotes, selectedBranch, countedCash, closeShift]);
+    return;
+  }
 
-  // Resolución de Auditoría (Admin)
+  setDialogConfig({
+    isOpen: true,
+    type: "warning",
+    title: "Confirmar Cierre de Turno",
+    description:
+      "¿Confirmas el cierre de jornada (Corte Z)? Esta acción asentará el balance final en el sistema y cerrará la caja.",
+    confirmText: "Sí, Cerrar Turno",
+    cancelText: "Cancelar",
+    onConfirm: async () => {
+      try {
+        setIsProcessing(true);
+
+        await closeCashShiftInDB({
+          branchName: effectiveBranch,
+          countedCash: currentCounted,
+          expectedCash: currentExpected,
+          totalSales: totals.totalSales,
+          totalExpenses: totals.expenses,
+          difference: realDiff, // 👈 Pasa la diferencia calculada explícitamente
+          notes: cashierNotes,
+        });
+
+        closeShift();
+        setCashierNotes("");
+        setCountedCash(0.0);
+        setExpensesList([]);
+        setSalesBreakdown({ cash: 0, card: 0, transfer: 0, total: 0 });
+
+        setDialogConfig({
+          isOpen: true,
+          type: "success",
+          title: "Turno Cerrado con Éxito",
+          description:
+            "El balance final ha sido asentado correctamente en la base de datos (Corte Z registrado).",
+          confirmText: "Aceptar",
+          onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
+        });
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "Error al registrar el cierre de turno";
+        setDialogConfig({
+          isOpen: true,
+          type: "warning",
+          title: "Error de Cierre",
+          description: msg,
+          confirmText: "Aceptar",
+          onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
+        });
+      } finally {
+        setIsProcessing(false);
+      }
+    },
+    onCancel: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
+  });
+}, [totals, cashierNotes, effectiveBranch, countedCash, closeShift]);
+
+  // Resolución de Auditoría (Admin) persistida en Supabase
   const handleResolveDiscrepancy = useCallback(() => {
     if (!adminNotes.trim()) {
       setDialogConfig({
@@ -414,27 +485,70 @@ export default function CajaPage() {
       return;
     }
 
+    if (!currentAuditedShiftId) {
+      setDialogConfig({
+        isOpen: true,
+        type: "warning",
+        title: "Turno No Identificado",
+        description: "No se encontró un turno registrado en la fecha seleccionada para resolver.",
+        confirmText: "Aceptar",
+        onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
+      });
+      return;
+    }
+
     setDialogConfig({
       isOpen: true,
       type: "confirm",
       title: "Dictamen de Auditoría",
-      description: "¿Confirmas el dictamen de esta auditoría? Al guardar, la alerta de descuadre desaparecerá del Dashboard.",
+      description: "¿Confirmas el dictamen de esta auditoría? Al guardar, la alerta de descuadre quedará resuelta en la base de datos.",
       confirmText: "Aprobar y Resolver",
       cancelText: "Cancelar",
-      onConfirm: () => {
-        resolveAudit(adminNotes, resolutionType);
-        setDialogConfig({
-          isOpen: true,
-          type: "success",
-          title: "Auditoría Resuelta",
-          description: "La discrepancia contable fue archivada y resuelta con éxito.",
-          confirmText: "Aceptar",
-          onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
-        });
+      onConfirm: async () => {
+        try {
+          setIsProcessing(true);
+
+          await resolveShiftAuditInDB({
+            shiftId: currentAuditedShiftId,
+            resolutionType,
+            notes: adminNotes,
+          });
+
+          // Actualización de estado local
+          setSalesMetrics((prev) => ({
+            ...prev,
+            auditStatus: "reviewed",
+            auditResolution: resolutionType,
+            auditNotes: adminNotes,
+          }));
+
+          resolveAudit(adminNotes, resolutionType);
+
+          setDialogConfig({
+            isOpen: true,
+            type: "success",
+            title: "Auditoría Resuelta",
+            description: "La discrepancia contable fue archivada y resuelta con éxito en la base de datos.",
+            confirmText: "Aceptar",
+            onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
+          });
+        } catch (err: unknown) {
+          const msg = err instanceof Error ? err.message : "Error al procesar la auditoría";
+          setDialogConfig({
+            isOpen: true,
+            type: "warning",
+            title: "Error de Auditoría",
+            description: msg,
+            confirmText: "Aceptar",
+            onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
+          });
+        } finally {
+          setIsProcessing(false);
+        }
       },
       onCancel: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
     });
-  }, [adminNotes, resolutionType, resolveAudit]);
+  }, [adminNotes, resolutionType, currentAuditedShiftId, resolveAudit]);
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-700 flex flex-col font-sans select-none">
@@ -456,7 +570,7 @@ export default function CajaPage() {
                 <Store className="w-3.5 h-3.5 text-slate-400" />
                 <select
                   value={selectedBranch}
-                  onChange={(e) => setSelectedBranch(e.target.value)}
+                  onChange={(e) => setSelectedBranch(e.target.value as BranchName)}
                   className="text-xs font-bold text-slate-700 bg-transparent focus:outline-none cursor-pointer"
                 >
                   <option value="Santa Ana">Santa Ana</option>
@@ -472,8 +586,7 @@ export default function CajaPage() {
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
                   className="text-xs font-bold text-slate-700 bg-transparent focus:outline-none cursor-pointer"
-                >
-                </input>
+                />
               </div>
             </div>
           ) : (
@@ -527,7 +640,7 @@ export default function CajaPage() {
               <span>Ventas Totales</span>
             </div>
             <p className="text-xl font-bold text-sky-600">
-              ${salesBreakdown.total.toFixed(2)}
+              ${totals.totalSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
             </p>
           </div>
 
@@ -571,7 +684,7 @@ export default function CajaPage() {
                 </div>
               </div>
               <span className="text-base font-bold text-slate-800">
-                ${salesBreakdown.cash.toFixed(2)}
+                ${totals.cashSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
               </span>
             </div>
 
@@ -586,7 +699,7 @@ export default function CajaPage() {
                 </div>
               </div>
               <span className="text-base font-bold text-slate-800">
-                ${salesBreakdown.card.toFixed(2)}
+                ${totals.cardSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
               </span>
             </div>
 
@@ -601,7 +714,7 @@ export default function CajaPage() {
                 </div>
               </div>
               <span className="text-base font-bold text-slate-800">
-                ${salesBreakdown.transfer.toFixed(2)}
+                ${totals.transferSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
               </span>
             </div>
           </div>
