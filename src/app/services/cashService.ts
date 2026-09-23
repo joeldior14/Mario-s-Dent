@@ -317,22 +317,21 @@ export async function closeCashShiftInDB(payload: CloseShiftPayload) {
 
   // 4. Asentar el cierre con la diferencia real en Supabase
   const { error: updateErr } = await supabase
-    .from("cash_shifts")
-    .update({
-      status: "closed",
-      closed_at: new Date().toISOString(),
-      counted_cash: Number(finalCounted.toFixed(2)),
-      expected_cash: Number(finalExpected.toFixed(2)),
-      total_sales: Number((totalSales || 0).toFixed(2)),
-      total_expenses: Number((totalExpenses || 0).toFixed(2)),
-      difference: finalDifference, // 👈 Guarda el sobrante (+) o faltante (-) real
-      cashier_notes: notes?.trim() || null,
-      notes: notes?.trim() || null,
-      audit_status: autoAuditStatus,
-      audit_resolution: autoResolution,
-      audit_notes: autoAuditNotes,
-    })
-    .eq("id", activeShift.id);
+  .from("cash_shifts")
+  .update({
+    status: "closed",
+    closed_at: new Date().toISOString(),
+    counted_cash: Number(finalCounted.toFixed(2)),
+    expected_cash: Number(finalExpected.toFixed(2)),
+    total_sales: Number((totalSales || 0).toFixed(2)),
+    total_expenses: Number((totalExpenses || 0).toFixed(2)),
+    difference: finalDifference,
+    cashier_notes: notes?.trim() || null, // 👈 Se mantiene únicamente cashier_notes
+    audit_status: autoAuditStatus,
+    audit_resolution: autoResolution,
+    audit_notes: autoAuditNotes,
+  })
+  .eq("id", activeShift.id);
 
   if (updateErr) {
     throw new Error(`Error al registrar el Corte Z: ${updateErr.message}`);

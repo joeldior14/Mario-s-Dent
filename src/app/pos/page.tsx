@@ -441,17 +441,17 @@ export default function PosPage() {
 
       // 1. Guardar la venta en Supabase y descontar stock
       const result = await processSaleInDB({
-        branchName: currentBranch.trim(),
-        cashierId: user?.id || null,
-        cashierName: cashierName || user?.name || "Cajero",
-        paymentMethod,
-        items: cartPayload,
-        subtotal,
-        tax: iva,
-        total,
-        cashReceived: paymentMethod === "cash" ? numericCashReceived : undefined,
-        changeReturned: paymentMethod === "cash" ? changeDue : undefined,
-      });
+  branchName: (user?.branch || currentBranch || "Santa Ana").trim(),
+  cashierId: user?.id || null, // 👈 user.id desde useAuth()
+  cashierName: cashierName || user?.name || "Cajero",
+  paymentMethod,
+  items: cart,
+  subtotal,
+  tax: iva,
+  total,
+  cashReceived: paymentMethod === "cash" ? Number(cashReceived) : undefined,
+  changeReturned: paymentMethod === "cash" ? changeDue : undefined,
+});
 
       // 2. Feedback visual y reinicio de orden (Aumentar el número correlativo)
       setTicketSuccess(result.ticketNumber);

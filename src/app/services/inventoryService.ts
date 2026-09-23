@@ -63,7 +63,56 @@ export interface KardexMovementRecord {
   reference: string;
 }
 
-// Interfaces internas para resolver consultas de Supabase sin usar 'any'
+export interface POSCartItem {
+  id: string; // product_id
+  sku: string;
+  name: string;
+  brand: string;
+  price: number;
+  quantity: number;
+  stock: number;
+}
+
+export interface CheckoutPayload {
+  branchName: string;
+  cashierId?: string | null;
+  cashierName?: string | null;
+  paymentMethod: "cash" | "card" | "transfer";
+  items: POSCartItem[];
+  subtotal: number;
+  tax: number;
+  total: number;
+  cashReceived?: number;
+  changeReturned?: number;
+}
+
+export interface TicketItemAudit {
+  name: string;
+  qty: number;
+  unitPrice: number;
+}
+
+export interface TicketRecordAudit {
+  id: string;
+  ticketNumber: string;
+  time: string;
+  date: string;
+  branch: string;
+  cashier: string;
+  paymentMethod: "cash" | "card" | "transfer";
+  subtotal: number;
+  tax: number;
+  total: number;
+  cashReceived?: number;
+  changeReturned?: number;
+  authCode?: string;
+  items: TicketItemAudit[];
+}
+
+// =========================================================================
+// INTERFACES INTERNAS PARA SUPABASE (SIN 'any' Y CON RELACIONES DECLARADAS)
+// =========================================================================
+
 interface DBBranchRelation {
   id: string;
   name: string;
@@ -86,7 +135,35 @@ interface DBStockMovementQueryRow {
   profiles: DBProfileRelation | DBProfileRelation[] | null;
 }
 
+interface DBSaleProductItem {
+  name: string;
+}
+
+interface DBSaleItemRelation {
+  id: string;
+  quantity: number;
+  unit_price: number;
+  products: DBSaleProductItem | DBSaleProductItem[] | null;
+}
+
+interface DBSaleQueryRow {
+  id: string;
+  ticket_number: string;
+  payment_method: "cash" | "card" | "transfer";
+  subtotal: number;
+  tax: number;
+  total: number;
+  cash_received: number | null;
+  change_given: number | null;
+  created_at: string;
+  branches: { name: string } | { name: string }[] | null;
+  profiles: { full_name: string | null } | { full_name: string | null }[] | null;
+  sale_items: DBSaleItemRelation[] | null;
+}
+
+// =========================================================================
 // 1. CREAR PRODUCTO
+// =========================================================================
 export async function createProductInDB(payload: CreateProductPayload) {
   const cleanSku = payload.sku.trim().toUpperCase();
   const cleanBarcode = payload.barcode?.trim() || null;
@@ -145,7 +222,9 @@ export async function createProductInDB(payload: CreateProductPayload) {
   return newProduct;
 }
 
+// =========================================================================
 // 2. AJUSTAR EXISTENCIAS MANUALMENTE (+ / -)
+// =========================================================================
 export async function adjustProductStockInDB(payload: AdjustStockPayload) {
   const { productId, branchName, type, quantity, reason, userId } = payload;
   const delta = type === "add" ? quantity : -quantity;
@@ -208,7 +287,9 @@ export async function adjustProductStockInDB(payload: AdjustStockPayload) {
   return { newStock };
 }
 
+// =========================================================================
 // 3. ACTUALIZAR PRODUCTO Y EXISTENCIAS
+// =========================================================================
 export async function updateProductInDB(payload: UpdateProductPayload) {
   const cleanSku = payload.sku.trim().toUpperCase();
   const cleanBarcode = payload.barcode?.trim() || null;
@@ -269,7 +350,9 @@ export async function updateProductInDB(payload: UpdateProductPayload) {
   return true;
 }
 
+// =========================================================================
 // 4. ELIMINAR PRODUCTO DEL CATÁLOGO
+// =========================================================================
 export async function deleteProductFromDB(productId: string) {
   const { error: invErr } = await supabase
     .from("branch_inventory")
@@ -304,7 +387,9 @@ export async function deleteProductFromDB(productId: string) {
   return true;
 }
 
+// =========================================================================
 // 5. TRASLADO DE STOCK ENTRE SUCURSALES
+// =========================================================================
 export async function transferProductStockInDB(payload: TransferStockPayload) {
   const { productId, sourceBranchName, targetBranchName, quantity, userId } = payload;
 
@@ -405,7 +490,9 @@ export async function transferProductStockInDB(payload: TransferStockPayload) {
   return { newSourceStock, newTargetStock };
 }
 
+// =========================================================================
 // 6. CONSULTAR MOVIMIENTOS KARDEX
+// =========================================================================
 export async function fetchProductKardex(
   productId: string,
   branchName?: string
@@ -479,29 +566,9 @@ export async function fetchProductKardex(
   });
 }
 
-export interface POSCartItem {
-  id: string; // product_id
-  sku: string;
-  name: string;
-  brand: string;
-  price: number;
-  quantity: number;
-  stock: number;
-}
-
-export interface CheckoutPayload {
-  branchName: string;
-  cashierId?: string | null;
-  cashierName?: string | null;
-  paymentMethod: "cash" | "card" | "transfer";
-  items: POSCartItem[];
-  subtotal: number;
-  tax: number;
-  total: number;
-  cashReceived?: number;
-  changeReturned?: number;
-}
-
+// =========================================================================
+// 7. PROCESAR VENTA POS
+// =========================================================================
 export async function processSaleInDB(payload: CheckoutPayload) {
   const {
     branchName,
@@ -519,21 +586,29 @@ export async function processSaleInDB(payload: CheckoutPayload) {
     throw new Error("El carrito no tiene productos.");
   }
 
-  // 1. Obtener la sucursal actual
+  // 1. Asegurar el ID del cajero en sesión activa
+  let effectiveCashierId = cashierId || null;
+  if (!effectiveCashierId) {
+    const { data: authData } = await supabase.auth.getUser();
+    effectiveCashierId = authData.user?.id || null;
+  }
+
+  // 2. Obtener la sucursal actual
+  const cleanBranch = (branchName || "").trim();
   const { data: branch, error: branchErr } = await supabase
     .from("branches")
     .select("id, name")
-    .ilike("name", branchName)
-    .single();
+    .ilike("name", cleanBranch)
+    .maybeSingle();
 
   if (branchErr || !branch) {
-    throw new Error(`No se encontró la sucursal: ${branchName}`);
+    throw new Error(`No se encontró la sucursal: "${cleanBranch}"`);
   }
 
-  // 2. Obtener el turno abierto de la sucursal
+  // 3. Obtener el turno abierto de la sucursal
   const { data: activeShift, error: shiftErr } = await supabase
     .from("cash_shifts")
-    .select("id")
+    .select("id, cashier_id")
     .eq("branch_id", branch.id)
     .eq("status", "open")
     .order("opened_at", { ascending: false })
@@ -544,11 +619,11 @@ export async function processSaleInDB(payload: CheckoutPayload) {
     throw new Error("No hay un turno de caja abierto en esta sucursal para asociar la venta.");
   }
 
-  // 3. Generar número de ticket único
-  const branchCode = branch.name.substring(0, 2).toUpperCase();
-  const ticketNumber = `T-${branchCode}-${Math.floor(1000 + Math.random() * 9000)}`;
+  const finalCashierId = effectiveCashierId || activeShift.cashier_id;
+  const branchPrefix = branch.name.substring(0, 2).toUpperCase();
+  const ticketNumber = `T-${branchPrefix}-${Math.floor(1000 + Math.random() * 9000)}`;
 
-  // 4. Insertar cabecera en 'sales'
+  // 4. Inserción en la tabla 'sales'
   const { data: saleData, error: saleErr } = await supabase
     .from("sales")
     .insert([
@@ -556,7 +631,7 @@ export async function processSaleInDB(payload: CheckoutPayload) {
         ticket_number: ticketNumber,
         branch_id: branch.id,
         shift_id: activeShift.id,
-        cashier_id: cashierId || null,
+        cashier_id: finalCashierId,
         payment_method: paymentMethod,
         subtotal: Number(subtotal),
         tax: Number(tax),
@@ -570,29 +645,23 @@ export async function processSaleInDB(payload: CheckoutPayload) {
     .single();
 
   if (saleErr || !saleData) {
-    throw new Error(`Error al guardar en tabla 'sales': ${saleErr?.message || "Desconocido"}`);
+    throw new Error(`Error al guardar en tabla 'sales': ${saleErr?.message}`);
   }
 
   const saleId = saleData.id;
 
-  // 5. Insertar renglones en 'sale_items', descontar stock y registrar Kardex
+  // 5. Partidas, descuento de stock y Kardex
   for (const item of items) {
-    // A) Insertar detalle de venta
-    const { error: itemErr } = await supabase.from("sale_items").insert([
+    await supabase.from("sale_items").insert([
       {
         sale_id: saleId,
         product_id: item.id,
         quantity: item.quantity,
         unit_price: item.price,
-        subtotal: item.price * item.quantity,
+        subtotal: Number((item.price * item.quantity).toFixed(2)),
       },
     ]);
 
-    if (itemErr) {
-      console.error("Error al registrar renglón en sale_items:", itemErr.message);
-    }
-
-    // B) Consultar stock actual
     const { data: invRecord } = await supabase
       .from("branch_inventory")
       .select("id, stock")
@@ -603,7 +672,6 @@ export async function processSaleInDB(payload: CheckoutPayload) {
     const currentStock = invRecord?.stock ?? 0;
     const newStock = Math.max(0, currentStock - item.quantity);
 
-    // C) Actualizar inventario de la sucursal
     if (invRecord) {
       await supabase
         .from("branch_inventory")
@@ -611,12 +679,11 @@ export async function processSaleInDB(payload: CheckoutPayload) {
         .eq("id", invRecord.id);
     }
 
-    // D) Registrar movimiento en Kardex (stock_movements)
     await supabase.from("stock_movements").insert([
       {
         product_id: item.id,
         branch_id: branch.id,
-        user_id: cashierId || null,
+        user_id: finalCashierId,
         movement_type: "VENTA_POS",
         quantity: -item.quantity,
         stock_after: newStock,
@@ -625,5 +692,78 @@ export async function processSaleInDB(payload: CheckoutPayload) {
     ]);
   }
 
-  return { ticketNumber, total, saleId };
+  return { ticketNumber, saleId, total };
+}
+
+// =========================================================================
+// 8. CONSULTAR TICKETS PARA AUDITORÍA
+// =========================================================================
+export async function fetchTicketsByBranchAndDate(
+  branchName: string,
+  dateStr: string
+): Promise<TicketRecordAudit[]> {
+  const startOfDay = `${dateStr}T00:00:00.000Z`;
+  const endOfDay = `${dateStr}T23:59:59.999Z`;
+
+  const { data, error } = await supabase
+    .from("sales")
+    .select(`
+      id,
+      ticket_number,
+      payment_method,
+      subtotal,
+      tax,
+      total,
+      cash_received,
+      change_given,
+      created_at,
+      branches!inner(name),
+      profiles(full_name),
+      sale_items(
+        id,
+        quantity,
+        unit_price,
+        products(name)
+      )
+    `)
+    .ilike("branches.name", `%${branchName.trim()}%`)
+    .gte("created_at", startOfDay)
+    .lte("created_at", endOfDay)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.error("Error al consultar ventas para auditoría:", error);
+    return [];
+  }
+
+  const queryRows = (data ?? []) as unknown as DBSaleQueryRow[];
+
+  return queryRows.map((sale: DBSaleQueryRow) => {
+    const d = new Date(sale.created_at);
+    const branchRecord = Array.isArray(sale.branches) ? sale.branches[0] : sale.branches;
+    const profileRecord = Array.isArray(sale.profiles) ? sale.profiles[0] : sale.profiles;
+
+    return {
+      id: sale.id,
+      ticketNumber: sale.ticket_number || "S/F",
+      time: d.toLocaleTimeString("es-SV", { hour: "2-digit", minute: "2-digit" }),
+      date: dateStr,
+      branch: branchRecord?.name || branchName,
+      cashier: profileRecord?.full_name || "Cajero",
+      paymentMethod: sale.payment_method || "cash",
+      subtotal: Number(sale.subtotal) || 0,
+      tax: Number(sale.tax) || 0,
+      total: Number(sale.total) || 0,
+      cashReceived: sale.cash_received ? Number(sale.cash_received) : undefined,
+      changeReturned: sale.change_given ? Number(sale.change_given) : undefined,
+      items: (sale.sale_items || []).map((it: DBSaleItemRelation) => {
+        const prod = Array.isArray(it.products) ? it.products[0] : it.products;
+        return {
+          name: prod?.name || "Insumo Dental",
+          qty: Number(it.quantity) || 1,
+          unitPrice: Number(it.unit_price) || 0,
+        };
+      }),
+    };
+  });
 }

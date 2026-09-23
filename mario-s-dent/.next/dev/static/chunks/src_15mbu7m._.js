@@ -2168,6 +2168,439 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
     __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
 }
 }),
+"[project]/src/app/services/inventoryService.ts [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "adjustProductStockInDB",
+    ()=>adjustProductStockInDB,
+    "createProductInDB",
+    ()=>createProductInDB,
+    "deleteProductFromDB",
+    ()=>deleteProductFromDB,
+    "fetchProductKardex",
+    ()=>fetchProductKardex,
+    "fetchTicketsByBranchAndDate",
+    ()=>fetchTicketsByBranchAndDate,
+    "processSaleInDB",
+    ()=>processSaleInDB,
+    "transferProductStockInDB",
+    ()=>transferProductStockInDB,
+    "updateProductInDB",
+    ()=>updateProductInDB
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/supabaseClient.ts [app-client] (ecmascript)");
+;
+async function createProductInDB(payload) {
+    const cleanSku = payload.sku.trim().toUpperCase();
+    const cleanBarcode = payload.barcode?.trim() || null;
+    const { data: newProduct, error: productError } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("products").insert([
+        {
+            sku: cleanSku,
+            barcode: cleanBarcode,
+            name: payload.name.trim(),
+            brand: payload.brand.trim(),
+            category: payload.category,
+            description: payload.description.trim(),
+            cost: Number(payload.cost),
+            price: Number(payload.price),
+            image_url: payload.image || null
+        }
+    ]).select().single();
+    if (productError) {
+        if (productError.code === "23505") {
+            throw new Error("Ya existe un producto registrado con ese SKU o Código de Barras.");
+        }
+        throw productError;
+    }
+    const { data: branches, error: branchError } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id, name");
+    if (branchError) throw branchError;
+    const inventoryRows = (branches || []).map((b)=>{
+        let stock = 0;
+        if (b.name === "Santa Ana") stock = payload.initialStock?.santaAna ?? 0;
+        if (b.name === "Ahuachapán") stock = payload.initialStock?.ahuachapan ?? 0;
+        if (b.name === "Sonsonate") stock = payload.initialStock?.sonsonate ?? 0;
+        return {
+            branch_id: b.id,
+            product_id: newProduct.id,
+            stock,
+            min_stock: 5
+        };
+    });
+    const { error: invError } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").insert(inventoryRows);
+    if (invError) throw invError;
+    return newProduct;
+}
+async function adjustProductStockInDB(payload) {
+    const { productId, branchName, type, quantity, reason, userId } = payload;
+    const delta = type === "add" ? quantity : -quantity;
+    const { data: branch, error: branchErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id").eq("name", branchName).single();
+    if (branchErr || !branch) {
+        throw new Error(`No se encontró la sucursal: ${branchName}`);
+    }
+    const { data: currentInv, error: invErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").select("id, stock").eq("product_id", productId).eq("branch_id", branch.id).single();
+    if (invErr || !currentInv) {
+        throw new Error("No existe registro de inventario para este producto en esta sucursal.");
+    }
+    const currentStock = currentInv.stock ?? 0;
+    const newStock = currentStock + delta;
+    if (newStock < 0) {
+        throw new Error(`Stock insuficiente. Solo hay ${currentStock} unidades disponibles.`);
+    }
+    const { error: updateErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").update({
+        stock: newStock
+    }).eq("id", currentInv.id);
+    if (updateErr) throw updateErr;
+    const movementType = type === "add" ? "INGRESO" : "AJUSTE";
+    const { error: movErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("stock_movements").insert([
+        {
+            product_id: productId,
+            branch_id: branch.id,
+            user_id: userId || null,
+            movement_type: movementType,
+            quantity: delta,
+            stock_after: newStock,
+            reference: reason
+        }
+    ]);
+    if (movErr) {
+        console.error("Error al registrar movimiento en Kardex:", movErr.message);
+    }
+    return {
+        newStock
+    };
+}
+async function updateProductInDB(payload) {
+    const cleanSku = payload.sku.trim().toUpperCase();
+    const cleanBarcode = payload.barcode?.trim() || null;
+    const { error: productErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("products").update({
+        sku: cleanSku,
+        barcode: cleanBarcode,
+        name: payload.name.trim(),
+        brand: payload.brand.trim(),
+        category: payload.category,
+        description: payload.description.trim(),
+        cost: Number(payload.cost),
+        price: Number(payload.price),
+        image_url: payload.image || null
+    }).eq("id", payload.id);
+    if (productErr) {
+        if (productErr.code === "23505") {
+            throw new Error("Ya existe un producto con ese SKU o Código de Barras.");
+        }
+        throw productErr;
+    }
+    const { data: branchList, error: branchErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id, name");
+    if (branchErr) throw branchErr;
+    const normalize = (str)=>str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+    const updatePromises = (branchList || []).map((b)=>{
+        const branchData = payload.branches.find((entry)=>normalize(entry.branchName) === normalize(b.name));
+        const stockToSet = branchData ? Math.max(0, Number(branchData.stock) || 0) : 0;
+        return __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").upsert({
+            branch_id: b.id,
+            product_id: payload.id,
+            stock: stockToSet
+        }, {
+            onConflict: "branch_id,product_id"
+        });
+    });
+    const results = await Promise.all(updatePromises);
+    const failedUpsert = results.find((r)=>r.error);
+    if (failedUpsert?.error) throw failedUpsert.error;
+    return true;
+}
+async function deleteProductFromDB(productId) {
+    const { error: invErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").delete().eq("product_id", productId);
+    if (invErr) {
+        console.error("Error al eliminar inventario de sucursales:", invErr);
+        throw new Error(`Error en branch_inventory: ${invErr.message}`);
+    }
+    const { error: movErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("stock_movements").delete().eq("product_id", productId);
+    if (movErr) {
+        console.error("Error al eliminar historial de movimientos:", movErr);
+        throw new Error(`Error en stock_movements: ${movErr.message}`);
+    }
+    const { error: productErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("products").delete().eq("id", productId);
+    if (productErr) {
+        console.error("Error al eliminar producto maestro:", productErr);
+        throw new Error(`Error en products: ${productErr.message}`);
+    }
+    return true;
+}
+async function transferProductStockInDB(payload) {
+    const { productId, sourceBranchName, targetBranchName, quantity, userId } = payload;
+    if (sourceBranchName === targetBranchName) {
+        throw new Error("La sucursal de origen y destino no pueden ser iguales.");
+    }
+    if (quantity <= 0) {
+        throw new Error("La cantidad debe ser mayor a 0.");
+    }
+    const { data: branches, error: branchErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id, name").in("name", [
+        sourceBranchName,
+        targetBranchName
+    ]);
+    if (branchErr || !branches || branches.length < 2) {
+        throw new Error("No se pudieron verificar las sucursales de origen y destino.");
+    }
+    const sourceBranch = branches.find((b)=>b.name === sourceBranchName);
+    const targetBranch = branches.find((b)=>b.name === targetBranchName);
+    const { data: sourceInv, error: srcInvErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").select("id, stock").eq("product_id", productId).eq("branch_id", sourceBranch.id).single();
+    if (srcInvErr || !sourceInv) {
+        throw new Error(`El producto no tiene registro de stock en ${sourceBranchName}.`);
+    }
+    const currentSourceStock = sourceInv.stock ?? 0;
+    if (currentSourceStock < quantity) {
+        throw new Error(`Stock insuficiente en ${sourceBranchName}. Disponible: ${currentSourceStock}, solicitado: ${quantity}.`);
+    }
+    const { data: targetInv } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").select("id, stock").eq("product_id", productId).eq("branch_id", targetBranch.id).maybeSingle();
+    const currentTargetStock = targetInv?.stock ?? 0;
+    const newSourceStock = currentSourceStock - quantity;
+    const newTargetStock = currentTargetStock + quantity;
+    const { error: updateSrcErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").update({
+        stock: newSourceStock
+    }).eq("id", sourceInv.id);
+    if (updateSrcErr) throw updateSrcErr;
+    const { error: upsertTgtErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").upsert({
+        branch_id: targetBranch.id,
+        product_id: productId,
+        stock: newTargetStock
+    }, {
+        onConflict: "branch_id,product_id"
+    });
+    if (upsertTgtErr) throw upsertTgtErr;
+    const movements = [
+        {
+            product_id: productId,
+            branch_id: sourceBranch.id,
+            user_id: userId || null,
+            movement_type: "TRASLADO",
+            quantity: -quantity,
+            stock_after: newSourceStock,
+            reference: `Traslado enviado hacia ${targetBranchName}`
+        },
+        {
+            product_id: productId,
+            branch_id: targetBranch.id,
+            user_id: userId || null,
+            movement_type: "TRASLADO",
+            quantity: quantity,
+            stock_after: newTargetStock,
+            reference: `Traslado recibido desde ${sourceBranchName}`
+        }
+    ];
+    const { error: movErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("stock_movements").insert(movements);
+    if (movErr) {
+        console.error("Aviso Kardex:", movErr.message);
+    }
+    return {
+        newSourceStock,
+        newTargetStock
+    };
+}
+async function fetchProductKardex(productId, branchName) {
+    let query = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("stock_movements").select(`
+      id,
+      created_at,
+      movement_type,
+      quantity,
+      stock_after,
+      reference,
+      branches (
+        id,
+        name
+      ),
+      profiles (
+        id,
+        full_name,
+        username
+      )
+    `).eq("product_id", productId).order("created_at", {
+        ascending: false
+    });
+    if (branchName && branchName !== "ALL" && branchName !== "Todas las sedes") {
+        const { data: branchData } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id").ilike("name", branchName).maybeSingle();
+        if (branchData) {
+            query = query.eq("branch_id", branchData.id);
+        }
+    }
+    const { data, error } = await query;
+    if (error) {
+        console.error("Error al consultar Kardex:", error);
+        throw new Error(`Error en Kardex: ${error.message}`);
+    }
+    const movementRows = data ?? [];
+    return movementRows.map((row)=>{
+        const branchRecord = Array.isArray(row.branches) ? row.branches[0] : row.branches;
+        const profileRecord = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
+        const dateObj = new Date(row.created_at);
+        const formattedDate = dateObj.toLocaleDateString("es-SV", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true
+        });
+        return {
+            id: row.id,
+            date: formattedDate,
+            type: row.movement_type,
+            branch: branchRecord?.name ?? "Sin sede",
+            user: profileRecord?.full_name ?? profileRecord?.username ?? "Sistema",
+            quantity: Number(row.quantity),
+            stockAfter: Number(row.stock_after),
+            reference: row.reference ?? "Sin detalle"
+        };
+    });
+}
+async function processSaleInDB(payload) {
+    const { branchName, cashierId, paymentMethod, items, subtotal, tax, total, cashReceived, changeReturned } = payload;
+    if (!items || items.length === 0) {
+        throw new Error("El carrito no tiene productos.");
+    }
+    // 1. Asegurar el ID del cajero en sesión activa
+    let effectiveCashierId = cashierId || null;
+    if (!effectiveCashierId) {
+        const { data: authData } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].auth.getUser();
+        effectiveCashierId = authData.user?.id || null;
+    }
+    // 2. Obtener la sucursal actual
+    const cleanBranch = (branchName || "").trim();
+    const { data: branch, error: branchErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id, name").ilike("name", cleanBranch).maybeSingle();
+    if (branchErr || !branch) {
+        throw new Error(`No se encontró la sucursal: "${cleanBranch}"`);
+    }
+    // 3. Obtener el turno abierto de la sucursal
+    const { data: activeShift, error: shiftErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").select("id, cashier_id").eq("branch_id", branch.id).eq("status", "open").order("opened_at", {
+        ascending: false
+    }).limit(1).maybeSingle();
+    if (shiftErr || !activeShift) {
+        throw new Error("No hay un turno de caja abierto en esta sucursal para asociar la venta.");
+    }
+    const finalCashierId = effectiveCashierId || activeShift.cashier_id;
+    const branchPrefix = branch.name.substring(0, 2).toUpperCase();
+    const ticketNumber = `T-${branchPrefix}-${Math.floor(1000 + Math.random() * 9000)}`;
+    // 4. Inserción en la tabla 'sales'
+    const { data: saleData, error: saleErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sales").insert([
+        {
+            ticket_number: ticketNumber,
+            branch_id: branch.id,
+            shift_id: activeShift.id,
+            cashier_id: finalCashierId,
+            payment_method: paymentMethod,
+            subtotal: Number(subtotal),
+            tax: Number(tax),
+            total: Number(total),
+            cash_received: cashReceived ? Number(cashReceived) : null,
+            change_given: changeReturned ? Number(changeReturned) : null,
+            created_at: new Date().toISOString()
+        }
+    ]).select("id").single();
+    if (saleErr || !saleData) {
+        throw new Error(`Error al guardar en tabla 'sales': ${saleErr?.message}`);
+    }
+    const saleId = saleData.id;
+    // 5. Partidas, descuento de stock y Kardex
+    for (const item of items){
+        await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sale_items").insert([
+            {
+                sale_id: saleId,
+                product_id: item.id,
+                quantity: item.quantity,
+                unit_price: item.price,
+                subtotal: Number((item.price * item.quantity).toFixed(2))
+            }
+        ]);
+        const { data: invRecord } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").select("id, stock").eq("product_id", item.id).eq("branch_id", branch.id).maybeSingle();
+        const currentStock = invRecord?.stock ?? 0;
+        const newStock = Math.max(0, currentStock - item.quantity);
+        if (invRecord) {
+            await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").update({
+                stock: newStock
+            }).eq("id", invRecord.id);
+        }
+        await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("stock_movements").insert([
+            {
+                product_id: item.id,
+                branch_id: branch.id,
+                user_id: finalCashierId,
+                movement_type: "VENTA_POS",
+                quantity: -item.quantity,
+                stock_after: newStock,
+                reference: `Ticket #${ticketNumber}`
+            }
+        ]);
+    }
+    return {
+        ticketNumber,
+        saleId,
+        total
+    };
+}
+async function fetchTicketsByBranchAndDate(branchName, dateStr) {
+    const startOfDay = `${dateStr}T00:00:00.000Z`;
+    const endOfDay = `${dateStr}T23:59:59.999Z`;
+    const { data, error } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sales").select(`
+      id,
+      ticket_number,
+      payment_method,
+      subtotal,
+      tax,
+      total,
+      cash_received,
+      change_given,
+      created_at,
+      branches!inner(name),
+      profiles(full_name),
+      sale_items(
+        id,
+        quantity,
+        unit_price,
+        products(name)
+      )
+    `).ilike("branches.name", `%${branchName.trim()}%`).gte("created_at", startOfDay).lte("created_at", endOfDay).order("created_at", {
+        ascending: false
+    });
+    if (error) {
+        console.error("Error al consultar ventas para auditoría:", error);
+        return [];
+    }
+    const queryRows = data ?? [];
+    return queryRows.map((sale)=>{
+        const d = new Date(sale.created_at);
+        const branchRecord = Array.isArray(sale.branches) ? sale.branches[0] : sale.branches;
+        const profileRecord = Array.isArray(sale.profiles) ? sale.profiles[0] : sale.profiles;
+        return {
+            id: sale.id,
+            ticketNumber: sale.ticket_number || "S/F",
+            time: d.toLocaleTimeString("es-SV", {
+                hour: "2-digit",
+                minute: "2-digit"
+            }),
+            date: dateStr,
+            branch: branchRecord?.name || branchName,
+            cashier: profileRecord?.full_name || "Cajero",
+            paymentMethod: sale.payment_method || "cash",
+            subtotal: Number(sale.subtotal) || 0,
+            tax: Number(sale.tax) || 0,
+            total: Number(sale.total) || 0,
+            cashReceived: sale.cash_received ? Number(sale.cash_received) : undefined,
+            changeReturned: sale.change_given ? Number(sale.change_given) : undefined,
+            items: (sale.sale_items || []).map((it)=>{
+                const prod = Array.isArray(it.products) ? it.products[0] : it.products;
+                return {
+                    name: prod?.name || "Insumo Dental",
+                    qty: Number(it.quantity) || 1,
+                    unitPrice: Number(it.unit_price) || 0
+                };
+            })
+        };
+    });
+}
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
 "[project]/src/components/AuditTicketsModal.tsx [app-client] (ecmascript)", ((__turbopack_context__) => {
 "use strict";
 
@@ -2186,102 +2619,16 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$banknote$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Banknote$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/banknote.mjs [app-client] (ecmascript) <export default as Banknote>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$building$2d$2$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Building2$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/building-2.mjs [app-client] (ecmascript) <export default as Building2>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$calendar$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Calendar$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/calendar.mjs [app-client] (ecmascript) <export default as Calendar>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$loader$2d$circle$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Loader2$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/loader-circle.mjs [app-client] (ecmascript) <export default as Loader2>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$inventoryService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/app/services/inventoryService.ts [app-client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature();
 "use client";
 ;
 ;
-const ALL_MOCK_TICKETS = [
-    {
-        id: "tk-1",
-        ticketNumber: "T-SA-1045",
-        time: "10:14 AM",
-        date: "2026-09-08",
-        branch: "Santa Ana",
-        cashier: "Maria G.",
-        paymentMethod: "cash",
-        subtotal: 79.65,
-        tax: 10.35,
-        total: 90.0,
-        cashReceived: 100.0,
-        changeReturned: 10.0,
-        items: [
-            {
-                name: "Resina Filtek Z250 XT (A2)",
-                qty: 2,
-                unitPrice: 32.5
-            },
-            {
-                name: "Alginato Hydrogum 5 (453g)",
-                qty: 1,
-                unitPrice: 25.0
-            }
-        ]
-    },
-    {
-        id: "tk-2",
-        ticketNumber: "T-SA-1044",
-        time: "09:48 AM",
-        date: "2026-09-08",
-        branch: "Santa Ana",
-        cashier: "Maria G.",
-        paymentMethod: "card",
-        subtotal: 42.48,
-        tax: 5.52,
-        total: 48.0,
-        authCode: "AUTH-882190",
-        items: [
-            {
-                name: "Lidocaína 2% c/Epinefrina (Caja x 50)",
-                qty: 1,
-                unitPrice: 48.0
-            }
-        ]
-    },
-    {
-        id: "tk-3",
-        ticketNumber: "T-SA-1030",
-        time: "04:20 PM",
-        date: "2026-09-07",
-        branch: "Santa Ana",
-        cashier: "Maria G.",
-        paymentMethod: "cash",
-        subtotal: 120.0,
-        tax: 15.6,
-        total: 135.6,
-        cashReceived: 150.0,
-        changeReturned: 14.4,
-        items: [
-            {
-                name: "Opalescence Go 15%",
-                qty: 2,
-                unitPrice: 67.8
-            }
-        ]
-    },
-    {
-        id: "tk-4",
-        ticketNumber: "T-SA-1029",
-        time: "11:15 AM",
-        date: "2026-09-07",
-        branch: "Santa Ana",
-        cashier: "Maria G.",
-        paymentMethod: "transfer",
-        subtotal: 65.0,
-        tax: 8.45,
-        total: 73.45,
-        authCode: "SPEI-44910",
-        items: [
-            {
-                name: "Guantes Nitrilo Med (Caja x 100)",
-                qty: 5,
-                unitPrice: 14.69
-            }
-        ]
-    }
-];
+;
 function normalizeDate(rawDate) {
-    if (!rawDate) return "2026-09-08";
+    if (!rawDate) return new Date().toISOString().split("T")[0];
     if (rawDate.includes("-")) {
         const parts = rawDate.split("-");
         if (parts[0].length === 4) return rawDate;
@@ -2297,52 +2644,69 @@ function normalizeDate(rawDate) {
 }
 function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selectedShift = "Jornada Completa" }) {
     _s();
+    const [tickets, setTickets] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [isLoading, setIsLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [searchTerm, setSearchTerm] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
     const [paymentFilter, setPaymentFilter] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("ALL");
-    const [selectedTicketId, setSelectedTicketId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
+    const [selectedTicket, setSelectedTicket] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const targetDate = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
         "AuditTicketsModal.useMemo[targetDate]": ()=>normalizeDate(selectedDate)
     }["AuditTicketsModal.useMemo[targetDate]"], [
         selectedDate
     ]);
-    // Filtrado de comprobantes
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "AuditTicketsModal.useEffect": ()=>{
+            if (!isOpen) return;
+            let isMounted = true;
+            async function loadTickets() {
+                setIsLoading(true);
+                try {
+                    const data = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$inventoryService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fetchTicketsByBranchAndDate"])(branchName, targetDate);
+                    if (isMounted) {
+                        setTickets(data);
+                        setSelectedTicket(data.length > 0 ? data[0] : null);
+                    }
+                } catch (err) {
+                    console.error("Error al cargar tickets:", err);
+                } finally{
+                    if (isMounted) setIsLoading(false);
+                }
+            }
+            loadTickets();
+            return ({
+                "AuditTicketsModal.useEffect": ()=>{
+                    isMounted = false;
+                }
+            })["AuditTicketsModal.useEffect"];
+        }
+    }["AuditTicketsModal.useEffect"], [
+        isOpen,
+        branchName,
+        targetDate
+    ]);
     const filteredTickets = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
         "AuditTicketsModal.useMemo[filteredTickets]": ()=>{
-            return ALL_MOCK_TICKETS.filter({
+            return tickets.filter({
                 "AuditTicketsModal.useMemo[filteredTickets]": (t)=>{
-                    const matchDate = t.date === targetDate;
-                    const matchBranch = t.branch.toLowerCase().includes(branchName.toLowerCase());
-                    const matchSearch = t.ticketNumber.toLowerCase().includes(searchTerm.toLowerCase()) || t.items.some({
-                        "AuditTicketsModal.useMemo[filteredTickets]": (i)=>i.name.toLowerCase().includes(searchTerm.toLowerCase())
+                    const q = searchTerm.trim().toLowerCase();
+                    const matchSearch = !q || t.ticketNumber.toLowerCase().includes(q) || t.items.some({
+                        "AuditTicketsModal.useMemo[filteredTickets]": (i)=>i.name.toLowerCase().includes(q)
                     }["AuditTicketsModal.useMemo[filteredTickets]"]);
                     const matchMethod = paymentFilter === "ALL" || t.paymentMethod === paymentFilter;
-                    return matchDate && matchBranch && matchSearch && matchMethod;
+                    return matchSearch && matchMethod;
                 }
             }["AuditTicketsModal.useMemo[filteredTickets]"]);
         }
     }["AuditTicketsModal.useMemo[filteredTickets]"], [
-        targetDate,
-        branchName,
+        tickets,
         searchTerm,
         paymentFilter
-    ]);
-    // Derivación en render para evitar llamadas síncronas en hooks
-    const selectedTicket = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
-        "AuditTicketsModal.useMemo[selectedTicket]": ()=>{
-            if (filteredTickets.length === 0) return null;
-            return filteredTickets.find({
-                "AuditTicketsModal.useMemo[selectedTicket]": (t)=>t.id === selectedTicketId
-            }["AuditTicketsModal.useMemo[selectedTicket]"]) ?? filteredTickets[0];
-        }
-    }["AuditTicketsModal.useMemo[selectedTicket]"], [
-        filteredTickets,
-        selectedTicketId
     ]);
     if (!isOpen) return null;
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         className: "fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs p-4 select-none animate-in fade-in duration-150",
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-            className: "bg-white border border-slate-200 w-full max-w-4xl h-[620px] rounded-2xl shadow-2xl overflow-hidden flex flex-col",
+            className: "bg-white border border-slate-200 w-full max-w-4xl h-[640px] rounded-2xl shadow-2xl overflow-hidden flex flex-col",
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "px-6 py-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50",
@@ -2356,12 +2720,12 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                         className: "w-5 h-5"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                        lineNumber: 171,
+                                        lineNumber: 111,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                    lineNumber: 170,
+                                    lineNumber: 110,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2371,7 +2735,7 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                             children: "Auditoría de Comprobantes y Tickets"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                            lineNumber: 174,
+                                            lineNumber: 114,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2379,11 +2743,11 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                             children: [
                                                 "Sucursal: ",
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                                                    className: "text-slate-700",
+                                                    className: "text-slate-600",
                                                     children: branchName
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                    lineNumber: 178,
+                                                    lineNumber: 118,
                                                     columnNumber: 27
                                                 }, this),
                                                 " • ",
@@ -2391,32 +2755,32 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                            lineNumber: 177,
+                                            lineNumber: 117,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                    lineNumber: 173,
+                                    lineNumber: 113,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                            lineNumber: 169,
+                            lineNumber: 109,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "flex items-center gap-3",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "flex items-center gap-2 bg-slate-100/90 border border-slate-200 px-3 py-1.5 rounded-xl shadow-2xs",
+                                    className: "flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-2.5 py-1 shadow-2xs",
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$calendar$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Calendar$3e$__["Calendar"], {
                                             className: "w-3.5 h-3.5 text-sky-600"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                            lineNumber: 185,
+                                            lineNumber: 125,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2424,42 +2788,40 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                             children: targetDate
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                            lineNumber: 186,
+                                            lineNumber: 126,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                    lineNumber: 184,
+                                    lineNumber: 124,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                    type: "button",
                                     onClick: onClose,
-                                    "aria-label": "Cerrar modal",
                                     className: "p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer",
                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$x$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__X$3e$__["X"], {
                                         className: "w-4 h-4"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                        lineNumber: 197,
+                                        lineNumber: 135,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                    lineNumber: 191,
+                                    lineNumber: 131,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                            lineNumber: 183,
+                            lineNumber: 123,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                    lineNumber: 168,
+                    lineNumber: 108,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2472,7 +2834,7 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                     className: "w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                    lineNumber: 205,
+                                    lineNumber: 143,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -2483,20 +2845,19 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                     className: "w-full h-8 pl-8 pr-3 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium focus:outline-none focus:border-sky-500"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                    lineNumber: 206,
+                                    lineNumber: 144,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                            lineNumber: 204,
+                            lineNumber: 142,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg text-[11px] font-semibold",
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                    type: "button",
                                     onClick: ()=>setPaymentFilter("ALL"),
                                     className: `px-2.5 py-1 rounded-md transition-all cursor-pointer ${paymentFilter === "ALL" ? "bg-white text-slate-800 shadow-2xs font-bold" : "text-slate-500"}`,
                                     children: [
@@ -2506,11 +2867,10 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                    lineNumber: 216,
+                                    lineNumber: 154,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                    type: "button",
                                     onClick: ()=>setPaymentFilter("cash"),
                                     className: `px-2 py-1 rounded-md transition-all flex items-center gap-1 cursor-pointer ${paymentFilter === "cash" ? "bg-white text-emerald-700 shadow-2xs font-bold" : "text-slate-500"}`,
                                     children: [
@@ -2518,18 +2878,17 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                             className: "w-3 h-3"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                            lineNumber: 232,
+                                            lineNumber: 168,
                                             columnNumber: 15
                                         }, this),
                                         " Efectivo"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                    lineNumber: 225,
+                                    lineNumber: 162,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                    type: "button",
                                     onClick: ()=>setPaymentFilter("card"),
                                     className: `px-2 py-1 rounded-md transition-all flex items-center gap-1 cursor-pointer ${paymentFilter === "card" ? "bg-white text-sky-700 shadow-2xs font-bold" : "text-slate-500"}`,
                                     children: [
@@ -2537,18 +2896,17 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                             className: "w-3 h-3"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                            lineNumber: 241,
+                                            lineNumber: 176,
                                             columnNumber: 15
                                         }, this),
                                         " Tarjeta"
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                    lineNumber: 234,
+                                    lineNumber: 170,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                    type: "button",
                                     onClick: ()=>setPaymentFilter("transfer"),
                                     className: `px-2 py-1 rounded-md transition-all flex items-center gap-1 cursor-pointer ${paymentFilter === "transfer" ? "bg-white text-indigo-700 shadow-2xs font-bold" : "text-slate-500"}`,
                                     children: [
@@ -2556,26 +2914,26 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                             className: "w-3 h-3"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                            lineNumber: 250,
+                                            lineNumber: 184,
                                             columnNumber: 15
                                         }, this),
                                         " Transf."
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                    lineNumber: 243,
+                                    lineNumber: 178,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                            lineNumber: 215,
+                            lineNumber: 153,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                    lineNumber: 203,
+                    lineNumber: 141,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2583,10 +2941,33 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             className: "col-span-7 border-r border-slate-100 overflow-y-auto divide-y divide-slate-100 bg-white",
-                            children: filteredTickets.length > 0 ? filteredTickets.map((t)=>{
+                            children: isLoading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                className: "h-full flex flex-col items-center justify-center p-8 text-center text-slate-400 gap-2",
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$loader$2d$circle$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Loader2$3e$__["Loader2"], {
+                                        className: "w-6 h-6 animate-spin text-sky-600"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                        lineNumber: 195,
+                                        columnNumber: 17
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                        className: "text-xs",
+                                        children: "Consultando comprobantes en base de datos..."
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                        lineNumber: 196,
+                                        columnNumber: 17
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                lineNumber: 194,
+                                columnNumber: 15
+                            }, this) : filteredTickets.length > 0 ? filteredTickets.map((t)=>{
                                 const isSelected = selectedTicket?.id === t.id;
                                 return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    onClick: ()=>setSelectedTicketId(t.id),
+                                    onClick: ()=>setSelectedTicket(t),
                                     className: `p-3.5 flex items-center justify-between cursor-pointer transition-colors ${isSelected ? "bg-sky-50/70 border-l-4 border-l-sky-600" : "hover:bg-slate-50"}`,
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2600,21 +2981,21 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                                             children: t.ticketNumber
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                            lineNumber: 274,
+                                                            lineNumber: 213,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                            className: "text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded bg-slate-100 text-slate-600",
+                                                            className: "text-[9px] font-extrabold uppercase px-1.5 py-0.5 rounded bg-slate-100 text-slate-600",
                                                             children: t.paymentMethod
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                            lineNumber: 277,
+                                                            lineNumber: 216,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                    lineNumber: 273,
+                                                    lineNumber: 212,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2626,13 +3007,13 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                    lineNumber: 281,
+                                                    lineNumber: 220,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                            lineNumber: 272,
+                                            lineNumber: 211,
                                             columnNumber: 21
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2643,13 +3024,13 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                            lineNumber: 285,
+                                            lineNumber: 224,
                                             columnNumber: 21
                                         }, this)
                                     ]
                                 }, t.id, true, {
                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                    lineNumber: 263,
+                                    lineNumber: 202,
                                     columnNumber: 19
                                 }, this);
                             }) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2659,7 +3040,7 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                         className: "w-8 h-8 stroke-[1.5] text-slate-300 mb-2"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                        lineNumber: 293,
+                                        lineNumber: 232,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2671,18 +3052,18 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                        lineNumber: 294,
+                                        lineNumber: 233,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                lineNumber: 292,
+                                lineNumber: 231,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                            lineNumber: 258,
+                            lineNumber: 192,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2698,10 +3079,10 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                                 children: [
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                         className: "font-black text-slate-800 text-sm",
-                                                        children: "MARIO'S DENT"
+                                                        children: "MARIOS DENT"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                        lineNumber: 305,
+                                                        lineNumber: 244,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2712,7 +3093,7 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                        lineNumber: 306,
+                                                        lineNumber: 245,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2723,13 +3104,13 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                                                 children: selectedTicket.ticketNumber
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                                lineNumber: 307,
+                                                                lineNumber: 246,
                                                                 columnNumber: 77
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                        lineNumber: 307,
+                                                        lineNumber: 246,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2741,13 +3122,13 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                        lineNumber: 308,
+                                                        lineNumber: 247,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                lineNumber: 304,
+                                                lineNumber: 243,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2764,7 +3145,7 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                                lineNumber: 314,
+                                                                lineNumber: 253,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2775,18 +3156,18 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                                lineNumber: 315,
+                                                                lineNumber: 254,
                                                                 columnNumber: 25
                                                             }, this)
                                                         ]
                                                     }, idx, true, {
                                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                        lineNumber: 313,
+                                                        lineNumber: 252,
                                                         columnNumber: 23
                                                     }, this))
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                lineNumber: 311,
+                                                lineNumber: 250,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2799,7 +3180,7 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                                                 children: "Subtotal"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                                lineNumber: 324,
+                                                                lineNumber: 263,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2809,13 +3190,13 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                                lineNumber: 325,
+                                                                lineNumber: 264,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                        lineNumber: 323,
+                                                        lineNumber: 262,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2825,7 +3206,7 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                                                 children: "IVA (13%)"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                                lineNumber: 328,
+                                                                lineNumber: 267,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2835,13 +3216,13 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                                lineNumber: 329,
+                                                                lineNumber: 268,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                        lineNumber: 327,
+                                                        lineNumber: 266,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2851,7 +3232,7 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                                                 children: "TOTAL COBRADO"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                                lineNumber: 332,
+                                                                lineNumber: 271,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2861,19 +3242,19 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                                lineNumber: 333,
+                                                                lineNumber: 272,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                        lineNumber: 331,
+                                                        lineNumber: 270,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                lineNumber: 322,
+                                                lineNumber: 261,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2887,13 +3268,13 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                                                 children: selectedTicket.paymentMethod
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                                lineNumber: 338,
+                                                                lineNumber: 277,
                                                                 columnNumber: 32
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                        lineNumber: 338,
+                                                        lineNumber: 277,
                                                         columnNumber: 21
                                                     }, this),
                                                     selectedTicket.paymentMethod === "cash" ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -2901,36 +3282,36 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                                 children: [
                                                                     "Recibido: $",
-                                                                    selectedTicket.cashReceived?.toFixed(2)
+                                                                    selectedTicket.cashReceived?.toFixed(2) ?? "0.00"
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                                lineNumber: 341,
+                                                                lineNumber: 280,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                                 children: [
                                                                     "Cambio: $",
-                                                                    selectedTicket.changeReturned?.toFixed(2)
+                                                                    selectedTicket.changeReturned?.toFixed(2) ?? "0.00"
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                                lineNumber: 342,
+                                                                lineNumber: 281,
                                                                 columnNumber: 25
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                        lineNumber: 340,
+                                                        lineNumber: 279,
                                                         columnNumber: 23
                                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                                         children: [
                                                             "Voucher / Auth: ",
-                                                            selectedTicket.authCode
+                                                            selectedTicket.authCode || "N/A"
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                        lineNumber: 345,
+                                                        lineNumber: 284,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2940,50 +3321,50 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                        lineNumber: 347,
+                                                        lineNumber: 286,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                lineNumber: 337,
+                                                lineNumber: 276,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                        lineNumber: 303,
+                                        lineNumber: 242,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                         type: "button",
-                                        onClick: ()=>alert(`Reimprimiendo comprobante ${selectedTicket.ticketNumber}...`),
+                                        onClick: ()=>alert(`Reimprimiendo comprobante archivado ${selectedTicket.ticketNumber}...`),
                                         className: "w-full flex items-center justify-center gap-2 py-2.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-xl shadow-2xs transition-colors cursor-pointer",
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$printer$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Printer$3e$__["Printer"], {
                                                 className: "w-3.5 h-3.5 text-sky-600"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                lineNumber: 356,
+                                                lineNumber: 295,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Reimprimir Comprobante"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                lineNumber: 357,
+                                                lineNumber: 296,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                        lineNumber: 351,
+                                        lineNumber: 290,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                lineNumber: 302,
+                                lineNumber: 241,
                                 columnNumber: 15
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "h-full flex flex-col items-center justify-center text-center text-slate-400 p-6",
@@ -2992,7 +3373,7 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                         className: "w-8 h-8 stroke-[1.5] mb-2 text-slate-300"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                        lineNumber: 362,
+                                        lineNumber: 301,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -3000,39 +3381,39 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                         children: "Selecciona un ticket del listado para ver su detalle."
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                        lineNumber: 363,
+                                        lineNumber: 302,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                lineNumber: 361,
+                                lineNumber: 300,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                            lineNumber: 300,
+                            lineNumber: 239,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                    lineNumber: 256,
+                    lineNumber: 190,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-            lineNumber: 166,
+            lineNumber: 105,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-        lineNumber: 165,
+        lineNumber: 104,
         columnNumber: 5
     }, this);
 }
-_s(AuditTicketsModal, "e4smnCvH/UMqecWoNw9S7TH/K/c=");
+_s(AuditTicketsModal, "8VufpS12sQynC7oKuqdDULBfFvs=");
 _c = AuditTicketsModal;
 var _c;
 __turbopack_context__.k.register(_c, "AuditTicketsModal");
@@ -7134,4 +7515,4 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 }),
 ]);
 
-//# sourceMappingURL=src_0bdosy8._.js.map
+//# sourceMappingURL=src_15mbu7m._.js.map

@@ -1010,6 +1010,10 @@
     height: 620px;
   }
 
+  .h-\[640px\] {
+    height: 640px;
+  }
+
   .h-full {
     height: 100%;
   }

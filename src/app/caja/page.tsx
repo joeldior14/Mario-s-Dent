@@ -69,7 +69,7 @@ export default function CajaPage() {
 
   const [currentAuditedShiftId, setCurrentAuditedShiftId] = useState<string | null>(null);
 
-  // Fecha actual en formato legible para el cajero (Zona horaria de El Salvador)
+  // Fecha en zona horaria local de El Salvador
   const currentDateDisplay = useMemo(() => {
     return new Intl.DateTimeFormat("es-SV", {
       timeZone: "America/El_Salvador",
@@ -79,14 +79,13 @@ export default function CajaPage() {
     }).format(new Date());
   }, []);
 
-  // Nombre reactivo del operador derivado de la sesión activa
   const activeOperatorName = useMemo(() => {
     return user?.name || cashierName || "Operador";
   }, [user?.name, cashierName]);
 
   const [isProcessing, setIsProcessing] = useState(false);
 
-  // Ventas en tiempo real para el Cajero
+  // Ventas en tiempo real
   const [salesBreakdown, setSalesBreakdown] = useState<ShiftSalesBreakdown>({
     cash: 0,
     card: 0,
@@ -94,12 +93,12 @@ export default function CajaPage() {
     total: 0,
   });
 
-  // Control de Modales Operativos
+  // Modales
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isTicketAuditOpen, setIsTicketAuditOpen] = useState(false);
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
 
-  // Control del Diálogo de Notificaciones / Confirmaciones
+  // Diálogo común
   const [dialogConfig, setDialogConfig] = useState<{
     isOpen: boolean;
     type: DialogType;
@@ -117,13 +116,12 @@ export default function CajaPage() {
     onConfirm: () => {},
   });
 
-  // Filtros de Auditoría (Admin)
+  // Sucursales
   const [selectedBranch, setSelectedBranch] = useState<BranchName>(() => {
     return (user?.branch as BranchName) || "Santa Ana";
   });
 
-  // Sucursal efectiva: Cajero toma su sede fija, Administrador la seleccionada
-  const effectiveBranch = (!isAdmin && user?.branch) ? user.branch : selectedBranch;
+  const effectiveBranch = (!isAdmin && user?.branch) ? (user.branch as BranchName) : selectedBranch;
 
   const [selectedDate, setSelectedDate] = useState(() => {
     return new Intl.DateTimeFormat("en-CA", {
@@ -134,16 +132,16 @@ export default function CajaPage() {
     }).format(new Date());
   });
 
-  // Dictamen Contable (Admin)
+  // Dictamen contable (Admin)
   const [resolutionType, setResolutionType] = useState<ResolutionType>("MERMA_ACEPTADA");
   const [adminNotes, setAdminNotes] = useState("");
 
-  // Operatoria Cajero
+  // Operatoria de cajero
   const [cashierNotes, setCashierNotes] = useState("");
   const [countedCash, setCountedCash] = useState<number>(0.0);
   const [expensesList, setExpensesList] = useState<ExpenseRecord[]>([]);
 
-  // Estado unificado para métricas de turno / auditoría (Admin)
+  // Métricas del turno para auditoría
   const [salesMetrics, setSalesMetrics] = useState({
     shiftId: null as string | null,
     auditStatus: "pending_review" as "pending_review" | "reviewed",
@@ -160,44 +158,36 @@ export default function CajaPage() {
     operatorName: "Sin operador",
   });
 
-  // El estado auditado ahora depende del turno que se está visualizando en pantalla
   const isAudited = isAdmin
     ? salesMetrics.auditStatus === "reviewed"
     : auditStatus === "reviewed";
 
-  // Carga las ventas en vivo cuando el cajero tiene un turno abierto
+  // Carga de ventas en vivo para el turno
   useEffect(() => {
     if (isAdmin) return;
 
     let isMounted = true;
-
     async function loadSales() {
       if (!isShiftOpen) {
-        if (isMounted) {
-          setSalesBreakdown({ cash: 0, card: 0, transfer: 0, total: 0 });
-        }
+        if (isMounted) setSalesBreakdown({ cash: 0, card: 0, transfer: 0, total: 0 });
         return;
       }
 
       const breakdown = await getShiftSalesBreakdown(effectiveBranch);
-      if (isMounted) {
-        setSalesBreakdown(breakdown);
-      }
+      if (isMounted) setSalesBreakdown(breakdown);
     }
 
     loadSales();
-
     return () => {
       isMounted = false;
     };
   }, [isAdmin, effectiveBranch, isShiftOpen]);
 
-  // Carga los gastos en vivo cuando el cajero tiene un turno abierto
+  // Carga de gastos del turno
   useEffect(() => {
     if (isAdmin) return;
 
     let isMounted = true;
-
     async function loadExpenses() {
       if (!isShiftOpen) {
         if (isMounted) setExpensesList([]);
@@ -206,34 +196,28 @@ export default function CajaPage() {
 
       try {
         const dbExpenses = await fetchCurrentShiftExpenses(effectiveBranch);
-        if (isMounted) {
-          setExpensesList(dbExpenses);
-        }
+        if (isMounted) setExpensesList(dbExpenses);
       } catch (err) {
         console.error("Error al cargar gastos del turno:", err);
       }
     }
 
     loadExpenses();
-
     return () => {
       isMounted = false;
     };
   }, [isAdmin, effectiveBranch, isShiftOpen]);
 
-  // Carga Unificada de Auditoría para el Administrador
+  // Carga unificada de auditoría (Admin)
   useEffect(() => {
     if (!isAdmin) return;
 
     let isMounted = true;
-
     async function loadAdminAudit() {
       try {
         const audit = await getAdminShiftAudit(selectedBranch, selectedDate);
-
         if (isMounted) {
           setCurrentAuditedShiftId(audit.shiftId);
-
           setSalesMetrics({
             shiftId: audit.shiftId,
             auditStatus: (audit.auditStatus as "pending_review" | "reviewed") || "pending_review",
@@ -250,7 +234,6 @@ export default function CajaPage() {
             operatorName: audit.operatorName,
           });
 
-          // Sincronización limpia: si ya fue resuelto muestra lo registrado; si no, queda limpio
           if (audit.auditStatus === "reviewed") {
             setAdminNotes(audit.auditNotes || "");
             setResolutionType((audit.auditResolution as ResolutionType) || "MERMA_ACEPTADA");
@@ -265,33 +248,17 @@ export default function CajaPage() {
           setCurrentAuditedShiftId(null);
           setAdminNotes("");
           setResolutionType("MERMA_ACEPTADA");
-          setSalesMetrics({
-            shiftId: null,
-            auditStatus: "pending_review",
-            auditResolution: "MERMA_ACEPTADA",
-            auditNotes: "",
-            initialFund: 0.0,
-            cash: 0.0,
-            card: 0.0,
-            transfer: 0.0,
-            totalSales: 0.0,
-            expenses: 0.0,
-            reportedCountedCash: 0.0,
-            operatorNotes: "",
-            operatorName: "Sin operador",
-          });
         }
       }
     }
 
     loadAdminAudit();
-
     return () => {
       isMounted = false;
     };
   }, [isAdmin, selectedBranch, selectedDate]);
 
-  // Balance Financiero Dinámico sincronizado para Cajero y Administrador
+  // Cálculos contables unificados
   const totals: FinancialSummary = useMemo(() => {
     const liveExpenses = expensesList.reduce((acc, curr) => acc + (Number(curr.amount) || 0), 0);
     const totalExpenses = isAdmin ? salesMetrics.expenses : liveExpenses;
@@ -329,11 +296,10 @@ export default function CajaPage() {
     };
   }, [expensesList, isAdmin, isShiftOpen, initialCash, salesMetrics, salesBreakdown, countedCash]);
 
-  // Apertura de Turno conectada a Supabase
+  // Iniciar turno
   const handleOpenShiftConfirm = async (amount: number) => {
     try {
       setIsProcessing(true);
-
       await openCashShiftInDB({
         branchName: effectiveBranch,
         cashierId: user?.id || "",
@@ -358,11 +324,10 @@ export default function CajaPage() {
     }
   };
 
-  // Guardar Gasto Menor conectado a la tabla 'cash_movements' de Supabase
+  // Registrar gasto
   const handleSaveExpense = async (newExpense: ExpenseRecord) => {
     try {
       setIsProcessing(true);
-
       await recordExpenseInDB({
         branchName: effectiveBranch,
         amount: newExpense.amount,
@@ -396,82 +361,82 @@ export default function CajaPage() {
     }
   };
 
-  // Cierre de Turno conectado a Supabase (Corte Z)
- const handleCloseShift = useCallback(() => {
-  // Asegura el cálculo de la diferencia del arqueo en el momento de pulsar cerrar
-  const currentCounted = Number(countedCash) || 0;
-  const currentExpected = Number(totals.expectedCash) || 0;
-  const realDiff = Number((currentCounted - currentExpected).toFixed(2));
+  // Cerrar turno (Corte Z)
+  const handleCloseShift = useCallback(() => {
+    const currentCounted = Number(countedCash) || 0;
+    const currentExpected = Number(totals.expectedCash) || 0;
+    const realDiff = Number((currentCounted - currentExpected).toFixed(2));
 
-  if (realDiff < 0 && !cashierNotes.trim()) {
+    if (realDiff !== 0 && !cashierNotes.trim()) {
+      setDialogConfig({
+        isOpen: true,
+        type: "warning",
+        title: "Justificación Requerida",
+        description:
+          "Existe un descuadre en el arqueo de efectivo. Es obligatorio ingresar una justificación antes de realizar el Corte Z.",
+        confirmText: "Entendido",
+        onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
+      });
+      return;
+    }
+
     setDialogConfig({
       isOpen: true,
       type: "warning",
-      title: "Justificación Requerida",
+      title: "Confirmar Cierre de Turno",
       description:
-        "Existe un faltante en el arqueo de efectivo. Es obligatorio ingresar una justificación antes de realizar el Corte Z.",
-      confirmText: "Entendido",
-      onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
+        "¿Confirmas el cierre de jornada (Corte Z)? Esta acción asentará el balance final en el sistema y cerrará la caja.",
+      confirmText: "Sí, Cerrar Turno",
+      cancelText: "Cancelar",
+      onConfirm: async () => {
+        try {
+          setIsProcessing(true);
+
+          await closeCashShiftInDB({
+            branchName: effectiveBranch,
+            countedCash: currentCounted,
+            expectedCash: currentExpected,
+            totalSales: totals.totalSales,
+            totalExpenses: totals.expenses,
+            difference: realDiff,
+            notes: cashierNotes, // En el service se asienta exclusivamente en cashier_notes
+          });
+
+          closeShift();
+          setCashierNotes("");
+          setCountedCash(0.0);
+          setExpensesList([]);
+          setSalesBreakdown({ cash: 0, card: 0, transfer: 0, total: 0 });
+
+          setDialogConfig({
+            isOpen: true,
+            type: "success",
+            title: "Turno Cerrado con Éxito",
+            description:
+              "El balance final ha sido asentado correctamente en la base de datos (Corte Z registrado).",
+            confirmText: "Aceptar",
+            onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
+          });
+        } catch (err: unknown) {
+          const msg =
+            err instanceof Error ? err.message : "Error al registrar el cierre de turno";
+          setDialogConfig({
+            isOpen: true,
+            type: "warning",
+            title: "Error de Cierre",
+            description: msg,
+            confirmText: "Aceptar",
+            onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
+          });
+        } finally {
+          setIsProcessing(false);
+        }
+      },
+      onCancel: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
     });
-    return;
-  }
+  }, [totals, cashierNotes, effectiveBranch, countedCash, closeShift]);
 
-  setDialogConfig({
-    isOpen: true,
-    type: "warning",
-    title: "Confirmar Cierre de Turno",
-    description:
-      "¿Confirmas el cierre de jornada (Corte Z)? Esta acción asentará el balance final en el sistema y cerrará la caja.",
-    confirmText: "Sí, Cerrar Turno",
-    cancelText: "Cancelar",
-    onConfirm: async () => {
-      try {
-        setIsProcessing(true);
-
-        await closeCashShiftInDB({
-          branchName: effectiveBranch,
-          countedCash: currentCounted,
-          expectedCash: currentExpected,
-          totalSales: totals.totalSales,
-          totalExpenses: totals.expenses,
-          difference: realDiff, // 👈 Pasa la diferencia calculada explícitamente
-          notes: cashierNotes,
-        });
-
-        closeShift();
-        setCashierNotes("");
-        setCountedCash(0.0);
-        setExpensesList([]);
-        setSalesBreakdown({ cash: 0, card: 0, transfer: 0, total: 0 });
-
-        setDialogConfig({
-          isOpen: true,
-          type: "success",
-          title: "Turno Cerrado con Éxito",
-          description:
-            "El balance final ha sido asentado correctamente en la base de datos (Corte Z registrado).",
-          confirmText: "Aceptar",
-          onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
-        });
-      } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : "Error al registrar el cierre de turno";
-        setDialogConfig({
-          isOpen: true,
-          type: "warning",
-          title: "Error de Cierre",
-          description: msg,
-          confirmText: "Aceptar",
-          onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
-        });
-      } finally {
-        setIsProcessing(false);
-      }
-    },
-    onCancel: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
-  });
-}, [totals, cashierNotes, effectiveBranch, countedCash, closeShift]);
-
-  // Resolución de Auditoría (Admin) persistida en Supabase
+  // Auditoría dictaminada por Admin
   const handleResolveDiscrepancy = useCallback(() => {
     if (!adminNotes.trim()) {
       setDialogConfig({
@@ -514,7 +479,6 @@ export default function CajaPage() {
             notes: adminNotes,
           });
 
-          // Actualización de estado local
           setSalesMetrics((prev) => ({
             ...prev,
             auditStatus: "reviewed",
@@ -733,7 +697,6 @@ export default function CajaPage() {
                 </p>
               </div>
 
-              {/* Badge superior si hay descuadre */}
               {isAdmin && !totals.isBalanced && (
                 <span
                   className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold ${
@@ -779,7 +742,7 @@ export default function CajaPage() {
                         : ""
                     }
                     onChange={(e) => setCountedCash(Math.max(0, parseFloat(e.target.value) || 0))}
-                    placeholder={isShiftOpen ? "0.00" : "0.00"}
+                    placeholder="0.00"
                     className={`w-full pl-7 pr-3 py-2 border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none transition-colors ${
                       isShiftOpen && !isAdmin
                         ? "bg-slate-50 text-slate-800 focus:border-sky-400"
@@ -857,13 +820,13 @@ export default function CajaPage() {
             </div>
 
             {/* JUSTIFICACIÓN POR DESCUADRE */}
-            {(totals.isShortage || (isAdmin && !totals.isBalanced)) && (
-              <div className="space-y-1.5">
+            {(!totals.isBalanced || (isAdmin && !totals.isBalanced)) && (
+              <div className="space-y-1.5 animate-in fade-in duration-200">
                 <label className="block text-[11px] font-bold text-slate-600 uppercase">
                   Justificación / Motivo del Descuadre
                   {!isAdmin && (
                     <span className="text-rose-600 ml-1 font-semibold normal-case">
-                      *(Obligatorio para cerrar turno)
+                      *(Obligatorio por descuadre en caja)
                     </span>
                   )}
                 </label>
@@ -880,7 +843,11 @@ export default function CajaPage() {
                     disabled={!isShiftOpen}
                     value={cashierNotes}
                     onChange={(e) => setCashierNotes(e.target.value)}
-                    placeholder="Explique detalladamente la causa del faltante de efectivo..."
+                    placeholder={
+                      totals.isSurplus
+                        ? "Explique la causa del sobrante (ej. propinas, redondeo, cobro pendiente)..."
+                        : "Explique detalladamente la causa del faltante de efectivo..."
+                    }
                     className={`w-full p-2.5 border rounded-xl text-xs focus:outline-none transition-colors ${
                       !cashierNotes.trim()
                         ? "border-rose-300 bg-rose-50/30 placeholder-rose-400 focus:border-rose-500"

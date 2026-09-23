@@ -471,15 +471,15 @@ function PosPage() {
                 }));
             // 1. Guardar la venta en Supabase y descontar stock
             const result = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$inventoryService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["processSaleInDB"])({
-                branchName: currentBranch.trim(),
+                branchName: (user?.branch || currentBranch || "Santa Ana").trim(),
                 cashierId: user?.id || null,
                 cashierName: cashierName || user?.name || "Cajero",
                 paymentMethod,
-                items: cartPayload,
+                items: cart,
                 subtotal,
                 tax: iva,
                 total,
-                cashReceived: paymentMethod === "cash" ? numericCashReceived : undefined,
+                cashReceived: paymentMethod === "cash" ? Number(cashReceived) : undefined,
                 changeReturned: paymentMethod === "cash" ? changeDue : undefined
             });
             // 2. Feedback visual y reinicio de orden (Aumentar el número correlativo)
@@ -1657,7 +1657,6 @@ async function closeCashShiftInDB(payload) {
         total_expenses: Number((totalExpenses || 0).toFixed(2)),
         difference: finalDifference,
         cashier_notes: notes?.trim() || null,
-        notes: notes?.trim() || null,
         audit_status: autoAuditStatus,
         audit_resolution: autoResolution,
         audit_notes: autoAuditNotes
@@ -1789,6 +1788,8 @@ __turbopack_context__.s([
     ()=>deleteProductFromDB,
     "fetchProductKardex",
     ()=>fetchProductKardex,
+    "fetchTicketsByBranchAndDate",
+    ()=>fetchTicketsByBranchAndDate,
     "processSaleInDB",
     ()=>processSaleInDB,
     "transferProductStockInDB",
@@ -2065,28 +2066,35 @@ async function processSaleInDB(payload) {
     if (!items || items.length === 0) {
         throw new Error("El carrito no tiene productos.");
     }
-    // 1. Obtener la sucursal actual
-    const { data: branch, error: branchErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id, name").ilike("name", branchName).single();
-    if (branchErr || !branch) {
-        throw new Error(`No se encontró la sucursal: ${branchName}`);
+    // 1. Asegurar el ID del cajero en sesión activa
+    let effectiveCashierId = cashierId || null;
+    if (!effectiveCashierId) {
+        const { data: authData } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].auth.getUser();
+        effectiveCashierId = authData.user?.id || null;
     }
-    // 2. Obtener el turno abierto de la sucursal
-    const { data: activeShift, error: shiftErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").select("id").eq("branch_id", branch.id).eq("status", "open").order("opened_at", {
+    // 2. Obtener la sucursal actual
+    const cleanBranch = (branchName || "").trim();
+    const { data: branch, error: branchErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id, name").ilike("name", cleanBranch).maybeSingle();
+    if (branchErr || !branch) {
+        throw new Error(`No se encontró la sucursal: "${cleanBranch}"`);
+    }
+    // 3. Obtener el turno abierto de la sucursal
+    const { data: activeShift, error: shiftErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").select("id, cashier_id").eq("branch_id", branch.id).eq("status", "open").order("opened_at", {
         ascending: false
     }).limit(1).maybeSingle();
     if (shiftErr || !activeShift) {
         throw new Error("No hay un turno de caja abierto en esta sucursal para asociar la venta.");
     }
-    // 3. Generar número de ticket único
-    const branchCode = branch.name.substring(0, 2).toUpperCase();
-    const ticketNumber = `T-${branchCode}-${Math.floor(1000 + Math.random() * 9000)}`;
-    // 4. Insertar cabecera en 'sales'
+    const finalCashierId = effectiveCashierId || activeShift.cashier_id;
+    const branchPrefix = branch.name.substring(0, 2).toUpperCase();
+    const ticketNumber = `T-${branchPrefix}-${Math.floor(1000 + Math.random() * 9000)}`;
+    // 4. Inserción en la tabla 'sales'
     const { data: saleData, error: saleErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sales").insert([
         {
             ticket_number: ticketNumber,
             branch_id: branch.id,
             shift_id: activeShift.id,
-            cashier_id: cashierId || null,
+            cashier_id: finalCashierId,
             payment_method: paymentMethod,
             subtotal: Number(subtotal),
             tax: Number(tax),
@@ -2097,40 +2105,33 @@ async function processSaleInDB(payload) {
         }
     ]).select("id").single();
     if (saleErr || !saleData) {
-        throw new Error(`Error al guardar en tabla 'sales': ${saleErr?.message || "Desconocido"}`);
+        throw new Error(`Error al guardar en tabla 'sales': ${saleErr?.message}`);
     }
     const saleId = saleData.id;
-    // 5. Insertar renglones en 'sale_items', descontar stock y registrar Kardex
+    // 5. Partidas, descuento de stock y Kardex
     for (const item of items){
-        // A) Insertar detalle de venta
-        const { error: itemErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sale_items").insert([
+        await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sale_items").insert([
             {
                 sale_id: saleId,
                 product_id: item.id,
                 quantity: item.quantity,
                 unit_price: item.price,
-                subtotal: item.price * item.quantity
+                subtotal: Number((item.price * item.quantity).toFixed(2))
             }
         ]);
-        if (itemErr) {
-            console.error("Error al registrar renglón en sale_items:", itemErr.message);
-        }
-        // B) Consultar stock actual
         const { data: invRecord } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").select("id, stock").eq("product_id", item.id).eq("branch_id", branch.id).maybeSingle();
         const currentStock = invRecord?.stock ?? 0;
         const newStock = Math.max(0, currentStock - item.quantity);
-        // C) Actualizar inventario de la sucursal
         if (invRecord) {
             await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").update({
                 stock: newStock
             }).eq("id", invRecord.id);
         }
-        // D) Registrar movimiento en Kardex (stock_movements)
         await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("stock_movements").insert([
             {
                 product_id: item.id,
                 branch_id: branch.id,
-                user_id: cashierId || null,
+                user_id: finalCashierId,
                 movement_type: "VENTA_POS",
                 quantity: -item.quantity,
                 stock_after: newStock,
@@ -2140,9 +2141,69 @@ async function processSaleInDB(payload) {
     }
     return {
         ticketNumber,
-        total,
-        saleId
+        saleId,
+        total
     };
+}
+async function fetchTicketsByBranchAndDate(branchName, dateStr) {
+    const startOfDay = `${dateStr}T00:00:00.000Z`;
+    const endOfDay = `${dateStr}T23:59:59.999Z`;
+    const { data, error } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sales").select(`
+      id,
+      ticket_number,
+      payment_method,
+      subtotal,
+      tax,
+      total,
+      cash_received,
+      change_given,
+      created_at,
+      branches!inner(name),
+      profiles(full_name),
+      sale_items(
+        id,
+        quantity,
+        unit_price,
+        products(name)
+      )
+    `).ilike("branches.name", `%${branchName.trim()}%`).gte("created_at", startOfDay).lte("created_at", endOfDay).order("created_at", {
+        ascending: false
+    });
+    if (error) {
+        console.error("Error al consultar ventas para auditoría:", error);
+        return [];
+    }
+    const queryRows = data ?? [];
+    return queryRows.map((sale)=>{
+        const d = new Date(sale.created_at);
+        const branchRecord = Array.isArray(sale.branches) ? sale.branches[0] : sale.branches;
+        const profileRecord = Array.isArray(sale.profiles) ? sale.profiles[0] : sale.profiles;
+        return {
+            id: sale.id,
+            ticketNumber: sale.ticket_number || "S/F",
+            time: d.toLocaleTimeString("es-SV", {
+                hour: "2-digit",
+                minute: "2-digit"
+            }),
+            date: dateStr,
+            branch: branchRecord?.name || branchName,
+            cashier: profileRecord?.full_name || "Cajero",
+            paymentMethod: sale.payment_method || "cash",
+            subtotal: Number(sale.subtotal) || 0,
+            tax: Number(sale.tax) || 0,
+            total: Number(sale.total) || 0,
+            cashReceived: sale.cash_received ? Number(sale.cash_received) : undefined,
+            changeReturned: sale.change_given ? Number(sale.change_given) : undefined,
+            items: (sale.sale_items || []).map((it)=>{
+                const prod = Array.isArray(it.products) ? it.products[0] : it.products;
+                return {
+                    name: prod?.name || "Insumo Dental",
+                    qty: Number(it.quantity) || 1,
+                    unitPrice: Number(it.unit_price) || 0
+                };
+            })
+        };
+    });
 }
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
