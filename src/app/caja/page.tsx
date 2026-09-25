@@ -25,7 +25,6 @@ import {
   Building2,
   Lock,
   Receipt,
-  FileSpreadsheet,
   PlusCircle,
   Store,
   Calendar,
@@ -34,6 +33,10 @@ import {
   CheckCircle2,
   AlertTriangle,
   ShieldCheck,
+  TrendingDown,
+  Coins,
+  Plus,
+  ArrowRight,
 } from "lucide-react";
 
 export type ResolutionType = "MERMA_ACEPTADA" | "COBRO_EMPLEADO" | "CORRECCION_POS";
@@ -52,6 +55,8 @@ interface FinancialSummary {
   isShortage: boolean;
   isBalanced: boolean;
 }
+
+const BILL_DENOMINATIONS = [100, 50, 20, 10, 5, 1];
 
 export default function CajaPage() {
   const {
@@ -121,7 +126,7 @@ export default function CajaPage() {
     return (user?.branch as BranchName) || "Santa Ana";
   });
 
-  const effectiveBranch = (!isAdmin && user?.branch) ? (user.branch as BranchName) : selectedBranch;
+  const effectiveBranch = !isAdmin && user?.branch ? (user.branch as BranchName) : selectedBranch;
 
   const [selectedDate, setSelectedDate] = useState(() => {
     return new Intl.DateTimeFormat("en-CA", {
@@ -296,6 +301,11 @@ export default function CajaPage() {
     };
   }, [expensesList, isAdmin, isShiftOpen, initialCash, salesMetrics, salesBreakdown, countedCash]);
 
+  // Denominaciones rápidas
+  const handleAddDenomination = (val: number) => {
+    setCountedCash((prev) => Number((prev + val).toFixed(2)));
+  };
+
   // Iniciar turno
   const handleOpenShiftConfirm = async (amount: number) => {
     try {
@@ -399,7 +409,7 @@ export default function CajaPage() {
             totalSales: totals.totalSales,
             totalExpenses: totals.expenses,
             difference: realDiff,
-            notes: cashierNotes, // En el service se asienta exclusivamente en cashier_notes
+            notes: cashierNotes,
           });
 
           closeShift();
@@ -518,188 +528,286 @@ export default function CajaPage() {
     <div className="min-h-screen bg-[#F8FAFC] text-slate-700 flex flex-col font-sans select-none">
       <Navbar />
 
-      <main className="flex-1 p-8 max-w-7xl mx-auto w-full space-y-6">
-        {/* ENCABEZADO */}
-        <header className="flex items-start justify-between">
+      <main className="flex-1 p-6 md:p-8 max-w-7xl mx-auto w-full space-y-6">
+        {/* =========================================================================
+            ENCABEZADO DE PANTALLA Y CONTROLES
+           ========================================================================= */}
+        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-200/60">
           <div>
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight">Control de caja</h1>
-            <p className="text-xs text-slate-400 font-medium mt-0.5">
-              Cash Drawer & Daily Close (Corte Z)
-            </p>
-          </div>
-
-          {isAdmin ? (
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1.5 bg-white border border-slate-200 px-3 py-1.5 rounded-xl shadow-xs">
-                <Store className="w-3.5 h-3.5 text-slate-400" />
-                <select
-                  value={selectedBranch}
-                  onChange={(e) => setSelectedBranch(e.target.value as BranchName)}
-                  className="text-xs font-bold text-slate-700 bg-transparent focus:outline-none cursor-pointer"
-                >
-                  <option value="Santa Ana">Santa Ana</option>
-                  <option value="Ahuachapán">Ahuachapán</option>
-                  <option value="Sonsonate">Sonsonate</option>
-                </select>
-              </div>
-
-              <div className="flex items-center gap-1.5 bg-white border border-slate-200 px-3 py-1.5 rounded-xl shadow-xs">
-                <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                <input
-                  type="date"
-                  value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
-                  className="text-xs font-bold text-slate-700 bg-transparent focus:outline-none cursor-pointer"
-                />
-              </div>
-            </div>
-          ) : (
-            <div className="flex items-center gap-4">
-              <div className="text-xs text-slate-500 font-medium text-right flex items-center">
-                <span className="text-slate-600 font-semibold capitalize">
-                  {currentDateDisplay}
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+                Control de caja
+              </h1>
+              {isAdmin ? (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-purple-50 text-purple-700 border border-purple-200">
+                  <ShieldCheck className="w-3.5 h-3.5 text-purple-600" />
+                  Auditoría Administrativa
                 </span>
-                <span className="mx-2 text-slate-300">|</span>
-                <span>
-                  Turno:{" "}
-                  <strong className={isShiftOpen ? "text-emerald-600" : "text-slate-700"}>
-                    {isShiftOpen ? "En Curso" : "Cerrado"}
-                  </strong>
+              ) : isShiftOpen ? (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  Turno en Curso
                 </span>
-                <span className="mx-2 text-slate-300">|</span>
-                <span>
-                  Operador: <strong className="text-slate-700">{activeOperatorName}</strong>
+              ) : (
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-100 text-slate-600 border border-rose-500">
+                  Turno Cerrado
                 </span>
-              </div>
-
-              {!isShiftOpen && (
-                <button
-                  type="button"
-                  onClick={() => setIsModalOpen(true)}
-                  className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors cursor-pointer"
-                >
-                  <PlusCircle className="w-4 h-4" />
-                  <span>Iniciar Turno</span>
-                </button>
               )}
             </div>
-          )}
+            <p className="text-xs text-slate-400 font-medium mt-0.5">
+              Cajón de efectivo, conciliación de ventas y cierre diario (Corte Z)
+            </p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            {isAdmin ? (
+              <div className="flex items-center gap-2">
+                <div className="relative flex items-center bg-white border border-slate-200 rounded-xl px-3 h-10 shadow-2xs hover:border-sky-400 transition-colors">
+                  <Store className="w-3.5 h-3.5 text-sky-600 mr-2 shrink-0" />
+                  <select
+                    value={selectedBranch}
+                    onChange={(e) => setSelectedBranch(e.target.value as BranchName)}
+                    className="text-xs font-bold text-slate-800 bg-transparent focus:outline-none cursor-pointer pr-4"
+                  >
+                    <option value="Santa Ana">Santa Ana</option>
+                    <option value="Ahuachapán">Ahuachapán</option>
+                    <option value="Sonsonate">Sonsonate</option>
+                  </select>
+                </div>
+
+                <div className="flex items-center gap-2 bg-white border border-slate-200 px-3 h-10 rounded-xl shadow-2xs hover:border-sky-400 transition-colors">
+                  <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                  <input
+                    type="date"
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    className="text-xs font-bold text-slate-700 bg-transparent focus:outline-none cursor-pointer"
+                  />
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setIsTicketAuditOpen(true)}
+                  className="px-3.5 h-10 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl shadow-2xs hover:border-sky-400 transition-colors flex items-center gap-2 cursor-pointer"
+                >
+                  <FileText className="w-3.5 h-3.5 text-sky-600" />
+                  <span>Auditar Tickets</span>
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 bg-white border border-sky-500 rounded-xl px-3 py-1.5 shadow-2xs text-xs font-medium text-slate-500">
+                  <span className="text-slate-700 font-bold capitalize">{currentDateDisplay}</span>
+                  <span className="text-slate-300">|</span>
+                  <span>
+                    Operador: <strong className="text-slate-800">{activeOperatorName}</strong>
+                  </span>
+                </div>
+
+                {!isShiftOpen && (
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(true)}
+                    className="flex items-center gap-1.5 px-4 h-10 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors cursor-pointer"
+                  >
+                    <PlusCircle className="w-4 h-4" />
+                    <span>Iniciar Turno</span>
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
         </header>
 
-        {/* 4 CARDS SUPERIORES */}
-        <section className="grid grid-cols-4 gap-5">
-          <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
-            <div className="flex items-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-2">
-              <Banknote className="w-3.5 h-3.5" />
-              <span>Fondo Inicial</span>
+        {/* =========================================================================
+            4 TARJETAS SUPERIORES DE TOTALES
+           ========================================================================= */}
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Fondo Inicial */}
+          <div className="bg-white border border-amber-300 border-l-4 border-l-amber-500 rounded-2xl p-4 shadow-xs hover:border-slate-300 transition-all">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-black-700 text-[15px] font-bold uppercase tracking-wider">
+                Fondo Inicial
+              </span>
+              <div className="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
+                <Banknote className="w-4 h-4" />
+              </div>
             </div>
-            <p className="text-xl font-bold text-slate-800">
+            <p className="text-2xl font-black text-slate-800 font-mono tracking-tight">
               ${totals.initialFund.toLocaleString("en-US", { minimumFractionDigits: 2 })}
             </p>
+            <span className="text-[10px] text-slate-400 font-medium mt-0.5 block">
+              Gaveta en apertura
+            </span>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
-            <div className="flex items-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-2">
-              <Receipt className="w-3.5 h-3.5" />
-              <span>Ventas Totales</span>
+          {/* Ventas Totales */}
+          <div className="bg-white border border-blue-300 border-l-4 border-l-blue-500 rounded-2xl p-4 shadow-xs hover:border-slate-300 transition-all">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-black-700 text-[15px] font-bold uppercase tracking-wider">
+                Ventas Totales
+              </span>
+              <div className="w-7 h-7 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center">
+                <Receipt className="w-4 h-4" />
+              </div>
             </div>
-            <p className="text-xl font-bold text-sky-600">
+            <p className="text-2xl font-black text-sky-600 font-mono tracking-tight">
               ${totals.totalSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
             </p>
+            <span className="text-[10px] text-slate-400 font-medium mt-0.5 block">
+              Todos los métodos de pago
+            </span>
           </div>
 
-          <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-xs">
-            <div className="flex items-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-2">
-              <FileSpreadsheet className="w-3.5 h-3.5" />
-              <span>Gastos</span>
+          {/* Gastos Menores */}
+          <div className="bg-white border border-red-300 border-l-4 border-l-red-500  rounded-2xl p-4 shadow-xs hover:border-slate-300 transition-all">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-black-700 text-[15px] font-bold uppercase tracking-wider">
+                Gastos Menores
+              </span>
+              <div className="w-7 h-7 rounded-lg bg-rose-50 text-rose-500 flex items-center justify-center">
+                <TrendingDown className="w-4 h-4" />
+              </div>
             </div>
-            <p className="text-xl font-bold text-red-500">
+            <p className="text-2xl font-black text-rose-500 font-mono tracking-tight">
               {totals.expenses > 0
                 ? `-$${totals.expenses.toLocaleString("en-US", { minimumFractionDigits: 2 })}`
                 : "$0.00"}
             </p>
+            <span className="text-[10px] text-slate-400 font-medium mt-0.5 block">
+              Egresos de caja chica
+            </span>
           </div>
 
-          <div className="bg-white border border-slate-200 border-l-4 border-l-emerald-500 rounded-xl p-4 shadow-xs">
-            <div className="flex items-center gap-2 text-slate-400 text-[10px] font-bold uppercase tracking-wider mb-2">
-              <Receipt className="w-3.5 h-3.5" />
-              <span>Total Esperado</span>
+          {/* Total Esperado General */}
+          <div className="bg-white border border-green-300 border-l-4 border-l-emerald-500 rounded-2xl p-4 shadow-xs hover:border-slate-300 transition-all">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-black-700 text-[15px] font-bold uppercase tracking-wider">
+                Total Esperado
+              </span>
+              <div className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center">
+                <Coins className="w-4 h-4" />
+              </div>
             </div>
-            <p className="text-xl font-bold text-slate-800">
+            <p className="text-2xl font-black text-green-700 font-mono tracking-tight">
               ${totals.totalExpected.toLocaleString("en-US", { minimumFractionDigits: 2 })}
             </p>
+            <span className="text-[10px] text-slate-400 font-medium mt-0.5 block">
+              Fondo + Ventas - Gastos
+            </span>
           </div>
         </section>
 
-        {/* 2 COLUMNAS DE DETALLE */}
+        {/* =========================================================================
+            CUERPO EN 2 COLUMNAS (DESGLOSE + ARQUEO)
+           ========================================================================= */}
         <section className="grid grid-cols-12 gap-6 items-start">
-          {/* DESGLOSE POR MÉTODO */}
-          <div className="col-span-5 space-y-3">
-            <h2 className="text-sm font-bold text-slate-800 mb-4">Desglose de Ingresos</h2>
-
-            <div className="bg-white border border-slate-200 rounded-xl p-4 flex items-center justify-between shadow-xs">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center">
-                  <Banknote className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="text-xs font-bold text-slate-800 leading-tight">Efectivo</p>
-                  <p className="text-[11px] text-slate-400">Ingreso a gaveta física</p>
-                </div>
-              </div>
-              <span className="text-base font-bold text-slate-800">
-                ${totals.cashSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-              </span>
+          {/* COLUMNA IZQUIERDA: Desglose por Método de Pago */}
+          <div className="col-span-12 lg:col-span-5 space-y-4">
+            <div className="flex items-center justify-between px-1">
+              <h2 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                Desglose de Ingresos
+              </h2>
+              <span className="text-[11px] text-slate-400 font-medium">Auditoría por canal</span>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-xl p-4 flex items-center justify-between shadow-xs">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center">
-                  <CreditCard className="w-5 h-5" />
+            <div className="space-y-3">
+              {/* Efectivo */}
+              <div className="bg-white border border-emerald-400 rounded-2xl p-4 flex items-center justify-between shadow-xs hover:border-slate-300 transition-all">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                    <Banknote className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-800 leading-tight">Efectivo</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Ingreso a gaveta física</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs font-bold text-slate-800 leading-tight">Tarjeta</p>
-                  <p className="text-[11px] text-slate-400">Comprobantes de terminal</p>
-                </div>
+                <span className="text-base font-extrabold text-slate-900 font-mono">
+                  ${totals.cashSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                </span>
               </div>
-              <span className="text-base font-bold text-slate-800">
-                ${totals.cardSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-              </span>
+
+              {/* Tarjeta */}
+              <div className="bg-white border border-sky-400 rounded-2xl p-4 flex items-center justify-between shadow-xs hover:border-slate-300 transition-all">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
+                    <CreditCard className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-800 leading-tight">Tarjeta</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Vouchers de POS</p>
+                  </div>
+                </div>
+                <span className="text-base font-extrabold text-slate-900 font-mono">
+                  ${totals.cardSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                </span>
+              </div>
+
+              {/* Transferencia */}
+              <div className="bg-white border border-purple-400 rounded-2xl p-4 flex items-center justify-between shadow-xs hover:border-slate-300 transition-all">
+                <div className="flex items-center gap-3.5">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                    <Building2 className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-slate-800 leading-tight">Transferencia</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">Acreditación bancaria</p>
+                  </div>
+                </div>
+                <span className="text-base font-extrabold text-slate-900 font-mono">
+                  ${totals.transferSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                </span>
+              </div>
             </div>
 
-            <div className="bg-white border border-slate-200 rounded-xl p-4 flex items-center justify-between shadow-xs">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center">
-                  <Building2 className="w-5 h-5" />
+            {/* Listado de Gastos del Turno */}
+            {expensesList.length > 0 && (
+              <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
+                    Egresos Registrados ({expensesList.length})
+                  </span>
+                  <span className="text-[10px] font-bold text-rose-500 font-mono">
+                    -${totals.expenses.toFixed(2)}
+                  </span>
                 </div>
-                <div>
-                  <p className="text-xs font-bold text-slate-800 leading-tight">Transferencia</p>
-                  <p className="text-[11px] text-slate-400">Acreditaciones bancarias</p>
+                <div className="divide-y divide-slate-100 max-h-32 overflow-y-auto pr-1">
+                  {expensesList.map((exp, idx) => (
+                    <div key={idx} className="py-2 flex items-center justify-between text-xs">
+                      <div>
+                        <p className="font-bold text-slate-800 truncate max-w-[190px]">
+                          {exp.concept}
+                        </p>
+                        <p className="text-[10px] text-slate-400">{exp.category}</p>
+                      </div>
+                      <span className="font-extrabold text-rose-500 font-mono">
+                        -${Number(exp.amount).toFixed(2)}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               </div>
-              <span className="text-base font-bold text-slate-800">
-                ${totals.transferSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-              </span>
-            </div>
+            )}
           </div>
 
-          {/* ARQUEO Y AUDITORÍA */}
-          <div className="col-span-7 bg-white border border-slate-200 rounded-xl p-6 shadow-xs space-y-5">
-            <div className="flex items-center justify-between">
+          {/* COLUMNA DERECHA: Consola de Arqueo y Auditoría */}
+          <div className="col-span-12 lg:col-span-7 bg-white border border-blue-300 rounded-2xl p-6 shadow-xs space-y-5">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
-                <h2 className="text-sm font-bold text-slate-800">
+                <h2 className="text-sm font-black text-slate-900 tracking-tight">
                   {isAdmin ? "Auditoría de Arqueo (Corte Z)" : "Arqueo de Caja (Efectivo)"}
                 </h2>
                 <p className="text-[11px] text-slate-400 mt-0.5">
                   {isAdmin
-                    ? "Fiscalización de valores reportados y resolución contable"
+                    ? "Fiscalización de valores reportados y dictamen contable"
                     : "Ingrese el conteo físico de billetes y monedas en gaveta"}
                 </p>
               </div>
 
               {isAdmin && !totals.isBalanced && (
                 <span
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold ${
+                  className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold ${
                     isAudited
                       ? "bg-sky-50 text-sky-700 border border-sky-200"
                       : "bg-rose-50 text-rose-700 border border-rose-200 animate-pulse"
@@ -720,13 +828,14 @@ export default function CajaPage() {
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            {/* Inputs de Conteo y Esperado */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-[11px] font-semibold text-slate-600 mb-1.5">
+                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-tight mb-1.5">
                   Efectivo Contado
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-medium">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-bold font-mono">
                     $
                   </span>
                   <input
@@ -743,9 +852,9 @@ export default function CajaPage() {
                     }
                     onChange={(e) => setCountedCash(Math.max(0, parseFloat(e.target.value) || 0))}
                     placeholder="0.00"
-                    className={`w-full pl-7 pr-3 py-2 border border-slate-200 rounded-lg text-xs font-semibold focus:outline-none transition-colors ${
+                    className={`w-full pl-8 pr-3 h-11 border border-slate-200 rounded-xl text-sm font-bold font-mono focus:outline-none transition-colors ${
                       isShiftOpen && !isAdmin
-                        ? "bg-slate-50 text-slate-800 focus:border-sky-400"
+                        ? "bg-slate-50 text-slate-900 focus:bg-white focus:border-sky-500"
                         : "bg-slate-100 text-slate-500 cursor-not-allowed"
                     }`}
                   />
@@ -753,11 +862,11 @@ export default function CajaPage() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-semibold text-slate-500 mb-1.5 leading-tight">
-                  Efectivo Esperado
+                <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-tight mb-1.5">
+                  Efectivo Esperado en Gaveta
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-medium">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-bold font-mono">
                     $
                   </span>
                   <input
@@ -765,20 +874,22 @@ export default function CajaPage() {
                     readOnly
                     disabled
                     value={totals.expectedCash.toFixed(2)}
-                    className="w-full pl-7 pr-3 py-2 bg-slate-100/70 border border-slate-200 rounded-lg text-xs font-semibold text-slate-500 cursor-not-allowed select-none"
+                    className="w-full pl-8 pr-3 h-11 bg-slate-100/80 border border-slate-200 rounded-xl text-sm font-bold font-mono text-slate-600 cursor-not-allowed select-none"
                   />
                 </div>
               </div>
             </div>
 
-            {/* CUADRO DE DIFERENCIA */}
+            {/* Cuadro de Conciliación / Diferencia */}
             <div
               className={`p-4 rounded-xl border flex items-center justify-between transition-colors ${
                 totals.isBalanced
-                  ? "bg-emerald-50/80 border-emerald-300 text-emerald-800"
+                  ? "bg-emerald-50/70 border-emerald-300 text-emerald-900"
                   : isAudited
-                  ? "bg-sky-50 border-sky-300 text-sky-800"
-                  : "bg-rose-50 border-rose-300 text-rose-800"
+                  ? "bg-sky-50/70 border-sky-300 text-sky-900"
+                  : totals.isSurplus
+                  ? "bg-blue-50/70 border-blue-300 text-blue-900"
+                  : "bg-rose-50/70 border-rose-300 text-rose-900"
               }`}
             >
               <div className="flex items-center gap-3">
@@ -787,7 +898,7 @@ export default function CajaPage() {
                 ) : isAudited ? (
                   <ShieldCheck className="w-5 h-5 text-sky-600 shrink-0" />
                 ) : (
-                  <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0" />
+                  <AlertTriangle className={`w-5 h-5 shrink-0 ${totals.isSurplus ? "text-blue-600" : "text-rose-600"}`} />
                 )}
                 <div>
                   <p className="text-xs font-bold leading-tight">
@@ -796,7 +907,7 @@ export default function CajaPage() {
                       : isAudited
                       ? "Descuadre Auditado y Resuelto"
                       : totals.isSurplus
-                      ? "Diferencia: Sobrante en Efectivo"
+                      ? "Diferencia: Sobrante de Efectivo"
                       : "Diferencia: Faltante de Efectivo"}
                   </p>
                   <p className="text-[11px] opacity-80 mt-0.5">
@@ -805,12 +916,12 @@ export default function CajaPage() {
                       : isAudited
                       ? `Discrepancia conciliada bajo el dictamen [${resolutionType}].`
                       : totals.isSurplus
-                      ? "Hay más dinero en la gaveta de lo registrado en sistema."
-                      : "El efectivo físico es menor al balance exigido."}
+                      ? "Hay más dinero físico en gaveta del registrado en sistema."
+                      : "El efectivo físico es menor al balance contable exigido."}
                   </p>
                 </div>
               </div>
-              <span className="text-lg font-extrabold tracking-tight tabular-nums">
+              <span className="text-lg font-black font-mono tracking-tight">
                 {totals.isBalanced
                   ? "$0.00"
                   : totals.isSurplus
@@ -819,14 +930,14 @@ export default function CajaPage() {
               </span>
             </div>
 
-            {/* JUSTIFICACIÓN POR DESCUADRE */}
-            {(!totals.isBalanced || (isAdmin && !totals.isBalanced)) && (
+            {/* Justificación obligatoria por descuadre */}
+            {(totals.isShortage || (isAdmin && !totals.isBalanced)) && (
               <div className="space-y-1.5 animate-in fade-in duration-200">
-                <label className="block text-[11px] font-bold text-slate-600 uppercase">
+                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-tight">
                   Justificación / Motivo del Descuadre
                   {!isAdmin && (
                     <span className="text-rose-600 ml-1 font-semibold normal-case">
-                      *(Obligatorio por descuadre en caja)
+                      *(Obligatorio para cerrar turno)
                     </span>
                   )}
                 </label>
@@ -843,22 +954,18 @@ export default function CajaPage() {
                     disabled={!isShiftOpen}
                     value={cashierNotes}
                     onChange={(e) => setCashierNotes(e.target.value)}
-                    placeholder={
-                      totals.isSurplus
-                        ? "Explique la causa del sobrante (ej. propinas, redondeo, cobro pendiente)..."
-                        : "Explique detalladamente la causa del faltante de efectivo..."
-                    }
-                    className={`w-full p-2.5 border rounded-xl text-xs focus:outline-none transition-colors ${
+                    placeholder="Explique detalladamente la causa del faltante de efectivo..."
+                    className={`w-full p-3 border rounded-xl text-xs focus:outline-none transition-colors ${
                       !cashierNotes.trim()
-                        ? "border-rose-300 bg-rose-50/30 placeholder-rose-400 focus:border-rose-500"
-                        : "border-slate-200 bg-slate-50 text-slate-800 focus:border-sky-400"
+                        ? "border-rose-300 bg-rose-50/25 placeholder-rose-300 focus:border-rose-500"
+                        : "border-slate-200 bg-slate-50 text-slate-800 focus:border-sky-500 focus:bg-white"
                     } ${!isShiftOpen ? "bg-slate-100 cursor-not-allowed" : ""}`}
                   />
                 )}
               </div>
             )}
 
-            {/* ACCIONES */}
+            {/* Acciones del Administrador */}
             {isAdmin ? (
               <div className="pt-3 border-t border-slate-100 space-y-4">
                 <div className="flex items-center justify-between">
@@ -868,19 +975,10 @@ export default function CajaPage() {
                       onClick={() =>
                         downloadCorteZPDF(`Corte-Z-${selectedBranch}-${selectedDate}.pdf`)
                       }
-                      className="flex items-center gap-1.5 px-3 py-2 border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
+                      className="flex items-center gap-1.5 px-3 py-2 border border-emerald-200 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl transition-colors cursor-pointer shadow-2xs"
                     >
-                      <FileText className="w-3.5 h-3.5 text-slate-400" />
+                      <FileText className="w-3.5 h-3.5 text-emerald-600" />
                       <span>Descargar Corte Z</span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => setIsTicketAuditOpen(true)}
-                      className="flex items-center gap-1.5 px-3 py-2 border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg transition-colors cursor-pointer"
-                    >
-                      <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
-                      <span>Auditar Tickets</span>
                     </button>
                   </div>
 
@@ -896,7 +994,7 @@ export default function CajaPage() {
                           <span>Aprobar y Resolver Alerta</span>
                         </button>
                       ) : (
-                        <span className="text-[11px] font-bold text-sky-700 bg-sky-50 border border-sky-200 px-3 py-1.5 rounded-lg flex items-center gap-1.5">
+                        <span className="text-[11px] font-bold text-sky-700 bg-sky-50 border border-sky-200 px-3 py-1.5 rounded-xl flex items-center gap-1.5">
                           <CheckCircle2 className="w-4 h-4 text-sky-600" /> Resuelto por {user?.name || "Administrador"}
                         </span>
                       )}
@@ -905,15 +1003,15 @@ export default function CajaPage() {
                 </div>
 
                 {!totals.isBalanced && !isAudited && (
-                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                  <div className="p-3.5 bg-purple-50/50 border border-purple-200 rounded-xl space-y-2.5">
                     <div className="flex items-center justify-between">
-                      <span className="text-[11px] font-bold text-slate-700">
+                      <span className="text-[11px] font-bold text-purple-900 uppercase tracking-tight">
                         Dictamen Contable:
                       </span>
                       <select
                         value={resolutionType}
                         onChange={(e) => setResolutionType(e.target.value as ResolutionType)}
-                        className="text-xs font-semibold bg-white border border-slate-200 rounded-md px-2 py-1 focus:outline-none"
+                        className="text-xs font-bold bg-white border border-purple-200 rounded-lg px-2.5 py-1 text-slate-800 focus:outline-none cursor-pointer"
                       >
                         <option value="MERMA_ACEPTADA">Ajuste Aceptado (Merma)</option>
                         <option value="COBRO_EMPLEADO">Cobro a Cajero / Nómina</option>
@@ -925,35 +1023,32 @@ export default function CajaPage() {
                       value={adminNotes}
                       onChange={(e) => setAdminNotes(e.target.value)}
                       placeholder="Escriba la justificación contable de la resolución..."
-                      className="w-full text-xs p-2 bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-sky-400"
+                      className="w-full text-xs p-2.5 bg-white border border-purple-200 rounded-lg focus:outline-none focus:border-purple-400 placeholder-purple-300"
                     />
                   </div>
                 )}
               </div>
             ) : (
-              <div className="pt-3 space-y-3">
-                <div className="flex items-center justify-end gap-3">
-                  <button
-                    type="button"
-                    disabled={!isShiftOpen}
-                    onClick={() => setIsExpenseModalOpen(true)}
-                    className="px-4 py-2 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-lg shadow-xs transition-colors cursor-pointer disabled:opacity-50"
-                  >
-                    Registrar Gasto Menor
-                  </button>
-                </div>
+              /* Acciones del Cajero */
+              <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-3">
+                <button
+                  type="button"
+                  disabled={!isShiftOpen}
+                  onClick={() => setIsExpenseModalOpen(true)}
+                  className="px-4 py-2.5 border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl shadow-2xs transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  Registrar Gasto Menor
+                </button>
 
                 {isShiftOpen && (
-                  <div className="flex justify-end">
-                    <button
-                      type="button"
-                      onClick={handleCloseShift}
-                      className="flex items-center gap-2 bg-[#B91C1C] hover:bg-red-800 text-white text-xs font-semibold px-5 py-2.5 rounded-lg shadow-xs transition-colors cursor-pointer"
-                    >
-                      <Lock className="w-3.5 h-3.5" />
-                      <span>Cerrar Turno Diario (Corte Z)</span>
-                    </button>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={handleCloseShift}
+                    className="flex items-center gap-2 bg-[#B91C1C] hover:bg-red-800 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-xs transition-colors cursor-pointer"
+                  >
+                    <Lock className="w-3.5 h-3.5" />
+                    <span>Cerrar Turno (Corte Z)</span>
+                  </button>
                 )}
               </div>
             )}
@@ -961,7 +1056,9 @@ export default function CajaPage() {
         </section>
       </main>
 
-      {/* MODALES OPERATIVOS */}
+      {/* =========================================================================
+          MODALES OPERATIVOS (PRESERVADOS INTACTOS)
+         ========================================================================= */}
       <ExpenseModal
         isOpen={isExpenseModalOpen}
         onClose={() => setIsExpenseModalOpen(false)}
@@ -976,7 +1073,7 @@ export default function CajaPage() {
       <AuditTicketsModal
         isOpen={isTicketAuditOpen}
         onClose={() => setIsTicketAuditOpen(false)}
-        branchName={selectedBranch}
+        branchName={effectiveBranch}
         selectedDate={selectedDate}
         selectedShift="Jornada Completa"
       />
@@ -1004,8 +1101,8 @@ export default function CajaPage() {
 
       <CorteZPDFTemplate
         data={{
-          folio: `Z-${selectedBranch.substring(0, 2).toUpperCase()}-${selectedDate.replace(/-/g, "")}`,
-          branch: selectedBranch,
+          folio: `Z-${effectiveBranch.substring(0, 2).toUpperCase()}-${selectedDate.replace(/-/g, "")}`,
+          branch: effectiveBranch,
           date: selectedDate,
           cashier: isAdmin ? salesMetrics.operatorName : activeOperatorName,
           adminName: user?.name || "Mario Administrador",

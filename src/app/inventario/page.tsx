@@ -381,8 +381,8 @@ export default function InventoryPage() {
               >
                 <option value="All">Todas las categorías</option>
                 <option value="Resinas">Resinas</option>
-                <option value="Endo">Endo</option>
-                <option value="Orto">Orto</option>
+                <option value="Endo">Endodoncia</option>
+                <option value="Orto">Ortodoncia</option>
                 <option value="Instrumentos">Instrumentos</option>
                 <option value="Desechables">Productos Desechables</option>
               </select>
@@ -470,7 +470,7 @@ export default function InventoryPage() {
         )}
 
         {/* TABLA DE INVENTARIO */}
-        <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
+        <div className="bg-white border border-sky-200 rounded-2xl overflow-hidden shadow-xs">
           {isLoading ? (
             <div className="py-20 flex flex-col items-center justify-center text-slate-400 gap-2.5">
               <Loader2 className="w-7 h-7 animate-spin text-sky-600" />
@@ -479,7 +479,7 @@ export default function InventoryPage() {
           ) : (
             <table className="w-full text-left text-xs border-collapse">
               <thead>
-                <tr className="border-b border-slate-100 text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-50/50">
+                <tr className="border-b border-slate-100 text-[12px] font-bold uppercase tracking-wider text-sky-600 bg-slate-50/50">
                   <th className="py-3.5 px-6">SKU / Barcode</th>
                   <th className="py-3.5 px-4">Producto / Marca</th>
                   <th className="py-3.5 px-4">Descripción</th>

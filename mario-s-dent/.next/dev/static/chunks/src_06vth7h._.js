@@ -382,7 +382,7 @@ function InventoryPage() {
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
                                                         value: "Endo",
-                                                        children: "Endo"
+                                                        children: "Endodoncia"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
                                                         lineNumber: 384,
@@ -390,7 +390,7 @@ function InventoryPage() {
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
                                                         value: "Orto",
-                                                        children: "Orto"
+                                                        children: "Ortodoncia"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
                                                         lineNumber: 385,
@@ -682,7 +682,7 @@ function InventoryPage() {
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                        className: "bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs",
+                        className: "bg-white border border-sky-200 rounded-2xl overflow-hidden shadow-xs",
                         children: [
                             isLoading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "py-20 flex flex-col items-center justify-center text-slate-400 gap-2.5",
@@ -712,7 +712,7 @@ function InventoryPage() {
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("thead", {
                                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
-                                            className: "border-b border-slate-100 text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-50/50",
+                                            className: "border-b border-slate-100 text-[12px] font-bold uppercase tracking-wider text-sky-600 bg-slate-50/50",
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
                                                     className: "py-3.5 px-6",
@@ -1325,12 +1325,20 @@ __turbopack_context__.s([
     ()=>createProductInDB,
     "deleteProductFromDB",
     ()=>deleteProductFromDB,
+    "fetchBranchesPerformance",
+    ()=>fetchBranchesPerformance,
+    "fetchDashboardSalesMetrics",
+    ()=>fetchDashboardSalesMetrics,
+    "fetchDashboardStockAlerts",
+    ()=>fetchDashboardStockAlerts,
     "fetchProductKardex",
     ()=>fetchProductKardex,
     "fetchTicketsByBranchAndDate",
     ()=>fetchTicketsByBranchAndDate,
     "processSaleInDB",
     ()=>processSaleInDB,
+    "searchDashboardInventory",
+    ()=>searchDashboardInventory,
     "transferProductStockInDB",
     ()=>transferProductStockInDB,
     "updateProductInDB",
@@ -1605,19 +1613,16 @@ async function processSaleInDB(payload) {
     if (!items || items.length === 0) {
         throw new Error("El carrito no tiene productos.");
     }
-    // 1. Asegurar el ID del cajero en sesión activa
     let effectiveCashierId = cashierId || null;
     if (!effectiveCashierId) {
         const { data: authData } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].auth.getUser();
         effectiveCashierId = authData.user?.id || null;
     }
-    // 2. Obtener la sucursal actual
     const cleanBranch = (branchName || "").trim();
     const { data: branch, error: branchErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id, name").ilike("name", cleanBranch).maybeSingle();
     if (branchErr || !branch) {
         throw new Error(`No se encontró la sucursal: "${cleanBranch}"`);
     }
-    // 3. Obtener el turno abierto de la sucursal
     const { data: activeShift, error: shiftErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").select("id, cashier_id").eq("branch_id", branch.id).eq("status", "open").order("opened_at", {
         ascending: false
     }).limit(1).maybeSingle();
@@ -1627,7 +1632,6 @@ async function processSaleInDB(payload) {
     const finalCashierId = effectiveCashierId || activeShift.cashier_id;
     const branchPrefix = branch.name.substring(0, 2).toUpperCase();
     const ticketNumber = `T-${branchPrefix}-${Math.floor(1000 + Math.random() * 9000)}`;
-    // 4. Inserción en la tabla 'sales'
     const { data: saleData, error: saleErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sales").insert([
         {
             ticket_number: ticketNumber,
@@ -1647,7 +1651,6 @@ async function processSaleInDB(payload) {
         throw new Error(`Error al guardar en tabla 'sales': ${saleErr?.message}`);
     }
     const saleId = saleData.id;
-    // 5. Partidas, descuento de stock y Kardex
     for (const item of items){
         await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sale_items").insert([
             {
@@ -1741,6 +1744,266 @@ async function fetchTicketsByBranchAndDate(branchName, dateStr) {
                     unitPrice: Number(it.unit_price) || 0
                 };
             })
+        };
+    });
+}
+async function searchDashboardInventory(query, branchKey = "all") {
+    const cleanQuery = query.trim();
+    if (!cleanQuery) return [];
+    let targetBranchId = null;
+    if (branchKey !== "all") {
+        let branchNamePattern = "";
+        if (branchKey === "santa-ana") branchNamePattern = "Santa Ana";
+        if (branchKey === "ahuachapan") branchNamePattern = "Ahuachapán";
+        if (branchKey === "sonsonate") branchNamePattern = "Sonsonate";
+        const { data: bData } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id").ilike("name", `%${branchNamePattern}%`).maybeSingle();
+        targetBranchId = bData?.id ?? null;
+    }
+    const { data, error } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("products").select(`
+      id,
+      sku,
+      barcode,
+      name,
+      brand,
+      category,
+      price,
+      branch_inventory (
+        stock,
+        branch_id,
+        branches (
+          id,
+          name
+        )
+      )
+    `).or(`name.ilike.%${cleanQuery}%,sku.ilike.%${cleanQuery}%,barcode.ilike.%${cleanQuery}%`).limit(10);
+    if (error) {
+        console.error("Error al buscar productos en Dashboard:", error.message);
+        return [];
+    }
+    const queryRows = data ?? [];
+    const results = [];
+    queryRows.forEach((prod)=>{
+        const invList = prod.branch_inventory ?? [];
+        if (targetBranchId) {
+            const branchInv = invList.find((bi)=>bi.branch_id === targetBranchId);
+            results.push({
+                id: prod.id,
+                sku: prod.sku,
+                barcode: prod.barcode,
+                name: prod.name,
+                brand: prod.brand,
+                category: prod.category,
+                price: Number(prod.price) || 0,
+                stock: branchInv?.stock ?? 0,
+                branchName: branchInv?.branches?.name ?? "Sede seleccionada"
+            });
+        } else {
+            const totalStock = invList.reduce((acc, curr)=>acc + (Number(curr.stock) || 0), 0);
+            results.push({
+                id: prod.id,
+                sku: prod.sku,
+                barcode: prod.barcode,
+                name: prod.name,
+                brand: prod.brand,
+                category: prod.category,
+                price: Number(prod.price) || 0,
+                stock: totalStock,
+                branchName: "Todas las sedes (Red)"
+            });
+        }
+    });
+    return results;
+}
+async function fetchDashboardStockAlerts(branchKey = "all") {
+    let targetBranchId = null;
+    if (branchKey !== "all") {
+        let branchPattern = "";
+        if (branchKey === "santa-ana") branchPattern = "Santa Ana";
+        if (branchKey === "ahuachapan") branchPattern = "Ahuachapán";
+        if (branchKey === "sonsonate") branchPattern = "Sonsonate";
+        const { data: bData } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id").ilike("name", `%${branchPattern}%`).maybeSingle();
+        if (bData) targetBranchId = bData.id;
+    }
+    let query = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").select(`
+      id,
+      stock,
+      branch_id,
+      branches (
+        id,
+        name
+      ),
+      products (
+        id,
+        name,
+        brand
+      )
+    `).lte("stock", 5).order("stock", {
+        ascending: true
+    });
+    if (targetBranchId) {
+        query = query.eq("branch_id", targetBranchId);
+    }
+    const { data, error } = await query;
+    if (error || !data) {
+        console.error("Error al consultar alertas de stock:", error?.message);
+        return {
+            lowStockItems: [],
+            outOfStockItems: []
+        };
+    }
+    const queryRows = data ?? [];
+    const lowStockItems = [];
+    const outOfStockItems = [];
+    queryRows.forEach((row)=>{
+        const prod = Array.isArray(row.products) ? row.products[0] : row.products;
+        const branch = Array.isArray(row.branches) ? row.branches[0] : row.branches;
+        const currentStock = Number(row.stock) || 0;
+        if (!prod) return;
+        const alertItem = {
+            id: `${row.id}-${prod.id}`,
+            name: prod.name || "Insumo Dental",
+            brand: prod.brand || "Genérico",
+            branch: branch?.name || "Sede",
+            stock: currentStock
+        };
+        if (currentStock === 0) {
+            outOfStockItems.push(alertItem);
+        } else if (currentStock > 0 && currentStock <= 5) {
+            lowStockItems.push(alertItem);
+        }
+    });
+    return {
+        lowStockItems,
+        outOfStockItems
+    };
+}
+async function fetchDashboardSalesMetrics(dateStr, branchKey = "all") {
+    const defaultMetrics = {
+        totalIncome: 0,
+        totalTickets: 0,
+        estimatedProfit: 0,
+        trend: "+0.0%",
+        paymentMethods: {
+            card: 0,
+            transfer: 0,
+            cash: 0
+        },
+        breakdownAmounts: {
+            card: 0,
+            transfer: 0,
+            cash: 0
+        }
+    };
+    // 1. Rango del día completo en UTC
+    const startOfDay = `${dateStr}T00:00:00.000Z`;
+    const endOfDay = `${dateStr}T23:59:59.999Z`;
+    // 2. Resolver el ID de la sucursal si no es consolidado
+    let targetBranchId = null;
+    if (branchKey !== "all") {
+        let branchNamePattern = "";
+        if (branchKey === "santa-ana") branchNamePattern = "Santa Ana";
+        if (branchKey === "ahuachapan") branchNamePattern = "Ahuachapán";
+        if (branchKey === "sonsonate") branchNamePattern = "Sonsonate";
+        const { data: branchData } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id").ilike("name", `%${branchNamePattern}%`).maybeSingle();
+        if (!branchData) return defaultMetrics;
+        targetBranchId = branchData.id;
+    }
+    // 3. Consultar las ventas de la fecha
+    let query = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sales").select("id, total, subtotal, payment_method, branch_id").gte("created_at", startOfDay).lte("created_at", endOfDay);
+    if (targetBranchId) {
+        query = query.eq("branch_id", targetBranchId);
+    }
+    const { data: sales, error } = await query;
+    if (error || !sales || sales.length === 0) {
+        return defaultMetrics;
+    }
+    let totalIncome = 0;
+    let cardAmount = 0;
+    let transferAmount = 0;
+    let cashAmount = 0;
+    sales.forEach((sale)=>{
+        const amt = Number(sale.total) || 0;
+        totalIncome += amt;
+        if (sale.payment_method === "card") cardAmount += amt;
+        else if (sale.payment_method === "transfer") transferAmount += amt;
+        else if (sale.payment_method === "cash") cashAmount += amt;
+    });
+    // Cálculo porcentual para el donut SVG
+    const cardPercent = totalIncome > 0 ? Math.round(cardAmount / totalIncome * 100) : 0;
+    const transferPercent = totalIncome > 0 ? Math.round(transferAmount / totalIncome * 100) : 0;
+    const cashPercent = totalIncome > 0 ? Math.max(0, 100 - (cardPercent + transferPercent)) : 0;
+    // Margen bruto estimado sobre costo medio comercial (aprox 35% del subtotal)
+    const estimatedProfit = Number((totalIncome * 0.35).toFixed(2));
+    return {
+        totalIncome,
+        totalTickets: sales.length,
+        estimatedProfit,
+        trend: totalIncome > 0 ? "+100%" : "+0.0%",
+        paymentMethods: {
+            card: cardPercent,
+            transfer: transferPercent,
+            cash: cashPercent
+        },
+        breakdownAmounts: {
+            card: cardAmount,
+            transfer: transferAmount,
+            cash: cashAmount
+        }
+    };
+}
+async function fetchBranchesPerformance(dateStr) {
+    const startOfDay = `${dateStr}T00:00:00.000Z`;
+    const endOfDay = `${dateStr}T23:59:59.999Z`;
+    // 1. Obtener el listado maestro de sucursales
+    const { data: branches, error: branchErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id, name").order("name", {
+        ascending: true
+    });
+    if (branchErr || !branches) {
+        console.error("Error al obtener sucursales:", branchErr?.message);
+        return [];
+    }
+    // 2. Consultar las ventas de la fecha
+    const { data: sales, error: salesErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sales").select("branch_id, total").gte("created_at", startOfDay).lte("created_at", endOfDay);
+    if (salesErr) {
+        console.error("Error al obtener ventas por sede:", salesErr.message);
+    }
+    const salesList = sales || [];
+    let grandTotal = 0;
+    // 3. Acumular tickets e ingresos por branch_id
+    const branchMap = new Map();
+    branches.forEach((b)=>{
+        branchMap.set(b.id, {
+            tickets: 0,
+            income: 0
+        });
+    });
+    salesList.forEach((s)=>{
+        const amt = Number(s.total) || 0;
+        grandTotal += amt;
+        const current = branchMap.get(s.branch_id);
+        if (current) {
+            current.tickets += 1;
+            current.income += amt;
+        }
+    });
+    // 4. Formatear y calcular el porcentaje relativo de la barra
+    return branches.map((b)=>{
+        const stats = branchMap.get(b.id) || {
+            tickets: 0,
+            income: 0
+        };
+        const pct = grandTotal > 0 ? Math.round(stats.income / grandTotal * 100) : 0;
+        // Mapeo de key legible para selección en la interfaz
+        let key = "santa-ana";
+        const lower = b.name.toLowerCase();
+        if (lower.includes("ahuachap")) key = "ahuachapan";
+        if (lower.includes("sonso")) key = "sonsonate";
+        return {
+            id: key,
+            name: b.name.includes("Santa Ana") ? "Santa Ana (Matriz)" : b.name,
+            ticketsCount: stats.tickets,
+            totalIncome: stats.income,
+            percentage: pct
         };
     });
 }
