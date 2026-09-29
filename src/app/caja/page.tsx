@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useCallback, useEffect } from "react";
+import React, { useState, useMemo, useCallback, useEffect, useRef } from "react";
 import Navbar from "@/components/Navbar";
 import {
   openCashShiftInDB,
@@ -12,6 +12,7 @@ import {
   getAdminShiftAudit,
   resolveShiftAuditInDB,
 } from "@/app/services/cashService";
+import { useSearchParams } from "next/navigation";
 import ConfirmarModal, { DialogType } from "@/components/ConfirmarModal";
 import ExpenseModal, { ExpenseRecord } from "@/components/GastoMenorModal";
 import CorteZPDFTemplate, { downloadCorteZPDF } from "@/components/CortePDF";
@@ -27,16 +28,18 @@ import {
   Receipt,
   PlusCircle,
   Store,
-  Calendar,
+  Calendar as CalendarIcon,
   FileText,
-  ExternalLink,
   CheckCircle2,
   AlertTriangle,
   ShieldCheck,
   TrendingDown,
   Coins,
-  Plus,
-  ArrowRight,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Check,
+  Building,
 } from "lucide-react";
 
 export type ResolutionType = "MERMA_ACEPTADA" | "COBRO_EMPLEADO" | "CORRECCION_POS";
@@ -56,7 +59,11 @@ interface FinancialSummary {
   isBalanced: boolean;
 }
 
-const BILL_DENOMINATIONS = [100, 50, 20, 10, 5, 1];
+const BRANCH_LIST: { name: BranchName; state: string }[] = [
+  { name: "Santa Ana", state: "Matriz Principal" },
+  { name: "Ahuachapán", state: "Sucursal Occidente" },
+  { name: "Sonsonate", state: "Sucursal Occidente" },
+];
 
 export default function CajaPage() {
   const {
@@ -68,6 +75,10 @@ export default function CajaPage() {
     auditStatus,
     resolveAudit,
   } = useShift();
+
+  const searchParams = useSearchParams();
+  const paramBranch = searchParams.get("branch");
+  const paramDate = searchParams.get("date");
 
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
@@ -103,6 +114,12 @@ export default function CajaPage() {
   const [isTicketAuditOpen, setIsTicketAuditOpen] = useState(false);
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
 
+  // Estados de control para dropdowns personalizados
+  const [isBranchOpen, setIsBranchOpen] = useState(false);
+  const [isDateOpen, setIsDateOpen] = useState(false);
+  const branchRef = useRef<HTMLDivElement>(null);
+  const dateRef = useRef<HTMLDivElement>(null);
+
   // Diálogo común
   const [dialogConfig, setDialogConfig] = useState<{
     isOpen: boolean;
@@ -121,14 +138,16 @@ export default function CajaPage() {
     onConfirm: () => {},
   });
 
-  // Sucursales
+  // Sucursales y Fecha inicializadas con URL o fallback
   const [selectedBranch, setSelectedBranch] = useState<BranchName>(() => {
+    if (paramBranch) return paramBranch as BranchName;
     return (user?.branch as BranchName) || "Santa Ana";
   });
 
   const effectiveBranch = !isAdmin && user?.branch ? (user.branch as BranchName) : selectedBranch;
 
-  const [selectedDate, setSelectedDate] = useState(() => {
+  const [selectedDate, setSelectedDate] = useState<string>(() => {
+    if (paramDate) return paramDate;
     return new Intl.DateTimeFormat("en-CA", {
       timeZone: "America/El_Salvador",
       year: "numeric",
@@ -136,6 +155,65 @@ export default function CajaPage() {
       day: "2-digit",
     }).format(new Date());
   });
+
+  // Cierre de menús al hacer click fuera
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (branchRef.current && !branchRef.current.contains(e.target as Node)) {
+        setIsBranchOpen(false);
+      }
+      if (dateRef.current && !dateRef.current.contains(e.target as Node)) {
+        setIsDateOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  // Lógica del Calendario
+  const [viewMonth, setViewMonth] = useState(() => {
+    const d = new Date(selectedDate ? `${selectedDate}T12:00:00` : new Date());
+    return isNaN(d.getTime()) ? new Date() : d;
+  });
+
+  const monthNames = [
+    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+  ];
+  const dayNames = ["DO", "LU", "MA", "MI", "JU", "VI", "SÁ"];
+
+  const calendarDays = useMemo(() => {
+    const year = viewMonth.getFullYear();
+    const month = viewMonth.getMonth();
+    const firstDayIndex = new Date(year, month, 1).getDay();
+    const totalDays = new Date(year, month + 1, 0).getDate();
+    const prevMonthTotalDays = new Date(year, month, 0).getDate();
+
+    const days: { day: number; dateStr: string; isCurrentMonth: boolean }[] = [];
+
+    for (let i = firstDayIndex - 1; i >= 0; i--) {
+      const d = prevMonthTotalDays - i;
+      const m = month === 0 ? 12 : month;
+      const y = month === 0 ? year - 1 : year;
+      const dateStr = `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+      days.push({ day: d, dateStr, isCurrentMonth: false });
+    }
+
+    for (let i = 1; i <= totalDays; i++) {
+      const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(i).padStart(2, "0")}`;
+      days.push({ day: i, dateStr, isCurrentMonth: true });
+    }
+
+    const remaining = (7 - (days.length % 7)) % 7;
+    for (let i = 1; i <= remaining; i++) {
+      const m = month + 2 > 12 ? 1 : month + 2;
+      const y = month + 2 > 12 ? year + 1 : year;
+      const dateStr = `${y}-${String(m).padStart(2, "0")}-${String(i).padStart(2, "0")}`;
+      days.push({ day: i, dateStr, isCurrentMonth: false });
+    }
+
+    return days;
+  }, [viewMonth]);
 
   // Dictamen contable (Admin)
   const [resolutionType, setResolutionType] = useState<ResolutionType>("MERMA_ACEPTADA");
@@ -300,11 +378,6 @@ export default function CajaPage() {
       isBalanced: diff === 0,
     };
   }, [expensesList, isAdmin, isShiftOpen, initialCash, salesMetrics, salesBreakdown, countedCash]);
-
-  // Denominaciones rápidas
-  const handleAddDenomination = (val: number) => {
-    setCountedCash((prev) => Number((prev + val).toFixed(2)));
-  };
 
   // Iniciar turno
   const handleOpenShiftConfirm = async (amount: number) => {
@@ -535,11 +608,11 @@ export default function CajaPage() {
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-200/60">
           <div>
             <div className="flex items-center gap-2.5">
-              <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+              <h1 className="text-2xl font-black text-sky-600 tracking-tight">
                 Control de caja
               </h1>
               {isAdmin ? (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-purple-50 text-purple-700 border border-purple-200">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-50 text-purple-700 border border-purple-200">
                   <ShieldCheck className="w-3.5 h-3.5 text-purple-600" />
                   Auditoría Administrativa
                 </span>
@@ -554,37 +627,206 @@ export default function CajaPage() {
                 </span>
               )}
             </div>
-            <p className="text-xs text-slate-400 font-medium mt-0.5">
+            <p className="text-xs text-slate-600 font-medium mt-0.5">
               Cajón de efectivo, conciliación de ventas y cierre diario (Corte Z)
             </p>
           </div>
 
           <div className="flex items-center gap-3">
             {isAdmin ? (
-              <div className="flex items-center gap-2">
-                <div className="relative flex items-center bg-white border border-slate-200 rounded-xl px-3 h-10 shadow-2xs hover:border-sky-400 transition-colors">
-                  <Store className="w-3.5 h-3.5 text-sky-600 mr-2 shrink-0" />
-                  <select
-                    value={selectedBranch}
-                    onChange={(e) => setSelectedBranch(e.target.value as BranchName)}
-                    className="text-xs font-bold text-slate-800 bg-transparent focus:outline-none cursor-pointer pr-4"
+              <div className="flex items-center gap-2.5">
+                {/* 1. SELECTOR CUSTOMIZADO DE SUCURSAL */}
+                <div className="relative" ref={branchRef}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsBranchOpen(!isBranchOpen);
+                      setIsDateOpen(false);
+                    }}
+                    className={`h-10 px-3.5 bg-white border rounded-xl flex items-center gap-2.5 transition-all cursor-pointer shadow-2xs select-none ${
+                      isBranchOpen ? "border-sky-500 ring-2 ring-sky-500/10" : "border-slate-200 hover:border-slate-300"
+                    }`}
                   >
-                    <option value="Santa Ana">Santa Ana</option>
-                    <option value="Ahuachapán">Ahuachapán</option>
-                    <option value="Sonsonate">Sonsonate</option>
-                  </select>
+                    <div className="w-6 h-6 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
+                      <Store className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="flex flex-col text-left leading-tight">
+                      <span className="text-[9px] font-extrabold text-sky-600 uppercase tracking-wider">
+                        Sede
+                      </span>
+                      <span className="text-xs font-bold text-slate-800">
+                        {selectedBranch}
+                      </span>
+                    </div>
+                    <ChevronDown
+                      className={`w-3.5 h-3.5 text-slate-400 ml-1 transition-transform duration-200 ${
+                        isBranchOpen ? "rotate-180 text-sky-600" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {isBranchOpen && (
+                    <div className="absolute left-0 mt-2 w-52 bg-white border border-slate-100 rounded-2xl shadow-xl p-1.5 z-40 animate-in fade-in zoom-in-95 duration-150">
+                      <div className="px-2.5 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 mb-1">
+                        Seleccionar Sede
+                      </div>
+                      <div className="space-y-0.5">
+                        {BRANCH_LIST.map((branch) => {
+                          const isSelected = selectedBranch === branch.name;
+                          return (
+                            <button
+                              key={branch.name}
+                              type="button"
+                              onClick={() => {
+                                setSelectedBranch(branch.name);
+                                setIsBranchOpen(false);
+                              }}
+                              className={`w-full px-2.5 py-2 rounded-xl text-left text-xs font-semibold flex items-center justify-between transition-colors cursor-pointer ${
+                                isSelected
+                                  ? "bg-sky-50 text-sky-900 font-bold"
+                                  : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                              }`}
+                            >
+                              <div className="flex items-center gap-2">
+                                <Building className={`w-3.5 h-3.5 ${isSelected ? "text-sky-600" : "text-slate-400"}`} />
+                                <div>
+                                  <p className="leading-tight">{branch.name}</p>
+                                  <span className="text-[10px] text-slate-400 font-normal">{branch.state}</span>
+                                </div>
+                              </div>
+                              {isSelected && <Check className="w-3.5 h-3.5 text-sky-600" />}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
-                <div className="flex items-center gap-2 bg-white border border-slate-200 px-3 h-10 rounded-xl shadow-2xs hover:border-sky-400 transition-colors">
-                  <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                  <input
-                    type="date"
-                    value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                    className="text-xs font-bold text-slate-700 bg-transparent focus:outline-none cursor-pointer"
-                  />
+                {/* 2. SELECTOR CUSTOMIZADO DE FECHA (UN SOLO ICONO SKY + CALENDARIO ELEGANTE) */}
+                <div className="relative" ref={dateRef}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsDateOpen(!isDateOpen);
+                      setIsBranchOpen(false);
+                    }}
+                    className={`h-10 px-3.5 bg-white border rounded-xl flex items-center gap-2.5 transition-all cursor-pointer shadow-2xs select-none ${
+                      isDateOpen ? "border-sky-500 ring-2 ring-sky-500/10" : "border-slate-200 hover:border-slate-300"
+                    }`}
+                  >
+                    <div className="w-6 h-6 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
+                      <CalendarIcon className="w-3.5 h-3.5 text-sky-600" />
+                    </div>
+
+                    <div className="flex flex-col text-left leading-tight">
+                      <span className="text-[9px] font-extrabold text-sky-600 uppercase tracking-wider">
+                        Fecha
+                      </span>
+                      <span className="text-xs font-bold text-slate-800 font-mono tracking-tight">
+                        {selectedDate}
+                      </span>
+                    </div>
+
+                    <ChevronDown
+                      className={`w-3.5 h-3.5 text-slate-400 ml-1 transition-transform duration-200 ${
+                        isDateOpen ? "rotate-180 text-sky-600" : ""
+                      }`}
+                    />
+                  </button>
+
+                  {isDateOpen && (
+                    <div className="absolute right-0 sm:left-0 mt-2 w-72 bg-white border border-slate-100 rounded-3xl shadow-2xl p-4 z-40 animate-in fade-in zoom-in-95 duration-150">
+                      <div className="flex items-center justify-between mb-3 px-1">
+                        <span className="text-xs font-extrabold text-slate-800 capitalize">
+                          {monthNames[viewMonth.getMonth()]} {viewMonth.getFullYear()}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1))
+                            }
+                            className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
+                          >
+                            <ChevronLeft className="w-4 h-4" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1))
+                            }
+                            className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
+                          >
+                            <ChevronRight className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-7 gap-1 text-center mb-1">
+                        {dayNames.map((d) => (
+                          <span key={d} className="text-[10px] font-black text-slate-400 py-1">
+                            {d}
+                          </span>
+                        ))}
+                      </div>
+
+                      <div className="grid grid-cols-7 gap-1">
+                        {calendarDays.map((item, idx) => {
+                          const isSelected = selectedDate === item.dateStr;
+                          return (
+                            <button
+                              key={idx}
+                              type="button"
+                              onClick={() => {
+                                setSelectedDate(item.dateStr);
+                                setIsDateOpen(false);
+                              }}
+                              className={`h-8 w-8 mx-auto rounded-xl text-xs font-bold flex items-center justify-center transition-all cursor-pointer ${
+                                isSelected
+                                  ? "bg-sky-600 text-white shadow-xs scale-105"
+                                  : item.isCurrentMonth
+                                  ? "text-slate-700 hover:bg-sky-50 hover:text-sky-700"
+                                  : "text-slate-300 hover:text-slate-500"
+                              }`}
+                            >
+                              {item.day}
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const today = new Intl.DateTimeFormat("en-CA", {
+                              timeZone: "America/El_Salvador",
+                              year: "numeric",
+                              month: "2-digit",
+                              day: "2-digit",
+                            }).format(new Date());
+                            setSelectedDate(today);
+                            setViewMonth(new Date());
+                            setIsDateOpen(false);
+                          }}
+                          className="text-sky-600 font-bold hover:underline cursor-pointer"
+                        >
+                          Hoy
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setIsDateOpen(false)}
+                          className="text-slate-400 hover:text-slate-600 font-medium cursor-pointer"
+                        >
+                          Cerrar
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
+                {/* 3. BOTÓN AUDITAR TICKETS */}
                 <button
                   type="button"
                   onClick={() => setIsTicketAuditOpen(true)}
@@ -596,8 +838,8 @@ export default function CajaPage() {
               </div>
             ) : (
               <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2 bg-white border border-sky-500 rounded-xl px-3 py-1.5 shadow-2xs text-xs font-medium text-slate-500">
-                  <span className="text-slate-700 font-bold capitalize">{currentDateDisplay}</span>
+                <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 py-1.5 shadow-2xs text-xs font-medium text-sky-600">
+                  <span className="text-sky-700 font-bold capitalize">{currentDateDisplay}</span>
                   <span className="text-slate-300">|</span>
                   <span>
                     Operador: <strong className="text-slate-800">{activeOperatorName}</strong>
@@ -660,7 +902,7 @@ export default function CajaPage() {
           </div>
 
           {/* Gastos Menores */}
-          <div className="bg-white border border-red-300 border-l-4 border-l-red-500  rounded-2xl p-4 shadow-xs hover:border-slate-300 transition-all">
+          <div className="bg-white border border-red-300 border-l-4 border-l-red-500 rounded-2xl p-4 shadow-xs hover:border-slate-300 transition-all">
             <div className="flex items-center justify-between mb-2">
               <span className="text-black-700 text-[15px] font-bold uppercase tracking-wider">
                 Gastos Menores
@@ -705,10 +947,9 @@ export default function CajaPage() {
           {/* COLUMNA IZQUIERDA: Desglose por Método de Pago */}
           <div className="col-span-12 lg:col-span-5 space-y-4">
             <div className="flex items-center justify-between px-1">
-              <h2 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+              <h2 className="text-xs font-black text-sky-600 uppercase tracking-wider">
                 Desglose de Ingresos
               </h2>
-              <span className="text-[11px] text-slate-400 font-medium">Auditoría por canal</span>
             </div>
 
             <div className="space-y-3">
@@ -719,11 +960,10 @@ export default function CajaPage() {
                     <Banknote className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-slate-800 leading-tight">Efectivo</p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Ingreso a gaveta física</p>
+                    <p className="text-x font-bold text-emerald-800 leading-tight">Efectivo</p>
                   </div>
                 </div>
-                <span className="text-base font-extrabold text-slate-900 font-mono">
+                <span className="text-base font-extrabold text-emerald-900 font-mono">
                   ${totals.cashSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                 </span>
               </div>
@@ -735,11 +975,10 @@ export default function CajaPage() {
                     <CreditCard className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-slate-800 leading-tight">Tarjeta</p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Vouchers de POS</p>
+                    <p className="text-x font-bold text-sky-800 leading-tight">Tarjeta</p>
                   </div>
                 </div>
-                <span className="text-base font-extrabold text-slate-900 font-mono">
+                <span className="text-base font-extrabold text-sky-900 font-mono">
                   ${totals.cardSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                 </span>
               </div>
@@ -747,15 +986,14 @@ export default function CajaPage() {
               {/* Transferencia */}
               <div className="bg-white border border-purple-400 rounded-2xl p-4 flex items-center justify-between shadow-xs hover:border-slate-300 transition-all">
                 <div className="flex items-center gap-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-50 text-purple-600 flex items-center justify-center shrink-0">
                     <Building2 className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-xs font-bold text-slate-800 leading-tight">Transferencia</p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">Acreditación bancaria</p>
+                    <p className="text-x font-bold text-purple-800 leading-tight">Transferencia</p>
                   </div>
                 </div>
-                <span className="text-base font-extrabold text-slate-900 font-mono">
+                <span className="text-base font-extrabold text-purple-900 font-mono">
                   ${totals.transferSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                 </span>
               </div>
@@ -792,13 +1030,13 @@ export default function CajaPage() {
           </div>
 
           {/* COLUMNA DERECHA: Consola de Arqueo y Auditoría */}
-          <div className="col-span-12 lg:col-span-7 bg-white border border-blue-300 rounded-2xl p-6 shadow-xs space-y-5">
+          <div className="col-span-12 lg:col-span-7 bg-white border border-slate-300 rounded-2xl p-6 shadow-xs space-y-5">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
-                <h2 className="text-sm font-black text-slate-900 tracking-tight">
+                <h2 className="text-sm font-black text-sky-600 tracking-tight">
                   {isAdmin ? "Auditoría de Arqueo (Corte Z)" : "Arqueo de Caja (Efectivo)"}
                 </h2>
-                <p className="text-[11px] text-slate-400 mt-0.5">
+                <p className="text-xs font-medium text-slate-600 mt-0.5">
                   {isAdmin
                     ? "Fiscalización de valores reportados y dictamen contable"
                     : "Ingrese el conteo físico de billetes y monedas en gaveta"}
@@ -1057,7 +1295,7 @@ export default function CajaPage() {
       </main>
 
       {/* =========================================================================
-          MODALES OPERATIVOS (PRESERVADOS INTACTOS)
+          MODALES OPERATIVOS
          ========================================================================= */}
       <ExpenseModal
         isOpen={isExpenseModalOpen}

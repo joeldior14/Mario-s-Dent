@@ -8,7 +8,7 @@ export interface CreateProductPayload {
   sku: string;
   barcode?: string | null;
   name: string;
-  brand: string;
+  brand?: string; // Opcional: si no se provee, se asigna "Genérico"
   category: string;
   description: string;
   cost: number;
@@ -35,7 +35,7 @@ export interface UpdateProductPayload {
   sku: string;
   barcode?: string | null;
   name: string;
-  brand: string;
+  brand?: string;
   category: string;
   description: string;
   cost: number;
@@ -273,6 +273,7 @@ interface DBDashboardProductQueryRow {
 export async function createProductInDB(payload: CreateProductPayload) {
   const cleanSku = payload.sku.trim().toUpperCase();
   const cleanBarcode = payload.barcode?.trim() || null;
+  const cleanBrand = payload.brand?.trim() ? payload.brand.trim() : "Genérico";
 
   const { data: newProduct, error: productError } = await supabase
     .from("products")
@@ -281,7 +282,7 @@ export async function createProductInDB(payload: CreateProductPayload) {
         sku: cleanSku,
         barcode: cleanBarcode,
         name: payload.name.trim(),
-        brand: payload.brand.trim(),
+        brand: cleanBrand,
         category: payload.category,
         description: payload.description.trim(),
         cost: Number(payload.cost),
@@ -399,6 +400,7 @@ export async function adjustProductStockInDB(payload: AdjustStockPayload) {
 export async function updateProductInDB(payload: UpdateProductPayload) {
   const cleanSku = payload.sku.trim().toUpperCase();
   const cleanBarcode = payload.barcode?.trim() || null;
+  const cleanBrand = payload.brand?.trim() ? payload.brand.trim() : "Genérico";
 
   const { error: productErr } = await supabase
     .from("products")
@@ -406,7 +408,7 @@ export async function updateProductInDB(payload: UpdateProductPayload) {
       sku: cleanSku,
       barcode: cleanBarcode,
       name: payload.name.trim(),
-      brand: payload.brand.trim(),
+      brand: cleanBrand,
       category: payload.category,
       description: payload.description.trim(),
       cost: Number(payload.cost),
@@ -1214,6 +1216,3 @@ export async function fetchBranchesPerformance(
     };
   });
 }
-
-
-

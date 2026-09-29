@@ -39,6 +39,7 @@ export default function NewProductModal({
   const [sku, setSku] = useState("");
   const [barcode, setBarcode] = useState("");
   const [name, setName] = useState("");
+  const [brand, setBrand] = useState("");
   const [category, setCategory] = useState<string>(CATEGORIES[0]);
   const [description, setDescription] = useState("");
   const [cost, setCost] = useState("");
@@ -69,6 +70,7 @@ export default function NewProductModal({
     setSku("");
     setBarcode("");
     setName("");
+    setBrand("");
     setCategory(CATEGORIES[0]);
     setDescription("");
     setCost("");
@@ -84,7 +86,7 @@ export default function NewProductModal({
     const file = e.target.files?.[0];
     if (file) {
       if (!file.type.startsWith("image/")) {
-        setError("El archivo seleccionado debe ser una imagen (.png, .jpg, .webp)[cite: 1].");
+        setError("El archivo seleccionado debe ser una imagen (.png, .jpg, .webp).");
         return;
       }
       const reader = new FileReader();
@@ -127,7 +129,7 @@ export default function NewProductModal({
       sku: sku.trim().toUpperCase(),
       barcode: barcode.trim() || undefined,
       name: name.trim(),
-      brand: "Genérico",
+      brand: brand.trim() ? brand.trim() : "Genérico",
       category,
       description: description.trim(),
       cost: numCost,
@@ -222,10 +224,10 @@ export default function NewProductModal({
               >
                 <UploadCloud className="w-5 h-5 stroke-[1.5]" />
                 <span className="text-xs font-medium">
-                  Haz clic para subir la imagen del artículo[cite: 1]
+                  Haz clic para subir la imagen del artículo
                 </span>
                 <span className="text-[10px] text-slate-400">
-                  PNG, JPG o WEBP (máx. 2MB)[cite: 1]
+                  PNG, JPG o WEBP (máx. 2MB)
                 </span>
               </div>
             )}
@@ -262,19 +264,39 @@ export default function NewProductModal({
             </div>
           </div>
 
-          {/* Fila 2: Nombre del Producto */}
-          <div>
-            <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">
-              Nombre del Producto *
-            </label>
-            <input
-              type="text"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Ej. Resina Fluida Bulk Fill"
-              className="w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:border-sky-500 transition-all"
-            />
+          {/* Fila 2: Nombre del Producto y Marca (Opcional) */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">
+                Nombre del Producto *
+              </label>
+              <input
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Ej. Resina Fluida Bulk Fill"
+                className="w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:border-sky-500 transition-all"
+              />
+            </div>
+
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                  Marca
+                </label>
+                <span className="text-[10px] text-slate-400 font-medium lowercase">
+                  (opcional)
+                </span>
+              </div>
+              <input
+                type="text"
+                value={brand}
+                onChange={(e) => setBrand(e.target.value)}
+                placeholder="Ej. 3M, Dentsply (por defecto: Genérico)"
+                className="w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:border-sky-500 transition-all"
+              />
+            </div>
           </div>
 
           {/* Fila 3: Categoría y Descripción */}

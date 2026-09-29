@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import {
@@ -13,15 +13,18 @@ import {
   fetchDashboardStockAlerts,
   DashboardStockAlerts,
 } from "@/app/services/inventoryService";
+import { getPendingDiscrepancyAlert, PendingDiscrepancyAlert } from "@/app/services/cashService";
 import { useShift } from "@/app/context/ShiftContext";
 import {
-  Calendar,
+  Calendar as CalendarIcon,
   RotateCw,
   Search,
   TrendingUp,
   AlertTriangle,
   PackageX,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Store,
   CreditCard,
   Banknote,
@@ -29,6 +32,8 @@ import {
   ArrowUpRight,
   Layers,
   X,
+  Check,
+  Building,
 } from "lucide-react";
 
 interface BranchMetric {
@@ -79,8 +84,17 @@ const BRANCHES_DATA: Record<string, BranchMetric> = {
   },
 };
 
+const BRANCH_OPTIONS = [
+  { key: "all", label: "Todas las Sucursales", desc: "Consolidado de Red" },
+  { key: "santa-ana", label: "Santa Ana", desc: "Sede Matriz" },
+  { key: "ahuachapan", label: "Ahuachapán", desc: "Sucursal Occidente" },
+  { key: "sonsonate", label: "Sonsonate", desc: "Sucursal Occidente" },
+];
+
 export default function DashboardPage() {
   const { auditStatus } = useShift();
+  const [discrepancyAlert, setDiscrepancyAlert] = useState<PendingDiscrepancyAlert | null>(null);
+  const [isLoadingAlert, setIsLoadingAlert] = useState(true);
 
   // Estados del Buscador Rápido conectado a Supabase
   const [searchQuery, setSearchQuery] = useState("");
@@ -99,7 +113,58 @@ export default function DashboardPage() {
     }).format(new Date());
   });
 
+  // Estados y Refs para los dropdowns personalizados (Sede y Fecha)
+  const [isBranchDropdownOpen, setIsBranchDropdownOpen] = useState(false);
+  const [isDateOpen, setIsDateOpen] = useState(false);
+  const branchDropdownRef = useRef<HTMLDivElement>(null);
+  const dateRef = useRef<HTMLDivElement>(null);
+
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // Lógica del Calendario Customizado
+  const [viewMonth, setViewMonth] = useState(() => {
+    const d = new Date(selectedDate ? `${selectedDate}T12:00:00` : new Date());
+    return isNaN(d.getTime()) ? new Date() : d;
+  });
+
+  const monthNames = [
+    "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+  ];
+  const dayNames = ["DO", "LU", "MA", "MI", "JU", "VI", "SÁ"];
+
+  const calendarDays = useMemo(() => {
+    const year = viewMonth.getFullYear();
+    const month = viewMonth.getMonth();
+    const firstDayIndex = new Date(year, month, 1).getDay();
+    const totalDays = new Date(year, month + 1, 0).getDate();
+    const prevMonthTotalDays = new Date(year, month, 0).getDate();
+
+    const days: { day: number; dateStr: string; isCurrentMonth: boolean }[] = [];
+
+    for (let i = firstDayIndex - 1; i >= 0; i--) {
+      const d = prevMonthTotalDays - i;
+      const m = month === 0 ? 12 : month;
+      const y = month === 0 ? year - 1 : year;
+      const dateStr = `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+      days.push({ day: d, dateStr, isCurrentMonth: false });
+    }
+
+    for (let i = 1; i <= totalDays; i++) {
+      const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(i).padStart(2, "0")}`;
+      days.push({ day: i, dateStr, isCurrentMonth: true });
+    }
+
+    const remaining = (7 - (days.length % 7)) % 7;
+    for (let i = 1; i <= remaining; i++) {
+      const m = month + 2 > 12 ? 1 : month + 2;
+      const y = month + 2 > 12 ? year + 1 : year;
+      const dateStr = `${y}-${String(m).padStart(2, "0")}-${String(i).padStart(2, "0")}`;
+      days.push({ day: i, dateStr, isCurrentMonth: false });
+    }
+
+    return days;
+  }, [viewMonth]);
 
   // Métricas reales conectadas al backend
   const [realMetrics, setRealMetrics] = useState<DashboardSalesMetrics>({
@@ -121,6 +186,35 @@ export default function DashboardPage() {
   const handleRefresh = () => {
     setIsRefreshing(true);
   };
+
+  // Cerrar menús al hacer clic fuera
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (branchDropdownRef.current && !branchDropdownRef.current.contains(e.target as Node)) {
+        setIsBranchDropdownOpen(false);
+      }
+      if (dateRef.current && !dateRef.current.contains(e.target as Node)) {
+        setIsDateOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    async function loadAlert() {
+      try {
+        const alertData = await getPendingDiscrepancyAlert();
+        setDiscrepancyAlert(alertData);
+      } catch (err) {
+        console.error("Error al consultar alertas de caja:", err);
+      } finally {
+        setIsLoadingAlert(false);
+      }
+    }
+
+    loadAlert();
+  }, []);
 
   // Carga unificada de métricas, rendimiento y alertas desde Supabase
   useEffect(() => {
@@ -155,7 +249,7 @@ export default function DashboardPage() {
     };
   }, [selectedDate, selectedBranchKey, isRefreshing]);
 
-  // Búsqueda en Supabase con Debounce (300 ms) respetando la sucursal activa
+  // Búsqueda en Supabase con Debounce (300 ms)
   useEffect(() => {
     const cleanQuery = searchQuery.trim();
 
@@ -200,11 +294,6 @@ export default function DashboardPage() {
     };
   }, [selectedBranchKey]);
 
-  // Detección segura de discrepancia contable
-  const isAuditPending =
-    (auditStatus as string) === "pending" ||
-    (auditStatus as string) === "pending_review";
-
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-700 flex flex-col font-sans select-none">
       <Navbar />
@@ -216,60 +305,230 @@ export default function DashboardPage() {
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2.5">
-              <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+              <h1 className="text-2xl font-black text-sky-600 tracking-tight">
                 Panel Ejecutivo
               </h1>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 Red Operativa Activa
               </span>
             </div>
-            <p className="text-xs text-slate-400 font-medium mt-0.5">
+            <p className="text-xs text-slate-600 font-medium mt-0.5">
               Supervisión de ingresos, auditoría de ventas y salud de existencias
             </p>
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Selector de Sucursal */}
-            <div className="relative flex items-center bg-white border border-slate-200 rounded-xl px-3 h-10 shadow-2xs hover:border-slate-300 transition-colors">
-              <Store className="w-4 h-4 text-sky-600 mr-2 shrink-0" />
-              <div className="flex flex-col justify-center text-left leading-none pr-6">
-                <span className="text-[9px] text-slate-400 font-bold uppercase tracking-tight">
-                  Sede
-                </span>
-                <span className="text-xs font-bold text-slate-800 truncate max-w-[170px]">
-                  {activeMetrics.name}
-                </span>
-              </div>
-              <select
-                value={selectedBranchKey}
-                onChange={(e) => setSelectedBranchKey(e.target.value)}
-                className="appearance-none absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            {/* SELECTOR CUSTOMIZADO DE SUCURSAL */}
+            <div className="relative" ref={branchDropdownRef}>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsBranchDropdownOpen((prev) => !prev);
+                  setIsDateOpen(false);
+                }}
+                className={`h-10 px-3.5 bg-white border rounded-xl flex items-center gap-2.5 transition-all cursor-pointer shadow-2xs select-none ${
+                  isBranchDropdownOpen
+                    ? "border-sky-500 ring-2 ring-sky-500/10"
+                    : "border-slate-200 hover:border-slate-300"
+                }`}
               >
-                <option value="all">Todas las Sucursales (Consolidado)</option>
-                <option value="santa-ana">Santa Ana (Matriz)</option>
-                <option value="ahuachapan">Sucursal Ahuachapán</option>
-                <option value="sonsonate">Sucursal Sonsonate</option>
-              </select>
-              <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                <div className="w-6 h-6 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
+                  <Store className="w-3.5 h-3.5" />
+                </div>
+                <div className="flex flex-col text-left leading-tight">
+                  <span className="text-[9px] font-extrabold text-sky-600 uppercase tracking-wider">
+                    Sede
+                  </span>
+                  <span className="text-xs font-bold text-slate-800 truncate max-w-[170px]">
+                    {BRANCH_OPTIONS.find((b) => b.key === selectedBranchKey)?.label || activeMetrics.name}
+                  </span>
+                </div>
+                <ChevronDown
+                  className={`w-3.5 h-3.5 text-slate-400 ml-1.5 transition-transform duration-200 ${
+                    isBranchDropdownOpen ? "rotate-180 text-sky-600" : ""
+                  }`}
+                />
+              </button>
+
+              {isBranchDropdownOpen && (
+                <div className="absolute right-0 sm:left-0 mt-2 w-60 bg-white border border-slate-100 rounded-2xl shadow-xl p-1.5 z-40 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="px-2.5 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 mb-1">
+                    Seleccionar Sede
+                  </div>
+                  <div className="space-y-0.5">
+                    {BRANCH_OPTIONS.map((b) => {
+                      const isSelected = selectedBranchKey === b.key;
+                      return (
+                        <button
+                          key={b.key}
+                          type="button"
+                          onClick={() => {
+                            setSelectedBranchKey(b.key);
+                            setIsBranchDropdownOpen(false);
+                          }}
+                          className={`w-full px-2.5 py-2 rounded-xl text-left text-xs font-semibold flex items-center justify-between transition-colors cursor-pointer ${
+                            isSelected
+                              ? "bg-sky-50 text-sky-900 font-bold"
+                              : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                          }`}
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <Building
+                              className={`w-3.5 h-3.5 shrink-0 ${
+                                isSelected ? "text-sky-600" : "text-slate-400"
+                              }`}
+                            />
+                            <div>
+                              <p className="leading-tight">{b.label}</p>
+                              <span className="text-[10px] text-slate-400 font-normal">
+                                {b.desc}
+                              </span>
+                            </div>
+                          </div>
+                          {isSelected && <Check className="w-3.5 h-3.5 text-sky-600 shrink-0" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Selector de Fecha */}
-            <div className="flex items-center gap-2 bg-white border border-slate-200 px-3 h-10 rounded-xl shadow-2xs">
-              <Calendar className="w-3.5 h-3.5 text-slate-400" />
-              <input
-                type="date"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
-                className="text-xs font-bold text-slate-700 bg-transparent focus:outline-none cursor-pointer"
-              />
+            {/* SELECTOR CUSTOMIZADO DE FECHA (CALENDARIO FLOTANTE IGUAL AL DE CAJA) */}
+            <div className="relative" ref={dateRef}>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsDateOpen((prev) => !prev);
+                  setIsBranchDropdownOpen(false);
+                }}
+                className={`h-10 px-3.5 bg-white border rounded-xl flex items-center gap-2.5 transition-all cursor-pointer shadow-2xs select-none ${
+                  isDateOpen
+                    ? "border-sky-500 ring-2 ring-sky-500/10"
+                    : "border-slate-200 hover:border-slate-300"
+                }`}
+              >
+                <div className="w-6 h-6 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
+                  <CalendarIcon className="w-3.5 h-3.5 text-sky-600" />
+                </div>
+
+                <div className="flex flex-col text-left leading-tight">
+                  <span className="text-[9px] font-extrabold text-sky-600 uppercase tracking-wider">
+                    Fecha
+                  </span>
+                  <span className="text-xs font-bold text-slate-800 font-mono tracking-tight">
+                    {selectedDate}
+                  </span>
+                </div>
+
+                <ChevronDown
+                  className={`w-3.5 h-3.5 text-slate-400 ml-1 transition-transform duration-200 ${
+                    isDateOpen ? "rotate-180 text-sky-600" : ""
+                  }`}
+                />
+              </button>
+
+              {isDateOpen && (
+                <div className="absolute right-0 sm:left-0 mt-2 w-72 bg-white border border-slate-100 rounded-3xl shadow-2xl p-4 z-40 animate-in fade-in zoom-in-95 duration-150">
+                  {/* Encabezado del mes */}
+                  <div className="flex items-center justify-between mb-3 px-1">
+                    <span className="text-xs font-extrabold text-slate-800 capitalize">
+                      {monthNames[viewMonth.getMonth()]} {viewMonth.getFullYear()}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1))
+                        }
+                        className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
+                      >
+                        <ChevronLeft className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1))
+                        }
+                        className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
+                      >
+                        <ChevronRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Días de la semana */}
+                  <div className="grid grid-cols-7 gap-1 text-center mb-1">
+                    {dayNames.map((d) => (
+                      <span key={d} className="text-[10px] font-black text-slate-400 py-1">
+                        {d}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Cuadrícula de días */}
+                  <div className="grid grid-cols-7 gap-1">
+                    {calendarDays.map((item, idx) => {
+                      const isSelected = selectedDate === item.dateStr;
+                      return (
+                        <button
+                          key={idx}
+                          type="button"
+                          onClick={() => {
+                            setSelectedDate(item.dateStr);
+                            setIsDateOpen(false);
+                          }}
+                          className={`h-8 w-8 mx-auto rounded-xl text-xs font-bold flex items-center justify-center transition-all cursor-pointer ${
+                            isSelected
+                              ? "bg-sky-600 text-white shadow-xs scale-105"
+                              : item.isCurrentMonth
+                              ? "text-slate-700 hover:bg-sky-50 hover:text-sky-700"
+                              : "text-slate-300 hover:text-slate-500"
+                          }`}
+                        >
+                          {item.day}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Acciones al pie */}
+                  <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const today = new Intl.DateTimeFormat("en-CA", {
+                          timeZone: "America/El_Salvador",
+                          year: "numeric",
+                          month: "2-digit",
+                          day: "2-digit",
+                        }).format(new Date());
+                        setSelectedDate(today);
+                        setViewMonth(new Date());
+                        setIsDateOpen(false);
+                      }}
+                      className="text-sky-600 font-bold hover:underline cursor-pointer"
+                    >
+                      Hoy
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setIsDateOpen(false)}
+                      className="text-slate-400 hover:text-slate-600 font-medium cursor-pointer"
+                    >
+                      Cerrar
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Botón Sincronizar */}
             <button
               onClick={handleRefresh}
               title="Refrescar métricas"
-              className="w-10 h-10 bg-white border border-slate-200 hover:bg-slate-50 text-slate-500 hover:text-slate-700 rounded-xl flex items-center justify-center shadow-2xs transition-colors cursor-pointer"
+              className="w-10 h-10 bg-white border border-slate-200 hover:bg-slate-50 text-sky-500 hover:text-slate-700 rounded-xl flex items-center justify-center shadow-2xs transition-colors cursor-pointer"
             >
               <RotateCw className={`w-4 h-4 ${isRefreshing ? "animate-spin text-sky-600" : ""}`} />
             </button>
@@ -277,26 +536,31 @@ export default function DashboardPage() {
         </header>
 
         {/* =========================================================================
-            2. ALERTA DE DESCUADRE PENDIENTE
+            2. ALERTA DE DESCUADRE DINÁMICA
            ========================================================================= */}
-        {isAuditPending && (
-          <div className="bg-gradient-to-r from-rose-50 to-orange-50 border border-rose-200 rounded-2xl p-4 flex items-center justify-between shadow-2xs animate-in fade-in duration-200">
+        {!isLoadingAlert && discrepancyAlert && (
+          <div className="bg-gradient-to-r from-rose-50 to-orange-50 border border-rose-200 rounded-2xl p-4 flex items-center justify-between shadow-2xs">
             <div className="flex items-center gap-3.5">
               <div className="w-10 h-10 rounded-xl bg-rose-500 text-white flex items-center justify-center shrink-0 shadow-xs">
                 <AlertTriangle className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-xs font-bold text-rose-950">
-                  Discrepancia contable detectada en arqueo de caja
-                </p>
-                <p className="text-[11px] text-rose-700 mt-0.5">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="text-xs font-bold text-rose-950">
+                    Discrepancia contable detectada en arqueo de caja
+                  </p>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-extrabold bg-rose-100 text-rose-800 border border-rose-300/70 tracking-tight">
+                    {discrepancyAlert.branchName}
+                  </span>
+                </div>
+                <p className="text-[11px] text-rose-700/90 mt-0.5">
                   Existe un turno cerrado con descuadre en gaveta física que requiere resolución administrativa.
                 </p>
               </div>
             </div>
 
             <Link
-              href="/caja"
+              href={`/caja?branch=${encodeURIComponent(discrepancyAlert.branchName)}&date=${discrepancyAlert.closedAt.slice(0, 10)}`}
               className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl transition-colors shadow-2xs shrink-0 flex items-center gap-1.5"
             >
               <span>Auditar Caja</span>
@@ -339,7 +603,7 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {/* Menú Desplegable Flotante */}
+          {/* Menú Desplegable Flotante de Búsqueda */}
           {isSearchOpen && (
             <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-2xl shadow-xl z-30 max-h-72 overflow-y-auto divide-y divide-slate-100 animate-in fade-in-50 duration-150">
               {isSearching ? (
@@ -398,12 +662,12 @@ export default function DashboardPage() {
         <div className="grid grid-cols-12 gap-6 items-start">
           {/* COLUMNA IZQUIERDA: Finanzas y Desempeño */}
           <div className="col-span-12 lg:col-span-7 space-y-6">
-            <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs relative overflow-hidden">
+            <div className="bg-white border border-sky-400 rounded-2xl p-6 shadow-xs relative overflow-hidden">
               <div className="absolute right-0 top-0 translate-x-4 -translate-y-4 w-40 h-40 bg-sky-50/70 rounded-full blur-2xl pointer-events-none" />
 
               <div className="flex items-start justify-between">
                 <div>
-                  <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">
+                  <span className="text-xs font-bold text-sky-600 uppercase tracking-wider block mb-1">
                     Ingresos Totales Cobrados
                   </span>
                   <div className="flex items-baseline gap-3">
@@ -424,10 +688,10 @@ export default function DashboardPage() {
                 </div>
 
                 <div className="text-right">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">
+                  <span className="text-xs font-black text-slate-900 uppercase tracking-wider block">
                     Tickets
                   </span>
-                  <span className="text-3xl font-black text-sky-600 font-mono">
+                  <span className="text-3xl font-black text-sky-700 font-mono">
                     {realMetrics.totalTickets}
                   </span>
                 </div>
@@ -446,11 +710,11 @@ export default function DashboardPage() {
             </div>
 
             {/* Rendimiento por Sucursal (Conectado a Supabase) */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4">
+            <div className="bg-white border border-sky-400 rounded-2xl p-5 shadow-xs space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-slate-400" />
-                  <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                  <Layers className="w-4 h-4 text-sky-500" />
+                  <h3 className="text-xs font-bold text-sky-600 uppercase tracking-wider">
                     Rendimiento por Sucursal
                   </h3>
                 </div>
@@ -504,8 +768,8 @@ export default function DashboardPage() {
 
           {/* COLUMNA DERECHA: Métodos de Pago & Alertas de Inventario */}
           <div className="col-span-12 lg:col-span-5 space-y-6">
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs">
-              <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider mb-4">
+            <div className="bg-white border border-sky-400 rounded-2xl p-5 shadow-xs">
+              <h3 className="text-xs font-bold text-sky-600 uppercase tracking-wider mb-4">
                 Distribución por Métodos de Pago
               </h3>
 

@@ -1514,6 +1514,8 @@ __turbopack_context__.s([
     ()=>getAdminShiftAudit,
     "getNextOrderNumber",
     ()=>getNextOrderNumber,
+    "getPendingDiscrepancyAlert",
+    ()=>getPendingDiscrepancyAlert,
     "getShiftSalesBreakdown",
     ()=>getShiftSalesBreakdown,
     "openCashShiftInDB",
@@ -1702,6 +1704,27 @@ async function getNextOrderNumber(branchName) {
     if (error || count === null) return 1;
     return count + 1;
 }
+async function getPendingDiscrepancyAlert() {
+    const { data, error } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").select(`
+      id,
+      difference,
+      closed_at,
+      branches (
+        name
+      )
+    `).eq("status", "closed").eq("audit_status", "pending_review").neq("difference", 0).order("closed_at", {
+        ascending: false
+    }).limit(1).maybeSingle();
+    if (error || !data) return null;
+    // Extraer el nombre de la sucursal de la relación
+    const branchData = Array.isArray(data.branches) ? data.branches[0] : data.branches;
+    return {
+        shiftId: data.id,
+        branchName: branchData?.name || "Sucursal",
+        difference: Number(data.difference),
+        closedAt: data.closed_at
+    };
+}
 async function getAdminShiftAudit(branchName, dateStr) {
     const defaultData = {
         shiftId: null,
@@ -1826,12 +1849,13 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient
 async function createProductInDB(payload) {
     const cleanSku = payload.sku.trim().toUpperCase();
     const cleanBarcode = payload.barcode?.trim() || null;
+    const cleanBrand = payload.brand?.trim() ? payload.brand.trim() : "Genérico";
     const { data: newProduct, error: productError } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("products").insert([
         {
             sku: cleanSku,
             barcode: cleanBarcode,
             name: payload.name.trim(),
-            brand: payload.brand.trim(),
+            brand: cleanBrand,
             category: payload.category,
             description: payload.description.trim(),
             cost: Number(payload.cost),
@@ -1905,11 +1929,12 @@ async function adjustProductStockInDB(payload) {
 async function updateProductInDB(payload) {
     const cleanSku = payload.sku.trim().toUpperCase();
     const cleanBarcode = payload.barcode?.trim() || null;
+    const cleanBrand = payload.brand?.trim() ? payload.brand.trim() : "Genérico";
     const { error: productErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("products").update({
         sku: cleanSku,
         barcode: cleanBarcode,
         name: payload.name.trim(),
-        brand: payload.brand.trim(),
+        brand: cleanBrand,
         category: payload.category,
         description: payload.description.trim(),
         cost: Number(payload.cost),

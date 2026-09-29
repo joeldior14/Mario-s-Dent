@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 3, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/joelG/MariosDent/mario-s-dent/node_modules/next/navigation.js"],"sourcesContent":["module.exports = require('./dist/client/components/navigation')\n"],"names":["module","exports"],"mappings":"AAAAA,OAAOC,OAAO","ignoreList":[0]}},
+    {"offset": {"line": 8, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/joelG/MariosDent/mario-s-dent/src/app/page.tsx"],"sourcesContent":["\"use client\";\r\n\r\nimport { redirect } from \"next/navigation\";\r\n\r\nexport default function RootPage() {\r\n  redirect(\"/login\");\r\n}"],"names":["RootPage"],"mappings":";;;;AAEA;AAFA;;AAIe,SAASA;IACtB,IAAA,iJAAQ,EAAC;AACX;KAFwBA"}}]
+}

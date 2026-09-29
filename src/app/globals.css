@@ -1,1 +1,12 @@
 @import "tailwindcss";
+
+/* Ocultar el icono de calendario por defecto del navegador */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  display: none;
+  -webkit-appearance: none;
+}
+input[type="date"]::-webkit-inner-spin-button {
+  display: none;
+  -webkit-appearance: none;
+}

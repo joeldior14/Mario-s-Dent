@@ -34,6 +34,13 @@ export interface CloseShiftPayload {
   notes?: string;
 }
 
+export interface PendingDiscrepancyAlert {
+  shiftId: string;
+  branchName: string;
+  difference: number;
+  closedAt: string;
+}
+
 export interface ShiftAuditData {
   shiftId: string | null;
   status: "open" | "closed" | "none";
@@ -379,6 +386,40 @@ export async function getNextOrderNumber(branchName: string): Promise<number> {
 // ==========================================
 // FUNCIÓN CONSOLIDADA DE AUDITORÍA (ADMINISTRADOR)
 // ==========================================
+
+/**
+ * Consulta si existe algún turno cerrado con descuadre pendiente de resolución
+ */
+export async function getPendingDiscrepancyAlert(): Promise<PendingDiscrepancyAlert | null> {
+  const { data, error } = await supabase
+    .from("cash_shifts")
+    .select(`
+      id,
+      difference,
+      closed_at,
+      branches (
+        name
+      )
+    `)
+    .eq("status", "closed")
+    .eq("audit_status", "pending_review")
+    .neq("difference", 0)
+    .order("closed_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error || !data) return null;
+
+  // Extraer el nombre de la sucursal de la relación
+  const branchData = Array.isArray(data.branches) ? data.branches[0] : data.branches;
+
+  return {
+    shiftId: data.id,
+    branchName: branchData?.name || "Sucursal",
+    difference: Number(data.difference),
+    closedAt: data.closed_at,
+  };
+}
 
 /**
  * Consulta unificada para alimentar de forma simultánea las cuatro tarjetas

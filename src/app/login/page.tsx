@@ -99,6 +99,16 @@ export default function LoginPage() {
       <div className="flex-1 flex items-center justify-center p-6 sm:p-12 bg-white lg:bg-[#F8FAFC]">
         <div className="w-full max-w-md bg-white lg:p-8 lg:rounded-3xl lg:border lg:border-slate-200/80 lg:shadow-xl space-y-6">
           <div className="text-center space-y-2">
+            <div className="lg:hidden flex justify-center mb-4">
+    <Image
+      src="/mariosdent.jpg"
+      alt="Mario's Dent"
+      width={140}
+      height={50}
+      priority
+      className="h-12 w-auto object-contain"
+    />
+  </div>
             <h2 className="text-2xl font-black text-slate-900 tracking-tight">
               Bienvenido de nuevo
             </h2>
