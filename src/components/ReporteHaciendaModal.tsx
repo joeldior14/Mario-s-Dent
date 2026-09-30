@@ -122,11 +122,11 @@ export default function HaciendaReportModal({
             <div>
               <h3
                 id={`${modalId}-title`}
-                className="text-sm font-bold text-slate-800 leading-tight"
+                className="text-sm font-bold text-sky-600 leading-tight"
               >
                 Informe Fiscal de Inventario (Hacienda)
               </h3>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-xs font-medium text-slate-700">
                 Declaración Anual de Existencias y Valuación al Costo
               </p>
             </div>
@@ -134,7 +134,7 @@ export default function HaciendaReportModal({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-rose-600 hover:text-white hover:bg-rose-600 transition-colors cursor-pointer"
             title="Cerrar modal"
           >
             <X className="w-4 h-4" />
@@ -148,7 +148,7 @@ export default function HaciendaReportModal({
             <div>
               <label
                 htmlFor={`${modalId}-year`}
-                className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1"
+                className="text-[11px] font-bold text-sky-700 uppercase tracking-wider mb-1.5 flex items-center gap-1"
               >
                 <Calendar className="w-3.5 h-3.5 text-sky-600 shrink-0" />
                 <span>Ejercicio Fiscal (Corte 31/Dic)</span>
@@ -170,7 +170,7 @@ export default function HaciendaReportModal({
             <div>
               <label
                 htmlFor={`${modalId}-scope`}
-                className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5 flex items-center gap-1"
+                className="text-[11px] font-bold text-sky-700 uppercase tracking-wider mb-1.5 flex items-center gap-1"
               >
                 <Building className="w-3.5 h-3.5 text-sky-600 shrink-0" />
                 <span>Alcance / Establecimiento</span>
@@ -192,8 +192,8 @@ export default function HaciendaReportModal({
 
           {/* Tarjetas de Resumen Valuado */}
           <div className="grid grid-cols-3 gap-3">
-            <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl">
-              <span className="block text-[10px] text-slate-400 font-bold uppercase">
+            <div className="p-3 bg-purple-50 border border-slate-100 rounded-xl">
+              <span className="block text-[10px] text-purple-700 font-bold uppercase">
                 Artículos
               </span>
               <span className="text-sm font-bold text-slate-800 font-mono">
@@ -201,8 +201,8 @@ export default function HaciendaReportModal({
               </span>
             </div>
 
-            <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl">
-              <span className="block text-[10px] text-slate-400 font-bold uppercase">
+            <div className="p-3 bg-amber-50 border border-slate-100 rounded-xl">
+              <span className="block text-[10px] text-amber-700 font-bold uppercase">
                 Unidades Físicas
               </span>
               <span className="text-sm font-bold text-slate-800 font-mono">
@@ -225,10 +225,10 @@ export default function HaciendaReportModal({
 
           {/* Columnas incluidas */}
           <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5 text-xs text-slate-600">
-            <span className="font-bold text-slate-700 text-[11px] block">
+            <span className="font-bold text-sky-700 text-xs block">
               Columnas auditables generadas:
             </span>
-            <ul className="grid grid-cols-2 gap-1 text-[11px] text-slate-500">
+            <ul className="grid grid-cols-2 gap-1 text-[11px] text-slate-800">
               <li>• Código de Barra / SKU</li>
               <li>• Nombre y Descripción</li>
               <li>• Marca / Fabricante</li>
@@ -243,8 +243,8 @@ export default function HaciendaReportModal({
 
         {/* Pie con acciones */}
         <div className="px-6 py-4 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-1.5 text-slate-500 text-[11px]">
-            <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+          <div className="flex items-center gap-1.5 text-sky-700 text-xs">
+            <ShieldCheck className="w-4 h-4 text-sky-600 shrink-0" />
             <span>Formato listo para anexos fiscales.</span>
           </div>
 

@@ -723,7 +723,7 @@ export default function CajaPage() {
                       <span className="text-[9px] font-extrabold text-sky-600 uppercase tracking-wider">
                         Fecha
                       </span>
-                      <span className="text-xs font-bold text-slate-800 font-mono tracking-tight">
+                      <span className="text-xs font-bold text-slate-800 tabular-nums tracking-tight">
                         {selectedDate}
                       </span>
                     </div>
@@ -842,7 +842,7 @@ export default function CajaPage() {
                   <span className="text-sky-700 font-bold capitalize">{currentDateDisplay}</span>
                   <span className="text-slate-300">|</span>
                   <span>
-                    Operador: <strong className="text-slate-800">{activeOperatorName}</strong>
+                    Operador: <span className="text-slate-800">{activeOperatorName}</span>
                   </span>
                 </div>
 
@@ -866,7 +866,7 @@ export default function CajaPage() {
            ========================================================================= */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Fondo Inicial */}
-          <div className="bg-white border border-amber-300 border-l-4 border-l-amber-500 rounded-2xl p-4 shadow-xs hover:border-slate-300 transition-all">
+          <div className="bg-white border border-amber-300 border-l-4 border-l-amber-500 rounded-2xl p-4 shadow-xs hover:border-amber-300 transition-all">
             <div className="flex items-center justify-between mb-2">
               <span className="text-black-700 text-[15px] font-bold uppercase tracking-wider">
                 Fondo Inicial
@@ -875,16 +875,16 @@ export default function CajaPage() {
                 <Banknote className="w-4 h-4" />
               </div>
             </div>
-            <p className="text-2xl font-black text-slate-800 font-mono tracking-tight">
+            <p className="text-2xl font-bold text-amber-500 tabular-nums tracking-tight">
               ${totals.initialFund.toLocaleString("en-US", { minimumFractionDigits: 2 })}
             </p>
-            <span className="text-[10px] text-slate-400 font-medium mt-0.5 block">
+            <span className="text-[10px] text-amber-700 font-medium mt-0.5 block">
               Gaveta en apertura
             </span>
           </div>
 
           {/* Ventas Totales */}
-          <div className="bg-white border border-blue-300 border-l-4 border-l-blue-500 rounded-2xl p-4 shadow-xs hover:border-slate-300 transition-all">
+          <div className="bg-white border border-blue-300 border-l-4 border-l-blue-500 rounded-2xl p-4 shadow-xs hover:border-sky-300 transition-all">
             <div className="flex items-center justify-between mb-2">
               <span className="text-black-700 text-[15px] font-bold uppercase tracking-wider">
                 Ventas Totales
@@ -893,16 +893,16 @@ export default function CajaPage() {
                 <Receipt className="w-4 h-4" />
               </div>
             </div>
-            <p className="text-2xl font-black text-sky-600 font-mono tracking-tight">
+            <p className="text-2xl font-bold text-sky-600 tabular-nums tracking-tight">
               ${totals.totalSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
             </p>
-            <span className="text-[10px] text-slate-400 font-medium mt-0.5 block">
+            <span className="text-[10px] text-sky-700 font-medium mt-0.5 block">
               Todos los métodos de pago
             </span>
           </div>
 
           {/* Gastos Menores */}
-          <div className="bg-white border border-red-300 border-l-4 border-l-red-500 rounded-2xl p-4 shadow-xs hover:border-slate-300 transition-all">
+          <div className="bg-white border border-red-300 border-l-4 border-l-red-500 rounded-2xl p-4 shadow-xs hover:border-rose-300 transition-all">
             <div className="flex items-center justify-between mb-2">
               <span className="text-black-700 text-[15px] font-bold uppercase tracking-wider">
                 Gastos Menores
@@ -911,18 +911,18 @@ export default function CajaPage() {
                 <TrendingDown className="w-4 h-4" />
               </div>
             </div>
-            <p className="text-2xl font-black text-rose-500 font-mono tracking-tight">
+            <p className="text-2xl font-bold text-rose-500 tabular-nums tracking-tight">
               {totals.expenses > 0
                 ? `-$${totals.expenses.toLocaleString("en-US", { minimumFractionDigits: 2 })}`
                 : "$0.00"}
             </p>
-            <span className="text-[10px] text-slate-400 font-medium mt-0.5 block">
+            <span className="text-[10px] text-rose-700 font-medium mt-0.5 block">
               Egresos de caja chica
             </span>
           </div>
 
           {/* Total Esperado General */}
-          <div className="bg-white border border-green-300 border-l-4 border-l-emerald-500 rounded-2xl p-4 shadow-xs hover:border-slate-300 transition-all">
+          <div className="bg-white border border-green-300 border-l-4 border-l-emerald-500 rounded-2xl p-4 shadow-xs hover:border-emerald-300 transition-all">
             <div className="flex items-center justify-between mb-2">
               <span className="text-black-700 text-[15px] font-bold uppercase tracking-wider">
                 Total Esperado
@@ -931,10 +931,10 @@ export default function CajaPage() {
                 <Coins className="w-4 h-4" />
               </div>
             </div>
-            <p className="text-2xl font-black text-green-700 font-mono tracking-tight">
+            <p className="text-2xl font-bold text-green-700 tabular-nums tracking-tight">
               ${totals.totalExpected.toLocaleString("en-US", { minimumFractionDigits: 2 })}
             </p>
-            <span className="text-[10px] text-slate-400 font-medium mt-0.5 block">
+            <span className="text-[10px] text-emerald-700 font-medium mt-0.5 block">
               Fondo + Ventas - Gastos
             </span>
           </div>
@@ -954,7 +954,7 @@ export default function CajaPage() {
 
             <div className="space-y-3">
               {/* Efectivo */}
-              <div className="bg-white border border-emerald-400 rounded-2xl p-4 flex items-center justify-between shadow-xs hover:border-slate-300 transition-all">
+              <div className="bg-white border border-emerald-400 rounded-2xl p-4 flex items-center justify-between shadow-xs hover:border-emerald-300 transition-all">
                 <div className="flex items-center gap-3.5">
                   <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
                     <Banknote className="w-5 h-5" />
@@ -963,7 +963,7 @@ export default function CajaPage() {
                     <p className="text-x font-bold text-emerald-800 leading-tight">Efectivo</p>
                   </div>
                 </div>
-                <span className="text-base font-extrabold text-emerald-900 font-mono">
+                <span className="text-base font-extrabold text-emerald-900 tabular-nums">
                   ${totals.cashSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                 </span>
               </div>
@@ -978,7 +978,7 @@ export default function CajaPage() {
                     <p className="text-x font-bold text-sky-800 leading-tight">Tarjeta</p>
                   </div>
                 </div>
-                <span className="text-base font-extrabold text-sky-900 font-mono">
+                <span className="text-base font-extrabold text-sky-900 tabular-nums">
                   ${totals.cardSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                 </span>
               </div>
@@ -993,7 +993,7 @@ export default function CajaPage() {
                     <p className="text-x font-bold text-purple-800 leading-tight">Transferencia</p>
                   </div>
                 </div>
-                <span className="text-base font-extrabold text-purple-900 font-mono">
+                <span className="text-base font-extrabold text-purple-900 tabular-nums">
                   ${totals.transferSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                 </span>
               </div>
@@ -1006,7 +1006,7 @@ export default function CajaPage() {
                   <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">
                     Egresos Registrados ({expensesList.length})
                   </span>
-                  <span className="text-[10px] font-bold text-rose-500 font-mono">
+                  <span className="text-[10px] font-bold text-rose-500 tabular-nums">
                     -${totals.expenses.toFixed(2)}
                   </span>
                 </div>
@@ -1019,7 +1019,7 @@ export default function CajaPage() {
                         </p>
                         <p className="text-[10px] text-slate-400">{exp.category}</p>
                       </div>
-                      <span className="font-extrabold text-rose-500 font-mono">
+                      <span className="font-extrabold text-rose-500 tabular-nums">
                         -${Number(exp.amount).toFixed(2)}
                       </span>
                     </div>
@@ -1069,11 +1069,11 @@ export default function CajaPage() {
             {/* Inputs de Conteo y Esperado */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-tight mb-1.5">
+                <label className="block text-[11px] font-bold text-sky-700 uppercase tracking-tight mb-1.5">
                   Efectivo Contado
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-bold font-mono">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-bold tabular-nums">
                     $
                   </span>
                   <input
@@ -1090,7 +1090,7 @@ export default function CajaPage() {
                     }
                     onChange={(e) => setCountedCash(Math.max(0, parseFloat(e.target.value) || 0))}
                     placeholder="0.00"
-                    className={`w-full pl-8 pr-3 h-11 border border-slate-200 rounded-xl text-sm font-bold font-mono focus:outline-none transition-colors ${
+                    className={`w-full pl-8 pr-3 h-11 border border-slate-200 rounded-xl text-sm font-bold tabular-nums focus:outline-none transition-colors ${
                       isShiftOpen && !isAdmin
                         ? "bg-slate-50 text-slate-900 focus:bg-white focus:border-sky-500"
                         : "bg-slate-100 text-slate-500 cursor-not-allowed"
@@ -1100,11 +1100,11 @@ export default function CajaPage() {
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-tight mb-1.5">
+                <label className="block text-[11px] font-bold text-sky-700 uppercase tracking-tight mb-1.5">
                   Efectivo Esperado en Gaveta
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-bold font-mono">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-sm text-slate-400 font-bold tabular-nums">
                     $
                   </span>
                   <input
@@ -1112,7 +1112,7 @@ export default function CajaPage() {
                     readOnly
                     disabled
                     value={totals.expectedCash.toFixed(2)}
-                    className="w-full pl-8 pr-3 h-11 bg-slate-100/80 border border-slate-200 rounded-xl text-sm font-bold font-mono text-slate-600 cursor-not-allowed select-none"
+                    className="w-full pl-8 pr-3 h-11 bg-slate-100/80 border border-slate-200 rounded-xl text-sm font-bold tabular-nums text-slate-600 cursor-not-allowed select-none"
                   />
                 </div>
               </div>
@@ -1159,7 +1159,7 @@ export default function CajaPage() {
                   </p>
                 </div>
               </div>
-              <span className="text-lg font-black font-mono tracking-tight">
+              <span className="text-lg font-black tabular-nums tracking-tight">
                 {totals.isBalanced
                   ? "$0.00"
                   : totals.isSurplus

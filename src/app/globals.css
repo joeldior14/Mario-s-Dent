@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: var(--font-sans), system-ui, sans-serif;
+  --font-mono: var(--font-mono), monospace;
+}
+
 /* Ocultar el icono de calendario por defecto del navegador */
 input[type="date"]::-webkit-calendar-picker-indicator {
   opacity: 0;
@@ -9,4 +14,17 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 input[type="date"]::-webkit-inner-spin-button {
   display: none;
   -webkit-appearance: none;
+}
+
+body {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Opcional: Cifras numéricas tabulares alineadas */
+.font-mono {
+  font-family: var(--font-mono), monospace;
+  font-feature-settings: "tnum" 1;
 }

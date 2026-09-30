@@ -79,17 +79,17 @@ export default function OpenShiftModal({
               <DollarSign className="w-5 h-5" />
             </div>
             <div>
-              <h3 id="open-shift-title" className="text-base font-bold text-slate-800">
+              <h3 id="open-shift-title" className="text-base font-bold text-sky-600">
                 Apertura de Turno
               </h3>
-              <p className="text-xs text-slate-400">Cajero asignado: {cashierName}</p>
+              <p className="text-xs font-medium text-slate-800">Cajero asignado: {cashierName}</p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Cerrar modal"
-            className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition-colors"
+            className="p-1.5 text-rose-500 hover:text-white rounded-lg hover:bg-rose-500 transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -100,9 +100,9 @@ export default function OpenShiftModal({
           <div>
             <label
               htmlFor="initial-cash-input"
-              className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2"
+              className="block text-xs font-bold text-sky-700 uppercase tracking-wider mb-2"
             >
-              Fondo Inicial en Efectivo ($ USD)[cite: 1, 2]
+              Fondo Inicial en Efectivo ($ USD)
             </label>
             <div className="relative">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg font-bold">
@@ -117,14 +117,14 @@ export default function OpenShiftModal({
                 value={amount}
                 onChange={handleAmountChange}
                 placeholder="0.00"
-                className="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-2xl font-bold font-mono text-slate-800 placeholder-slate-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all"
+                className="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-2xl font-bold tabular-nums text-slate-800 placeholder-slate-300 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-transparent transition-all"
               />
             </div>
           </div>
 
           {/* Sugerencias Rápidas */}
           <div className="flex items-center gap-2">
-            <span className="text-[11px] font-semibold text-slate-400">Sugeridos:</span>
+            <span className="text-xs font-semibold text-slate-700">Sugeridos:</span>
             {PRESET_AMOUNTS.map((val) => {
               const formattedVal = val.toFixed(2);
               const isSelected = amount === formattedVal;
@@ -149,7 +149,7 @@ export default function OpenShiftModal({
           <div className="flex items-start gap-2.5 p-3 rounded-xl bg-amber-50 border border-amber-200/70 text-amber-800 text-xs leading-relaxed">
             <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
             <span>
-              Este monto servirá de base para el arqueo y cálculo de diferencias al realizar el Corte de Caja[cite: 1, 2].
+              Este monto servirá de base para el arqueo y cálculo de diferencias al realizar el Corte de Caja.
             </span>
           </div>
 

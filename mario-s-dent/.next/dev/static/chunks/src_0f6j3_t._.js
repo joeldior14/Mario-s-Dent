@@ -18,6 +18,22 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
 ;
 ;
 ;
+const COOKIE_NAME = "marios_dent_session";
+// Asienta la cookie de sesión para que el middleware de Next.js la lea
+function setSessionCookie(sessionData) {
+    if (typeof document === "undefined") return;
+    const cookiePayload = JSON.stringify({
+        id: sessionData.id,
+        role: sessionData.role,
+        branch: sessionData.branch
+    });
+    document.cookie = `${COOKIE_NAME}=${encodeURIComponent(cookiePayload)}; path=/; max-age=86400; SameSite=Lax`;
+}
+// Elimina la cookie de sesión
+function removeSessionCookie() {
+    if (typeof document === "undefined") return;
+    document.cookie = `${COOKIE_NAME}=; path=/; max-age=0; SameSite=Lax`;
+}
 const AuthContext = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["createContext"])(undefined);
 function AuthProvider({ children }) {
     _s();
@@ -63,10 +79,16 @@ function AuthProvider({ children }) {
                     const { data: { session } } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].auth.getSession();
                     if (session?.user && mounted) {
                         const profile = await loadProfile(session.user.id, session.user.email || "");
-                        if (mounted) setUser(profile);
+                        if (mounted && profile) {
+                            setUser(profile);
+                            setSessionCookie(profile);
+                        }
                     }
                 } catch  {
-                    if (mounted) setUser(null);
+                    if (mounted) {
+                        setUser(null);
+                        removeSessionCookie();
+                    }
                 } finally{
                     if (mounted) setIsLoading(false);
                 }
@@ -76,9 +98,13 @@ function AuthProvider({ children }) {
                 "AuthProvider.useEffect": async (_event, session)=>{
                     if (session?.user) {
                         const profile = await loadProfile(session.user.id, session.user.email || "");
-                        setUser(profile);
+                        if (profile) {
+                            setUser(profile);
+                            setSessionCookie(profile);
+                        }
                     } else {
                         setUser(null);
+                        removeSessionCookie();
                     }
                     setIsLoading(false);
                 }
@@ -96,7 +122,7 @@ function AuthProvider({ children }) {
     const login = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
         "AuthProvider.useCallback[login]": async (identifier, pass, expectedRole)=>{
             let emailToAuth = identifier.trim().toLowerCase();
-            // Si se ingresó un nombre de usuario (ej. 'admin'), se completa con el dominio
+            // Si se ingresó un nombre de usuario (ej. 'admin' o 'maria.g'), se completa con el dominio
             if (!emailToAuth.includes("@")) {
                 emailToAuth = `${emailToAuth}@mariosdent.com`;
             }
@@ -117,11 +143,13 @@ function AuthProvider({ children }) {
             }
             if (expectedRole === "admin" && profile.role !== "admin") {
                 await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].auth.signOut();
+                removeSessionCookie();
                 return {
                     error: "Acceso denegado: Esta cuenta no posee permisos de Administrador."
                 };
             }
             setUser(profile);
+            setSessionCookie(profile);
             if (profile.role === "admin") {
                 router.push("/dashboard");
             } else {
@@ -137,6 +165,7 @@ function AuthProvider({ children }) {
         "AuthProvider.useCallback[logout]": async ()=>{
             await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].auth.signOut();
             setUser(null);
+            removeSessionCookie();
             router.push("/login");
         }
     }["AuthProvider.useCallback[logout]"], [
@@ -152,7 +181,7 @@ function AuthProvider({ children }) {
         children: children
     }, void 0, false, {
         fileName: "[project]/src/app/context/AuthContext.tsx",
-        lineNumber: 191,
+        lineNumber: 225,
         columnNumber: 5
     }, this);
 }

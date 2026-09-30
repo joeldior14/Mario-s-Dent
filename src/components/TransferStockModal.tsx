@@ -151,8 +151,8 @@ export default function TransferStockModal({
               <ArrowRightLeft className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-800">Reabastecimiento de Sucursal</h3>
-              <p className="text-[11px] text-slate-500">Mover existencias entre tiendas</p>
+              <h3 className="text-sm font-bold text-sky-600">Reabastecimiento de Sucursal</h3>
+              <p className="text-xs font-medium text-slate-700">Mover existencias entre tiendas</p>
             </div>
           </div>
           <button
@@ -160,7 +160,7 @@ export default function TransferStockModal({
             onClick={handleCleanClose}
             disabled={isTransferring}
             aria-label="Cerrar"
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer disabled:opacity-40"
+            className="p-1 rounded-lg text-rose-500 hover:text-white hover:bg-rose-500 transition-colors cursor-pointer disabled:opacity-40"
           >
             <X className="w-4 h-4" />
           </button>
@@ -170,12 +170,12 @@ export default function TransferStockModal({
         <div className="p-5 space-y-4">
           {/* Selector con Autocompletado */}
           <div ref={dropdownRef} className="relative">
-            <label className="block text-xs font-semibold text-slate-600 mb-1">
+            <label className="block text-xs font-semibold text-sky-700 mb-1">
               Producto a trasladar
             </label>
 
             <div className="relative">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <Search className="w-4 h-4 text-sky-500 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
                 type="text"
                 value={searchTerm}
@@ -235,7 +235,7 @@ export default function TransferStockModal({
           {/* Origen y Destino */}
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-[11px] font-semibold text-slate-500 mb-1">
+              <label className="block text-xs font-semibold text-sky-700 mb-1">
                 Desde (Origen)
               </label>
               <select
@@ -253,17 +253,17 @@ export default function TransferStockModal({
                   </option>
                 ))}
               </select>
-              <p className="text-[10px] text-slate-400 mt-1 font-mono">
+              <p className="text-xs text-slate-500 mt-1 font-mono">
                 Disp:{" "}
-                <strong className={selectedProductId ? "text-slate-700" : "text-slate-400"}>
+                <strong className={selectedProductId ? "text-amber-700" : "text-slate-400"}>
                   {selectedProductId ? availableInSource : "—"}
                 </strong>{" "}
-                unids.
+                unidades
               </p>
             </div>
 
             <div>
-              <label className="block text-[11px] font-semibold text-slate-500 mb-1">
+              <label className="block text-xs font-semibold text-sky-700 mb-1">
                 Hacia (Destino)
               </label>
               <select
@@ -286,7 +286,7 @@ export default function TransferStockModal({
 
           {/* Cantidad */}
           <div>
-            <label className="block text-xs font-semibold text-slate-600 mb-1">
+            <label className="block text-xs font-semibold text-sky-700 mb-1">
               Cantidad de unidades
             </label>
             <input

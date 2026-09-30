@@ -1,57 +1,30 @@
 "use client";
 
-
-
 import React, { useState, useMemo, useEffect, useCallback, useRef, useSyncExternalStore } from "react";
-
 import Image from "next/image";
-
 import Link from "next/link";
-
 import Navbar from "@/components/Navbar";
-
 import { useShift } from "@/app/context/ShiftContext";
-
 import { useAuth } from "@/app/context/AuthContext";
-
 import { supabase } from "@/lib/supabaseClient";
-
 import { processSaleInDB, POSCartItem } from "@/app/services/inventoryService";
-
 import { getNextOrderNumber } from "@/app/services/cashService";
-
 import {
-
   Scan,
-
   Trash2,
-
   X,
-
   Minus,
-
   Plus,
-
   Banknote,
-
   CreditCard,
-
   Building2,
-
   Printer,
-
   Lock,
-
   ArrowRight,
-
   Package,
-
   Loader2,
-
   CheckCircle2,
-
   Coins,
-
 } from "lucide-react";
 
 
@@ -999,123 +972,63 @@ export default function PosPage() {
       {/* Banner de venta exitosa */}
 
       {ticketSuccess && (
-
         <div className="bg-emerald-600 text-white px-6 py-2.5 flex items-center justify-between text-xs font-bold shadow-md animate-in slide-in-from-top-2">
-
           <div className="flex items-center gap-2">
-
             <CheckCircle2 className="w-4 h-4" />
-
             <span>
-
               ¡Venta registrada con éxito! Comprobante emitido: <strong>{ticketSuccess}</strong>[cite: 1, 4]
-
             </span>
-
           </div>
-
           <button
-
             type="button"
-
             onClick={() => setTicketSuccess(null)}
-
             className="p-1 hover:bg-emerald-700 rounded-lg transition-colors cursor-pointer"
-
           >
-
             <X className="w-4 h-4" />
-
           </button>
-
         </div>
-
       )}
-
-
-
       <div className="flex-1 flex overflow-hidden">
 
         {/* PANEL IZQUIERDO: Búsqueda, Filtros y Catálogo */}
-
         <main className="flex-1 p-6 overflow-y-auto space-y-5">
-
           <div className="border border-slate-200 rounded-xl p-3 bg-white flex items-center gap-3 shadow-2xs focus-within:border-sky-500 focus-within:ring-2 focus-within:ring-sky-100 transition-all">
-
             <Scan className="w-5 h-5 text-sky-600 shrink-0" />
-
             <input
-
               ref={scanInputRef}
-
               type="text"
-
               autoFocus
-
               value={searchQuery}
-
               onKeyDown={handleScannerKeyDown}
-
               onChange={(e) => setSearchQuery(e.target.value)}
-
               placeholder="Escanear código de barras o buscar por SKU / Nombre..."
-
               className="w-full bg-transparent text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none"
-
             />
-
             {searchQuery && (
-
               <button
-
                 type="button"
-
                 onClick={() => setSearchQuery("")}
-
                 className="text-slate-400 hover:text-slate-600 text-xs px-2 cursor-pointer"
-
               >
-
                 Limpiar
-
               </button>
-
             )}
-
           </div>
-
-
-
           <div className="flex items-center gap-2 overflow-x-auto pb-1">
-
             {CATEGORIES.map((cat) => (
-
               <button
-
                 type="button"
-
                 key={cat}
-
                 onClick={() => setActiveCategory(cat)}
-
                 className={`px-4 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer shrink-0 ${
-
                   activeCategory === cat
-
                     ? "bg-[#0284C7] text-white border-[#0284C7] shadow-xs"
-
                     : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
-
                 }`}
-
               >
-
                 {cat === "All" ? "Todos" : cat}
-
               </button>
-
             ))}
-
           </div>
 
 
@@ -1200,7 +1113,7 @@ export default function PosPage() {
 
                         <div className="flex items-start justify-between gap-1 mb-1">
 
-                          <span className="text-xs font-bold text-slate-900 leading-snug break-words">
+                          <span className="text-xs font-bold text-slate-700 leading-snug break-words">
                             {item.name}
                           </span>
                           <span
@@ -1219,7 +1132,7 @@ export default function PosPage() {
                           {item.brand}
                         </p>
                       </div>
-                      <p className="text-sm font-extrabold text-slate-900 mt-3">
+                      <p className="text-sm font-extrabold text-sky-600 mt-3">
                         ${item.price.toFixed(2)}
                       </p>
                     </div>
@@ -1237,7 +1150,7 @@ export default function PosPage() {
         <aside className="w-[400px] bg-white border-l border-slate-200 flex flex-col h-full shadow-xs shrink-0">
           <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <span className="font-bold text-xs text-slate-800">Current Order</span>
+              <span className="font-bold text-xs text-sky-600">Orden actual</span>
               <span className="text-xs font-black text-sky-600 bg-sky-50 px-2 py-0.5 rounded-md border border-sky-100">
                 #{hasHydrated ? orderNumber : "—"}
               </span>
@@ -1259,8 +1172,8 @@ export default function PosPage() {
               <div className="h-full flex flex-col items-center justify-center text-slate-400 text-xs text-center p-6 space-y-2">
                 <span className="text-2xl">🛒</span>
                 <p className="font-semibold text-slate-600">No hay productos en la orden</p>
-                <p className="text-[10px] text-slate-400 max-w-[200px]">
-                  Selecciona un producto del catálogo o escanea su código de barras[cite: 1, 6].
+                <p className="text-[10px] text-slate-500 max-w-[200px]">
+                  Selecciona un producto del catálogo o escanea su código de barras.
                 </p>
               </div>
             ) : (
@@ -1274,7 +1187,7 @@ export default function PosPage() {
                       {item.name}
                     </h4>
                     <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">
-                      {item.brand} • <span className="font-mono">SKU: {item.sku}</span>
+                      {item.brand} • <span className="tabular-nums">SKU: {item.sku}</span>
                     </p>
                   </div>
                   <div className="w-24 shrink-0 flex items-center justify-between border border-slate-200 rounded-lg bg-white shadow-2xs h-7 px-1">
@@ -1300,7 +1213,7 @@ export default function PosPage() {
                     </button>
                   </div>
                   <div className="w-16 shrink-0 text-right">
-                    <span className="text-xs font-extrabold text-slate-800 font-mono tabular-nums block">
+                    <span className="text-xs font-extrabold text-slate-800 tabular-nums tabular-nums block">
                       ${(item.price * item.quantity).toFixed(2)}
                     </span>
                   </div>
@@ -1382,8 +1295,8 @@ export default function PosPage() {
                     <label className="block text-[10px] font-bold text-slate-600 uppercase tracking-wider mb-1">
                       Dinero Recibido ($)
                     </label>
-                    <div className="relative">
-                      <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-xs">
+                    <div className="relative ">
+                      <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">
                         $
                       </span>
                       <input
@@ -1393,7 +1306,7 @@ export default function PosPage() {
                         value={cashReceived}
                         onChange={(e) => setCashReceived(e.target.value)}
                         placeholder="0.00"
-                        className={`w-full pl-6 pr-2 py-1.5 bg-white border rounded-xl text-xs font-bold font-mono text-slate-900 focus:outline-none transition-colors ${
+                        className={`w-full h-[34px] pl-6 pr-2 py-1.5 bg-white border rounded-xl text-sm font-bold tabular-nums text-slate-900 focus:outline-none transition-colors ${
                           isCashInsufficient
                             ? "border-rose-400 focus:border-rose-500 bg-rose-50/30"
                             : "border-slate-300 focus:border-sky-500"
@@ -1407,7 +1320,7 @@ export default function PosPage() {
                     </label>
                     <div className="relative flex items-center h-[34px] px-3 bg-emerald-50/70 border border-emerald-200 rounded-xl">
                       <Coins className="w-3.5 h-3.5 text-emerald-600 mr-1.5 shrink-0" />
-                      <span className="font-mono font-extrabold text-sm text-emerald-700 tabular-nums">
+                      <span className="tabular-nums font-extrabold text-sm text-emerald-700 tabular-nums">
                         ${changeDue.toFixed(2)}
                       </span>
                     </div>

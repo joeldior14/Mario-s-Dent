@@ -85,7 +85,7 @@ const BRANCHES_DATA: Record<string, BranchMetric> = {
 };
 
 const BRANCH_OPTIONS = [
-  { key: "all", label: "Todas las Sucursales", desc: "Consolidado de Red" },
+  { key: "all", label: "Todas", desc: "Consolidado de Red" },
   { key: "santa-ana", label: "Santa Ana", desc: "Sede Matriz" },
   { key: "ahuachapan", label: "Ahuachapán", desc: "Sucursal Occidente" },
   { key: "sonsonate", label: "Sonsonate", desc: "Sucursal Occidente" },
@@ -113,15 +113,19 @@ export default function DashboardPage() {
     }).format(new Date());
   });
 
-  // Estados y Refs para los dropdowns personalizados (Sede y Fecha)
+  // Dropdowns de Sede y Fecha
   const [isBranchDropdownOpen, setIsBranchDropdownOpen] = useState(false);
   const [isDateOpen, setIsDateOpen] = useState(false);
   const branchDropdownRef = useRef<HTMLDivElement>(null);
   const dateRef = useRef<HTMLDivElement>(null);
 
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isLoadingMetrics, setIsLoadingMetrics] = useState(false);
 
-  // Lógica del Calendario Customizado
+  // Progreso de animación controlado
+  const [animProgress, setAnimProgress] = useState(0);
+
+  // Lógica del Calendario
   const [viewMonth, setViewMonth] = useState(() => {
     const d = new Date(selectedDate ? `${selectedDate}T12:00:00` : new Date());
     return isNaN(d.getTime()) ? new Date() : d;
@@ -129,7 +133,7 @@ export default function DashboardPage() {
 
   const monthNames = [
     "Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
-    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"
+    "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre",
   ];
   const dayNames = ["DO", "LU", "MA", "MI", "JU", "VI", "SÁ"];
 
@@ -177,7 +181,6 @@ export default function DashboardPage() {
   });
 
   const [branchPerformance, setBranchPerformance] = useState<BranchPerformanceMetric[]>([]);
-
   const [stockAlerts, setStockAlerts] = useState<DashboardStockAlerts>({
     lowStockItems: [],
     outOfStockItems: [],
@@ -187,7 +190,36 @@ export default function DashboardPage() {
     setIsRefreshing(true);
   };
 
-  // Cerrar menús al hacer clic fuera
+  const hasSales = realMetrics.totalIncome > 0;
+
+  // Animación del porcentaje de 0% a 100% y progreso sin llamadas síncronas en el cuerpo del efecto
+  useEffect(() => {
+    let animFrame: number;
+
+    if (isLoadingMetrics || !hasSales) {
+      animFrame = requestAnimationFrame(() => setAnimProgress(0));
+      return () => cancelAnimationFrame(animFrame);
+    }
+
+    const duration = 900;
+    const startTime = performance.now();
+
+    const animate = (now: number) => {
+      const elapsed = now - startTime;
+      const rawProgress = Math.min(elapsed / duration, 1);
+      const ease = 1 - Math.pow(1 - rawProgress, 3);
+      setAnimProgress(ease);
+
+      if (rawProgress < 1) {
+        animFrame = requestAnimationFrame(animate);
+      }
+    };
+
+    animFrame = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(animFrame);
+  }, [isLoadingMetrics, hasSales, selectedDate, selectedBranchKey]);
+
+  // Cierre de menús flotantes
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (branchDropdownRef.current && !branchDropdownRef.current.contains(e.target as Node)) {
@@ -202,25 +234,38 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => {
+    let isMounted = true;
+
     async function loadAlert() {
       try {
         const alertData = await getPendingDiscrepancyAlert();
-        setDiscrepancyAlert(alertData);
-      } catch (err) {
+        if (isMounted) {
+          setDiscrepancyAlert(alertData);
+        }
+      } catch (err: unknown) {
         console.error("Error al consultar alertas de caja:", err);
       } finally {
-        setIsLoadingAlert(false);
+        if (isMounted) {
+          setIsLoadingAlert(false);
+        }
       }
     }
 
     loadAlert();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  // Carga unificada de métricas, rendimiento y alertas desde Supabase
+  // Carga unificada de datos desde Supabase (Corregido sin setState síncrono en la raíz del efecto)
   useEffect(() => {
     let isMounted = true;
 
-    async function loadDashboardData() {
+    queueMicrotask(async () => {
+      if (!isMounted) return;
+      setIsLoadingMetrics(true);
+
       try {
         const [metricsData, perfData, alertsData] = await Promise.all([
           fetchDashboardSalesMetrics(selectedDate, selectedBranchKey),
@@ -233,23 +278,22 @@ export default function DashboardPage() {
           setBranchPerformance(perfData);
           setStockAlerts(alertsData);
         }
-      } catch (err) {
+      } catch (err: unknown) {
         console.error("Error al cargar datos del dashboard:", err);
       } finally {
         if (isMounted) {
+          setIsLoadingMetrics(false);
           setIsRefreshing(false);
         }
       }
-    }
-
-    loadDashboardData();
+    });
 
     return () => {
       isMounted = false;
     };
   }, [selectedDate, selectedBranchKey, isRefreshing]);
 
-  // Búsqueda en Supabase con Debounce (300 ms)
+  // Búsqueda de inventario con Debounce (Sin llamadas síncronas en el cuerpo del efecto)
   useEffect(() => {
     const cleanQuery = searchQuery.trim();
 
@@ -267,7 +311,7 @@ export default function DashboardPage() {
       try {
         const data = await searchDashboardInventory(cleanQuery, selectedBranchKey);
         setSearchResults(data);
-      } catch (err) {
+      } catch (err: unknown) {
         console.error("Error en búsqueda de inventario:", err);
       } finally {
         setIsSearching(false);
@@ -277,7 +321,6 @@ export default function DashboardPage() {
     return () => clearTimeout(delayDebounce);
   }, [searchQuery, selectedBranchKey]);
 
-  // Nombre legible de la sede activa
   const activeMetrics = useMemo(() => {
     if (selectedBranchKey !== "all" && BRANCHES_DATA[selectedBranchKey]) {
       return BRANCHES_DATA[selectedBranchKey];
@@ -294,18 +337,26 @@ export default function DashboardPage() {
     };
   }, [selectedBranchKey]);
 
+  // Distribución de porcentajes
+  const cardPct = realMetrics.paymentMethods.card || 0;
+  const transferPct = realMetrics.paymentMethods.transfer || 0;
+  const cashPct = realMetrics.paymentMethods.cash || 0;
+
+  const activeMethodsCount = [cardPct, transferPct, cashPct].filter((p) => p > 0).length;
+  const isSingleMethod100 = activeMethodsCount === 1;
+
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-700 flex flex-col font-sans select-none">
+    <div className="min-h-screen bg-[#F8FAFC] text-slate-700 flex flex-col font-sans">
       <Navbar />
 
-      <main className="flex-1 p-6 md:p-8 max-w-7xl mx-auto w-full space-y-6">
+      <main className="flex-1 p-4 sm:p-6 md:p-8 max-w-7xl mx-auto w-full space-y-6">
         {/* =========================================================================
             1. ENCABEZADO DE CONTROL EJECUTIVO
            ========================================================================= */}
-        <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2.5">
-              <h1 className="text-2xl font-black text-sky-600 tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-black text-sky-600 tracking-tight">
                 Panel Ejecutivo
               </h1>
               <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
@@ -318,217 +369,219 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-3">
-            {/* SELECTOR CUSTOMIZADO DE SUCURSAL */}
-            <div className="relative" ref={branchDropdownRef}>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsBranchDropdownOpen((prev) => !prev);
-                  setIsDateOpen(false);
-                }}
-                className={`h-10 px-3.5 bg-white border rounded-xl flex items-center gap-2.5 transition-all cursor-pointer shadow-2xs select-none ${
-                  isBranchDropdownOpen
-                    ? "border-sky-500 ring-2 ring-sky-500/10"
-                    : "border-slate-200 hover:border-slate-300"
-                }`}
-              >
-                <div className="w-6 h-6 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
-                  <Store className="w-3.5 h-3.5" />
-                </div>
-                <div className="flex flex-col text-left leading-tight">
-                  <span className="text-[9px] font-extrabold text-sky-600 uppercase tracking-wider">
-                    Sede
-                  </span>
-                  <span className="text-xs font-bold text-slate-800 truncate max-w-[170px]">
-                    {BRANCH_OPTIONS.find((b) => b.key === selectedBranchKey)?.label || activeMetrics.name}
-                  </span>
-                </div>
-                <ChevronDown
-                  className={`w-3.5 h-3.5 text-slate-400 ml-1.5 transition-transform duration-200 ${
-                    isBranchDropdownOpen ? "rotate-180 text-sky-600" : ""
+          <div className="flex items-center gap-2 w-full lg:w-auto">
+            <div className="grid grid-cols-2 gap-2 flex-1 lg:flex lg:items-center lg:gap-3">
+              {/* SELECTOR DE SUCURSAL */}
+              <div className="relative w-full lg:w-auto" ref={branchDropdownRef}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsBranchDropdownOpen((prev) => !prev);
+                    setIsDateOpen(false);
+                  }}
+                  className={`h-11 lg:h-10 px-3 bg-white border rounded-xl flex items-center justify-between gap-2 w-full lg:w-auto transition-all cursor-pointer shadow-2xs ${
+                    isBranchDropdownOpen
+                      ? "border-sky-500 ring-2 ring-sky-500/10"
+                      : "border-slate-200 hover:border-slate-300"
                   }`}
-                />
-              </button>
-
-              {isBranchDropdownOpen && (
-                <div className="absolute right-0 sm:left-0 mt-2 w-60 bg-white border border-slate-100 rounded-2xl shadow-xl p-1.5 z-40 animate-in fade-in zoom-in-95 duration-150">
-                  <div className="px-2.5 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 mb-1">
-                    Seleccionar Sede
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-6 h-6 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
+                      <Store className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="flex flex-col text-left leading-tight min-w-0">
+                      <span className="text-[9px] font-extrabold text-sky-600 uppercase tracking-wider">
+                        Sede
+                      </span>
+                      <span className="text-xs font-bold text-slate-800 truncate block max-w-[105px] sm:max-w-[150px]">
+                        {BRANCH_OPTIONS.find((b) => b.key === selectedBranchKey)?.label || activeMetrics.name}
+                      </span>
+                    </div>
                   </div>
-                  <div className="space-y-0.5">
-                    {BRANCH_OPTIONS.map((b) => {
-                      const isSelected = selectedBranchKey === b.key;
-                      return (
-                        <button
-                          key={b.key}
-                          type="button"
-                          onClick={() => {
-                            setSelectedBranchKey(b.key);
-                            setIsBranchDropdownOpen(false);
-                          }}
-                          className={`w-full px-2.5 py-2 rounded-xl text-left text-xs font-semibold flex items-center justify-between transition-colors cursor-pointer ${
-                            isSelected
-                              ? "bg-sky-50 text-sky-900 font-bold"
-                              : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                          }`}
-                        >
-                          <div className="flex items-center gap-2.5">
-                            <Building
-                              className={`w-3.5 h-3.5 shrink-0 ${
-                                isSelected ? "text-sky-600" : "text-slate-400"
-                              }`}
-                            />
-                            <div>
-                              <p className="leading-tight">{b.label}</p>
-                              <span className="text-[10px] text-slate-400 font-normal">
-                                {b.desc}
-                              </span>
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 text-slate-400 shrink-0 transition-transform duration-200 ${
+                      isBranchDropdownOpen ? "rotate-180 text-sky-600" : ""
+                    }`}
+                  />
+                </button>
+
+                {isBranchDropdownOpen && (
+                  <div className="absolute left-0 mt-2 w-64 bg-white border border-slate-100 rounded-2xl shadow-xl p-1.5 z-40 animate-in fade-in zoom-in-95 duration-150">
+                    <div className="px-2.5 py-1.5 text-[10px] font-bold text-slate-400 uppercase tracking-wider border-b border-slate-100 mb-1">
+                      Seleccionar Sede
+                    </div>
+                    <div className="space-y-0.5">
+                      {BRANCH_OPTIONS.map((b) => {
+                        const isSelected = selectedBranchKey === b.key;
+                        return (
+                          <button
+                            key={b.key}
+                            type="button"
+                            onClick={() => {
+                              setSelectedBranchKey(b.key);
+                              setIsBranchDropdownOpen(false);
+                            }}
+                            className={`w-full px-2.5 py-2 rounded-xl text-left text-xs font-semibold flex items-center justify-between transition-colors cursor-pointer ${
+                              isSelected
+                                ? "bg-sky-50 text-sky-900 font-bold"
+                                : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                            }`}
+                          >
+                            <div className="flex items-center gap-2.5">
+                              <Building
+                                className={`w-3.5 h-3.5 shrink-0 ${
+                                  isSelected ? "text-sky-600" : "text-slate-400"
+                                }`}
+                              />
+                              <div>
+                                <p className="leading-tight">{b.label}</p>
+                                <span className="text-[10px] text-slate-400 font-normal">
+                                  {b.desc}
+                                </span>
+                              </div>
                             </div>
-                          </div>
-                          {isSelected && <Check className="w-3.5 h-3.5 text-sky-600 shrink-0" />}
-                        </button>
-                      );
-                    })}
+                            {isSelected && <Check className="w-3.5 h-3.5 text-sky-600 shrink-0" />}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
 
-            {/* SELECTOR CUSTOMIZADO DE FECHA (CALENDARIO FLOTANTE IGUAL AL DE CAJA) */}
-            <div className="relative" ref={dateRef}>
-              <button
-                type="button"
-                onClick={() => {
-                  setIsDateOpen((prev) => !prev);
-                  setIsBranchDropdownOpen(false);
-                }}
-                className={`h-10 px-3.5 bg-white border rounded-xl flex items-center gap-2.5 transition-all cursor-pointer shadow-2xs select-none ${
-                  isDateOpen
-                    ? "border-sky-500 ring-2 ring-sky-500/10"
-                    : "border-slate-200 hover:border-slate-300"
-                }`}
-              >
-                <div className="w-6 h-6 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
-                  <CalendarIcon className="w-3.5 h-3.5 text-sky-600" />
-                </div>
-
-                <div className="flex flex-col text-left leading-tight">
-                  <span className="text-[9px] font-extrabold text-sky-600 uppercase tracking-wider">
-                    Fecha
-                  </span>
-                  <span className="text-xs font-bold text-slate-800 font-mono tracking-tight">
-                    {selectedDate}
-                  </span>
-                </div>
-
-                <ChevronDown
-                  className={`w-3.5 h-3.5 text-slate-400 ml-1 transition-transform duration-200 ${
-                    isDateOpen ? "rotate-180 text-sky-600" : ""
+              {/* SELECTOR DE FECHA */}
+              <div className="relative w-full lg:w-auto" ref={dateRef}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsDateOpen((prev) => !prev);
+                    setIsBranchDropdownOpen(false);
+                  }}
+                  className={`h-11 lg:h-10 px-3 bg-white border rounded-xl flex items-center justify-between gap-2 w-full lg:w-auto transition-all cursor-pointer shadow-2xs ${
+                    isDateOpen
+                      ? "border-sky-500 ring-2 ring-sky-500/10"
+                      : "border-slate-200 hover:border-slate-300"
                   }`}
-                />
-              </button>
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    <div className="w-6 h-6 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
+                      <CalendarIcon className="w-3.5 h-3.5 text-sky-600" />
+                    </div>
 
-              {isDateOpen && (
-                <div className="absolute right-0 sm:left-0 mt-2 w-72 bg-white border border-slate-100 rounded-3xl shadow-2xl p-4 z-40 animate-in fade-in zoom-in-95 duration-150">
-                  {/* Encabezado del mes */}
-                  <div className="flex items-center justify-between mb-3 px-1">
-                    <span className="text-xs font-extrabold text-slate-800 capitalize">
-                      {monthNames[viewMonth.getMonth()]} {viewMonth.getFullYear()}
-                    </span>
-                    <div className="flex items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1))
-                        }
-                        className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
-                      >
-                        <ChevronLeft className="w-4 h-4" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1))
-                        }
-                        className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 transition-colors"
-                      >
-                        <ChevronRight className="w-4 h-4" />
-                      </button>
+                    <div className="flex flex-col text-left leading-tight min-w-0">
+                      <span className="text-[9px] font-extrabold text-sky-600 uppercase tracking-wider">
+                        Fecha
+                      </span>
+                      <span className="text-xs font-bold text-slate-800 tabular-nums tracking-tight whitespace-nowrap">
+                        {selectedDate}
+                      </span>
                     </div>
                   </div>
 
-                  {/* Días de la semana */}
-                  <div className="grid grid-cols-7 gap-1 text-center mb-1">
-                    {dayNames.map((d) => (
-                      <span key={d} className="text-[10px] font-black text-slate-400 py-1">
-                        {d}
+                  <ChevronDown
+                    className={`w-3.5 h-3.5 text-slate-400 shrink-0 transition-transform duration-200 ${
+                      isDateOpen ? "rotate-180 text-sky-600" : ""
+                    }`}
+                  />
+                </button>
+
+                {isDateOpen && (
+                  <div className="absolute right-0 mt-2 w-72 max-w-[calc(100vw-2rem)] bg-white border border-slate-100 rounded-3xl shadow-2xl p-4 z-50 animate-in fade-in zoom-in-95 duration-150">
+                    <div className="flex items-center justify-between mb-3 px-1">
+                      <span className="text-xs font-extrabold text-slate-800 capitalize">
+                        {monthNames[viewMonth.getMonth()]} {viewMonth.getFullYear()}
                       </span>
-                    ))}
-                  </div>
-
-                  {/* Cuadrícula de días */}
-                  <div className="grid grid-cols-7 gap-1">
-                    {calendarDays.map((item, idx) => {
-                      const isSelected = selectedDate === item.dateStr;
-                      return (
+                      <div className="flex items-center gap-1">
                         <button
-                          key={idx}
                           type="button"
-                          onClick={() => {
-                            setSelectedDate(item.dateStr);
-                            setIsDateOpen(false);
-                          }}
-                          className={`h-8 w-8 mx-auto rounded-xl text-xs font-bold flex items-center justify-center transition-all cursor-pointer ${
-                            isSelected
-                              ? "bg-sky-600 text-white shadow-xs scale-105"
-                              : item.isCurrentMonth
-                              ? "text-slate-700 hover:bg-sky-50 hover:text-sky-700"
-                              : "text-slate-300 hover:text-slate-500"
-                          }`}
+                          onClick={() =>
+                            setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() - 1, 1))
+                          }
+                          className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 transition-colors cursor-pointer"
                         >
-                          {item.day}
+                          <ChevronLeft className="w-4 h-4" />
                         </button>
-                      );
-                    })}
-                  </div>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setViewMonth(new Date(viewMonth.getFullYear(), viewMonth.getMonth() + 1, 1))
+                          }
+                          className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-slate-100 text-slate-500 transition-colors cursor-pointer"
+                        >
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
 
-                  {/* Acciones al pie */}
-                  <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const today = new Intl.DateTimeFormat("en-CA", {
-                          timeZone: "America/El_Salvador",
-                          year: "numeric",
-                          month: "2-digit",
-                          day: "2-digit",
-                        }).format(new Date());
-                        setSelectedDate(today);
-                        setViewMonth(new Date());
-                        setIsDateOpen(false);
-                      }}
-                      className="text-sky-600 font-bold hover:underline cursor-pointer"
-                    >
-                      Hoy
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setIsDateOpen(false)}
-                      className="text-slate-400 hover:text-slate-600 font-medium cursor-pointer"
-                    >
-                      Cerrar
-                    </button>
+                    <div className="grid grid-cols-7 gap-1 text-center mb-1">
+                      {dayNames.map((d) => (
+                        <span key={d} className="text-[10px] font-black text-slate-400 py-1">
+                          {d}
+                        </span>
+                      ))}
+                    </div>
+
+                    <div className="grid grid-cols-7 gap-1">
+                      {calendarDays.map((item, idx) => {
+                        const isSelected = selectedDate === item.dateStr;
+                        return (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => {
+                              setSelectedDate(item.dateStr);
+                              setIsDateOpen(false);
+                            }}
+                            className={`h-8 w-8 mx-auto rounded-xl text-xs font-bold flex items-center justify-center transition-all cursor-pointer ${
+                              isSelected
+                                ? "bg-sky-600 text-white shadow-xs scale-105"
+                                : item.isCurrentMonth
+                                ? "text-slate-700 hover:bg-sky-50 hover:text-sky-700"
+                                : "text-slate-300 hover:text-slate-500"
+                            }`}
+                          >
+                            {item.day}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <div className="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px]">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const today = new Intl.DateTimeFormat("en-CA", {
+                            timeZone: "America/El_Salvador",
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                          }).format(new Date());
+                          setSelectedDate(today);
+                          setViewMonth(new Date());
+                          setIsDateOpen(false);
+                        }}
+                        className="text-sky-600 font-bold hover:underline cursor-pointer"
+                      >
+                        Hoy
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIsDateOpen(false)}
+                        className="text-slate-400 hover:text-slate-600 font-medium cursor-pointer"
+                      >
+                        Cerrar
+                      </button>
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
 
-            {/* Botón Sincronizar */}
+            {/* Botón Refrescar */}
             <button
               onClick={handleRefresh}
               title="Refrescar métricas"
-              className="w-10 h-10 bg-white border border-slate-200 hover:bg-slate-50 text-sky-500 hover:text-slate-700 rounded-xl flex items-center justify-center shadow-2xs transition-colors cursor-pointer"
+              className="w-11 h-11 lg:w-10 lg:h-10 shrink-0 bg-white border border-slate-200 hover:bg-slate-50 text-sky-500 hover:text-slate-700 rounded-xl flex items-center justify-center shadow-2xs transition-colors cursor-pointer"
             >
               <RotateCw className={`w-4 h-4 ${isRefreshing ? "animate-spin text-sky-600" : ""}`} />
             </button>
@@ -570,7 +623,7 @@ export default function DashboardPage() {
         )}
 
         {/* =========================================================================
-            3. BUSCADOR RÁPIDO DE PRECIOS & EXISTENCIAS (SUPABASE)
+            3. BUSCADOR RÁPIDO DE PRECIOS & EXISTENCIAS
            ========================================================================= */}
         <div className="relative">
           <div className="relative">
@@ -603,7 +656,6 @@ export default function DashboardPage() {
             )}
           </div>
 
-          {/* Menú Desplegable Flotante de Búsqueda */}
           {isSearchOpen && (
             <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-slate-200 rounded-2xl shadow-xl z-30 max-h-72 overflow-y-auto divide-y divide-slate-100 animate-in fade-in-50 duration-150">
               {isSearching ? (
@@ -617,10 +669,10 @@ export default function DashboardPage() {
                     key={item.id}
                     className="p-3.5 flex items-center justify-between hover:bg-slate-50 transition-colors"
                   >
-                    <div className="space-y-0.5 min-w-0 pr-4">
-                      <div className="flex items-center gap-2">
-                        <p className="text-xs font-bold text-slate-800 truncate">{item.name}</p>
-                        <span className="text-[10px] font-mono font-semibold bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded">
+                    <div className="space-y-1 min-w-0 pr-3 flex-1">
+                      <div className="flex items-start gap-2 flex-wrap sm:flex-nowrap">
+                        <p className="text-xs font-bold text-slate-800 leading-snug break-words">{item.name}</p>
+                        <span className="text-[10px] tabular-nums font-semibold bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded shrink-0">
                           {item.sku}
                         </span>
                       </div>
@@ -630,11 +682,11 @@ export default function DashboardPage() {
                     </div>
 
                     <div className="text-right shrink-0">
-                      <p className="text-xs font-mono font-bold text-sky-600">
+                      <p className="text-xs tabular-nums font-bold text-sky-600">
                         ${item.price.toFixed(2)}
                       </p>
                       <span
-                        className={`text-[10px] font-bold font-mono px-2 py-0.5 rounded-full inline-block mt-0.5 ${
+                        className={`text-[10px] font-bold tabular-nums px-2 py-0.5 rounded-full inline-block mt-0.5 ${
                           item.stock <= 0
                             ? "bg-rose-50 text-rose-700 border border-rose-200"
                             : item.stock <= 5
@@ -671,7 +723,7 @@ export default function DashboardPage() {
                     Ingresos Totales Cobrados
                   </span>
                   <div className="flex items-baseline gap-3">
-                    <span className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight font-mono">
+                    <span className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight tabular-nums">
                       ${realMetrics.totalIncome.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                     </span>
                     <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
@@ -681,7 +733,7 @@ export default function DashboardPage() {
                   </div>
                   <p className="text-xs text-slate-500 font-medium mt-1">
                     Margen bruto estimado:{" "}
-                    <strong className="text-slate-700 font-mono">
+                    <strong className="text-slate-700 tabular-nums">
                       ${realMetrics.estimatedProfit.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                     </strong>
                   </p>
@@ -691,7 +743,7 @@ export default function DashboardPage() {
                   <span className="text-xs font-black text-slate-900 uppercase tracking-wider block">
                     Tickets
                   </span>
-                  <span className="text-3xl font-black text-sky-700 font-mono">
+                  <span className="text-3xl font-black text-sky-700 tabular-nums">
                     {realMetrics.totalTickets}
                   </span>
                 </div>
@@ -709,7 +761,7 @@ export default function DashboardPage() {
               </div>
             </div>
 
-            {/* Rendimiento por Sucursal (Conectado a Supabase) */}
+            {/* Rendimiento por Sucursal */}
             <div className="bg-white border border-sky-400 rounded-2xl p-5 shadow-xs space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
@@ -739,10 +791,10 @@ export default function DashboardPage() {
                         <div className="flex items-center justify-between text-xs mb-1.5">
                           <span className="font-bold text-slate-800">{b.name}</span>
                           <div className="flex items-center gap-3">
-                            <span className="text-slate-400 text-[11px] font-mono">
+                            <span className="text-slate-400 text-[11px] tabular-nums">
                               {b.ticketsCount} tickets
                             </span>
-                            <span className="font-extrabold text-slate-900 font-mono">
+                            <span className="font-extrabold text-slate-900 tabular-nums">
                               ${b.totalIncome.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                             </span>
                           </div>
@@ -766,9 +818,12 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* COLUMNA DERECHA: Métodos de Pago & Alertas de Inventario */}
+          {/* COLUMNA DERECHA: Métodos de Pago */}
           <div className="col-span-12 lg:col-span-5 space-y-6">
-            <div className="bg-white border border-sky-400 rounded-2xl p-5 shadow-xs">
+            <div
+              key={`${selectedDate}-${selectedBranchKey}`}
+              className="bg-white border border-sky-400 rounded-2xl p-5 shadow-xs"
+            >
               <h3 className="text-xs font-bold text-sky-600 uppercase tracking-wider mb-4">
                 Distribución por Métodos de Pago
               </h3>
@@ -776,79 +831,111 @@ export default function DashboardPage() {
               <div className="flex items-center gap-6">
                 <div className="relative w-28 h-28 shrink-0 flex items-center justify-center">
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                    {/* CÍRCULO BASE NEUTRO */}
                     <path
-                      className="text-slate-100"
+                      className="text-slate-200"
                       strokeWidth="3.8"
                       stroke="currentColor"
                       fill="none"
                       d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                     />
-                    <path
-                      className="text-sky-500"
-                      strokeDasharray={`${realMetrics.paymentMethods.card}, 100`}
-                      strokeWidth="4"
-                      strokeLinecap="round"
-                      stroke="currentColor"
-                      fill="none"
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    />
-                    <path
-                      className="text-emerald-500"
-                      strokeDasharray={`${realMetrics.paymentMethods.transfer}, 100`}
-                      strokeDashoffset={`-${realMetrics.paymentMethods.card}`}
-                      strokeWidth="4"
-                      strokeLinecap="round"
-                      stroke="currentColor"
-                      fill="none"
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    />
-                    <path
-                      className="text-slate-400"
-                      strokeDasharray={`${realMetrics.paymentMethods.cash}, 100`}
-                      strokeDashoffset={`-${realMetrics.paymentMethods.card + realMetrics.paymentMethods.transfer}`}
-                      strokeWidth="4"
-                      strokeLinecap="round"
-                      stroke="currentColor"
-                      fill="none"
-                      d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                    />
+
+                    {/* ARCOS DE PAGO */}
+                    {hasSales && !isLoadingMetrics && (
+                      <>
+                        {/* 1. TARJETA */}
+                        {cardPct > 0 && (
+                          <path
+                            className="text-sky-500"
+                            strokeDasharray={`${cardPct * animProgress}, 100`}
+                            strokeWidth="4"
+                            strokeLinecap={isSingleMethod100 ? "butt" : "round"}
+                            stroke="currentColor"
+                            fill="none"
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          />
+                        )}
+
+                        {/* 2. TRANSFERENCIA */}
+                        {transferPct > 0 && (
+                          <path
+                            className="text-purple-500"
+                            strokeDasharray={`${transferPct * animProgress}, 100`}
+                            strokeDashoffset={`-${cardPct * animProgress}`}
+                            strokeWidth="4"
+                            strokeLinecap={isSingleMethod100 ? "butt" : "round"}
+                            stroke="currentColor"
+                            fill="none"
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          />
+                        )}
+
+                        {/* 3. EFECTIVO */}
+                        {cashPct > 0 && (
+                          <path
+                            className="text-emerald-400"
+                            strokeDasharray={`${cashPct * animProgress}, 100`}
+                            strokeDashoffset={`-${(cardPct + transferPct) * animProgress}`}
+                            strokeWidth="4"
+                            strokeLinecap={isSingleMethod100 ? "butt" : "round"}
+                            stroke="currentColor"
+                            fill="none"
+                            d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                          />
+                        )}
+                      </>
+                    )}
                   </svg>
 
+                  {/* NÚMERO CENTRAL */}
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                    <span className="text-xs font-black text-slate-800">100%</span>
-                    <span className="text-[9px] text-slate-400 font-bold uppercase">Total</span>
+                    <span className="text-xs font-black text-slate-800 tabular-nums tabular-nums">
+                      {hasSales && !isLoadingMetrics
+                        ? `${Math.round(animProgress * 100)}%`
+                        : "0%"}
+                    </span>
+                    <span className="text-[9px] text-slate-400 font-bold uppercase">
+                      Total
+                    </span>
                   </div>
                 </div>
 
+                {/* FILAS DE INFORMACIÓN */}
                 <div className="flex-1 space-y-2 text-xs">
-                  <div className="flex items-center justify-between p-1.5 rounded-lg bg-slate-50">
+                  <div className="flex items-center justify-between p-1.5 rounded-lg bg-sky-50">
                     <div className="flex items-center gap-2">
                       <CreditCard className="w-3.5 h-3.5 text-sky-500" />
-                      <span className="font-semibold text-slate-700">Tarjeta</span>
+                      <span className="font-semibold text-sky-700">Tarjeta</span>
                     </div>
-                    <span className="font-bold text-slate-900 font-mono">{realMetrics.paymentMethods.card}%</span>
+                    <span className="font-bold text-sky-900 tabular-nums">
+                      {hasSales ? `${cardPct}%` : "0%"}
+                    </span>
                   </div>
 
-                  <div className="flex items-center justify-between p-1.5 rounded-lg bg-slate-50">
+                  <div className="flex items-center justify-between p-1.5 rounded-lg bg-purple-50">
                     <div className="flex items-center gap-2">
-                      <Building2 className="w-3.5 h-3.5 text-emerald-500" />
-                      <span className="font-semibold text-slate-700">Transferencia</span>
+                      <Building2 className="w-3.5 h-3.5 text-purple-500" />
+                      <span className="font-semibold text-purple-700">Transferencia</span>
                     </div>
-                    <span className="font-bold text-slate-900 font-mono">{realMetrics.paymentMethods.transfer}%</span>
+                    <span className="font-bold text-purple-900 tabular-nums">
+                      {hasSales ? `${transferPct}%` : "0%"}
+                    </span>
                   </div>
 
-                  <div className="flex items-center justify-between p-1.5 rounded-lg bg-slate-50">
+                  <div className="flex items-center justify-between p-1.5 rounded-lg bg-emerald-50">
                     <div className="flex items-center gap-2">
-                      <Banknote className="w-3.5 h-3.5 text-slate-400" />
-                      <span className="font-semibold text-slate-700">Efectivo</span>
+                      <Banknote className="w-3.5 h-3.5 text-emerald-400" />
+                      <span className="font-semibold text-emerald-700">Efectivo</span>
                     </div>
-                    <span className="font-bold text-slate-900 font-mono">{realMetrics.paymentMethods.cash}%</span>
+                    <span className="font-bold text-emerald-900 tabular-nums">
+                      {hasSales ? `${cashPct}%` : "0%"}
+                    </span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Alertas de Inventario (Conectadas a Supabase) */}
+            {/* Alertas de Inventario */}
             <div className="space-y-4">
               {/* STOCK BAJO */}
               <div className="bg-amber-50/40 border border-amber-200/80 rounded-2xl p-4 shadow-2xs">
@@ -876,7 +963,7 @@ export default function DashboardPage() {
                           <span className="text-[10px] font-bold text-slate-500 bg-white border border-slate-200 px-1.5 py-0.5 rounded mr-1.5">
                             {item.branch}
                           </span>
-                          <span className="font-extrabold text-amber-700 font-mono">
+                          <span className="font-extrabold text-amber-700 tabular-nums">
                             {item.stock} disp.
                           </span>
                         </div>
@@ -891,7 +978,7 @@ export default function DashboardPage() {
 
                 <Link
                   href="/inventario"
-                  className="w-full mt-3 py-1.5 px-3 border border-dashed border-amber-300 rounded-xl text-center text-xs font-bold text-amber-800 hover:bg-amber-100/50 flex items-center justify-center gap-1.5 transition-colors block"
+                  className="w-full mt-3 py-1.5 px-3 border border-dashed border-amber-300 rounded-xl text-center text-xs font-bold text-amber-800 hover:bg-amber-100/50 hidden md:flex items-center justify-center gap-1.5 transition-colors"
                 >
                   <span>Revisar inventario para reordenar</span>
                   <ArrowUpRight className="w-3.5 h-3.5" />
@@ -904,7 +991,7 @@ export default function DashboardPage() {
                   <div className="flex items-center gap-2 text-rose-800">
                     <PackageX className="w-4 h-4 text-rose-600" />
                     <h4 className="text-xs font-bold uppercase tracking-wider">
-                      Productos Agotados (Stock 0)
+                      Productos Agotados
                     </h4>
                   </div>
                   <span className="text-[10px] font-extrabold bg-rose-100 text-rose-900 px-2 py-0.5 rounded-full border border-rose-200">
@@ -924,8 +1011,8 @@ export default function DashboardPage() {
                           <span className="text-[10px] font-bold text-slate-500 bg-white border border-slate-200 px-1.5 py-0.5 rounded mr-1.5">
                             {item.branch}
                           </span>
-                          <span className="font-extrabold text-rose-600 font-mono">
-                            0 en stock
+                          <span className="font-extrabold text-rose-600 tabular-nums">
+                            Agotado
                           </span>
                         </div>
                       </div>
@@ -939,7 +1026,7 @@ export default function DashboardPage() {
 
                 <Link
                   href="/inventario"
-                  className="w-full mt-3 py-1.5 px-3 border border-dashed border-rose-300 rounded-xl text-center text-xs font-bold text-rose-800 hover:bg-rose-100/50 flex items-center justify-center gap-1.5 transition-colors block"
+                  className="w-full mt-3 py-1.5 px-3 border border-dashed border-rose-300 rounded-xl text-center text-xs font-bold text-rose-800 hover:bg-rose-100/50 hidden md:flex items-center justify-center gap-1.5 transition-colors"
                 >
                   <span>Generar orden / Reabastecer</span>
                   <ArrowUpRight className="w-3.5 h-3.5" />

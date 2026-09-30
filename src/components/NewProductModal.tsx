@@ -161,10 +161,10 @@ export default function NewProductModal({
               <Package className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-slate-800">
+              <h3 className="text-sm font-bold text-sky-600">
                 Registrar Nuevo Producto
               </h3>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-xs text-slate-700">
                 Alta de artículo para catálogo comercial
               </p>
             </div>
@@ -173,7 +173,7 @@ export default function NewProductModal({
             type="button"
             onClick={handleCleanClose}
             aria-label="Cerrar"
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer"
+            className="p-1 rounded-lg text-rose-500 hover:text-white hover:bg-rose-500 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -189,7 +189,7 @@ export default function NewProductModal({
 
           {/* Área de Carga / Previsualización de Imagen */}
           <div>
-            <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs font-bold text-sky-700 uppercase tracking-wider mb-1.5">
               Fotografía del Producto
             </label>
             <input
@@ -236,7 +236,7 @@ export default function NewProductModal({
           {/* Fila 1: Código/SKU y Código de Barras */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-bold text-sky-700 uppercase tracking-wider mb-1">
                 Código / SKU *
               </label>
               <input
@@ -251,9 +251,15 @@ export default function NewProductModal({
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">
-                Código de Barras
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-xs font-bold text-sky-700 uppercase tracking-wider">
+                  Código de barras
+                </label>
+                <span className="text-[10px] text-slate-400 font-medium lowercase">
+                  (opcional)
+                </span>
+              </div>
+              
               <input
                 type="text"
                 value={barcode}
@@ -267,7 +273,7 @@ export default function NewProductModal({
           {/* Fila 2: Nombre del Producto y Marca (Opcional) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-bold text-sky-700 uppercase tracking-wider mb-1">
                 Nombre del Producto *
               </label>
               <input
@@ -282,7 +288,7 @@ export default function NewProductModal({
 
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                <label className="block text-[11px] font-bold text-sky-700 uppercase tracking-wider">
                   Marca
                 </label>
                 <span className="text-[10px] text-slate-400 font-medium lowercase">
@@ -302,7 +308,7 @@ export default function NewProductModal({
           {/* Fila 3: Categoría y Descripción */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-bold text-sky-700 uppercase tracking-wider mb-1">
                 Categoría *
               </label>
               <select
@@ -319,7 +325,7 @@ export default function NewProductModal({
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-bold text-sky-700 uppercase tracking-wider mb-1">
                 Descripción *
               </label>
               <input
@@ -336,7 +342,7 @@ export default function NewProductModal({
           {/* Fila 4: Costo y Precio de Venta */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-bold text-sky-700 uppercase tracking-wider mb-1">
                 Costo Unitario ($) *
               </label>
               <div className="relative">
@@ -357,7 +363,7 @@ export default function NewProductModal({
             </div>
 
             <div>
-              <label className="block text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-bold text-sky-700 uppercase tracking-wider mb-1">
                 Precio de Venta ($) *
               </label>
               <div className="relative">

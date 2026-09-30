@@ -1,23 +1,22 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Inter } from "next/font/google";
+import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ShiftProvider } from "@/app/context/ShiftContext";
 import { AuthProvider } from "@/app/context/AuthContext";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Tipografía geométrica y nítida para la interfaz del sistema
+const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800"],
+  variable: "--font-sans",
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+// Tipografía para balances, precios y números de arqueo
+const mono = JetBrains_Mono({
   subsets: ["latin"],
-});
-
-// Configuración de la fuente
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
+  weight: ["500", "600", "700", "800"],
+  variable: "--font-mono",
   display: "swap",
 });
 
@@ -32,8 +31,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="es">
-      <body className={`${inter.className} antialiased bg-[#F8FAFC]`}>
+    <html lang="es" className={`${jakarta.variable} ${mono.variable}`}>
+      <body className={`${jakarta.className} antialiased bg-[#F8FAFC] text-slate-800`}>
         <AuthProvider>
           <ShiftProvider>{children}</ShiftProvider>
         </AuthProvider>

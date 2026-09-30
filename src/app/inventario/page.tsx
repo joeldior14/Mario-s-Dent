@@ -115,7 +115,6 @@ const SORT_OPTIONS: { value: StockSortOrder; label: string; desc: string }[] = [
 
 export default function InventoryPage() {
   const { user } = useAuth();
-
   const currentUser = user || {
     name: "Mario Administrador",
     role: "admin" as "admin" | "cashier",
@@ -441,7 +440,7 @@ export default function InventoryPage() {
             <div className="flex items-center gap-2.5 flex-1 flex-wrap sm:flex-nowrap">
               {/* 1. Buscador */}
               <div className="relative flex-1 min-w-[220px]">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Search className="w-4 h-4 text-sky-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   placeholder="Buscar por SKU, código de barras o producto..."
@@ -693,7 +692,7 @@ export default function InventoryPage() {
                   <Store className="w-4 h-4 text-sky-600 mr-2 shrink-0" />
                   <div className="flex flex-col justify-center text-left leading-none">
                     <span className="text-[9px] text-sky-600 font-bold uppercase tracking-tight">
-                      Sucursal Asignada
+                      Sucursal
                     </span>
                     <span className="text-xs font-bold text-slate-700">
                       {currentUser.branch}
@@ -813,11 +812,11 @@ export default function InventoryPage() {
                           {/* 1. SKU & Barcode */}
                           <td className="py-3.5 px-5 whitespace-nowrap">
                             <div className="flex flex-col gap-0.5">
-                              <span className="font-mono text-xs font-bold text-slate-800 tracking-tight">
+                              <span className="tabular-nums text-xs font-bold text-slate-800 tracking-tight">
                                 {item.sku}
                               </span>
                               {item.barcode && (
-                                <span className="font-mono text-[10px] text-slate-400 font-normal">
+                                <span className="tabular-nums text-[10px] text-slate-400 font-normal">
                                   {item.barcode}
                                 </span>
                               )}
@@ -851,17 +850,17 @@ export default function InventoryPage() {
                           {/* 5. Columnas de Stock */}
                           {isAdmin && selectedBranch === "ALL" ? (
                             <>
-                              <td className="py-3.5 px-3 text-center font-mono text-xs text-slate-700">
+                              <td className="py-3.5 px-3 text-center tabular-nums text-xs text-slate-700">
                                 {item.branches.find((b) => b.branchId === "santa-ana")?.stock ?? 0}
                               </td>
-                              <td className="py-3.5 px-3 text-center font-mono text-xs text-slate-700">
+                              <td className="py-3.5 px-3 text-center tabular-nums text-xs text-slate-700">
                                 {item.branches.find((b) => b.branchId === "ahuachapan")?.stock ?? 0}
                               </td>
-                              <td className="py-3.5 px-3 text-center font-mono text-xs text-slate-700">
+                              <td className="py-3.5 px-3 text-center tabular-nums text-xs text-slate-700">
                                 {item.branches.find((b) => b.branchId === "sonsonate")?.stock ?? 0}
                               </td>
                               <td className="py-3.5 px-4 text-center whitespace-nowrap">
-                                <span className="inline-block px-2.5 py-0.5 rounded-md font-mono font-bold bg-sky-50 text-sky-700 border border-sky-200 shadow-2xs">
+                                <span className="inline-block px-2.5 py-0.5 rounded-md tabular-nums font-bold bg-sky-50 text-sky-700 border border-sky-200 shadow-2xs">
                                   {currentStock}
                                 </span>
                               </td>
@@ -871,7 +870,7 @@ export default function InventoryPage() {
                               {/* Stock Local */}
                               <td className="py-3.5 px-4 text-center whitespace-nowrap">
                                 <span
-                                  className={`inline-flex items-center justify-center min-w-[34px] px-2.5 py-0.5 rounded-md font-bold font-mono text-xs ${
+                                  className={`inline-flex items-center justify-center min-w-[34px] px-2.5 py-0.5 rounded-md font-bold tabular-nums text-xs ${
                                     currentStock === 0
                                       ? "bg-rose-50 text-rose-700 border border-rose-200/80"
                                       : currentStock <= 5
@@ -907,13 +906,13 @@ export default function InventoryPage() {
 
                           {/* 6. Costo (Admin) */}
                           {isAdmin && (
-                            <td className="py-3.5 px-4 text-right font-mono text-xs text-slate-700 whitespace-nowrap">
+                            <td className="py-3.5 px-4 text-right tabular-nums text-xs text-slate-700 whitespace-nowrap">
                               ${item.cost.toFixed(2)}
                             </td>
                           )}
 
                           {/* 7. Precio Venta */}
-                          <td className="py-3.5 px-4 text-right whitespace-nowrap font-mono">
+                          <td className="py-3.5 px-4 text-right whitespace-nowrap tabular-nums">
                             <span className="text-xs font-black bg-emerald-50 text-emerald-800 border border-emerald-200/70 px-2 py-0.5 rounded-lg">
                               ${item.price.toFixed(2)}
                             </span>
@@ -931,7 +930,6 @@ export default function InventoryPage() {
                                     className="inline-flex items-center gap-1 px-2 py-1 bg-slate-50 hover:bg-sky-50 text-slate-700 hover:text-sky-700 font-bold text-[10px] rounded-lg transition-colors cursor-pointer mr-0.5"
                                   >
                                     <SlidersHorizontal className="w-3 h-3 text-sky-600" />
-                                    <span>± Stock</span>
                                   </button>
                                 )}
 

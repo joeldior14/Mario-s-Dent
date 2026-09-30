@@ -145,11 +145,11 @@ export default function ExpenseModal({
               <FileSpreadsheet className="w-4 h-4" />
             </div>
             <div>
-              <h3 id="expense-modal-title" className="text-sm font-bold text-slate-800">
+              <h3 id="expense-modal-title" className="text-sm font-bold text-sky-600">
                 Registrar Gasto Menor
               </h3>
-              <p className="text-[11px] text-slate-400">
-                Salida justificada de efectivo del cajón de mostrador[cite: 1]
+              <p className="text-xs text-slate-700">
+                Salida justificada de efectivo del cajón de mostrador
               </p>
             </div>
           </div>
@@ -157,7 +157,7 @@ export default function ExpenseModal({
             type="button"
             onClick={onClose}
             aria-label="Cerrar modal"
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+            className="p-1 rounded-lg text-rose-500 hover:text-white hover:bg-rose-500 transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -175,7 +175,7 @@ export default function ExpenseModal({
           {/* Saldo disponible */}
           <div className="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between text-xs">
             <span className="text-slate-500 font-medium">Efectivo disponible en gaveta:</span>
-            <span className="font-mono font-bold text-slate-800 text-sm">
+            <span className="tabular-nums font-bold text-slate-800 text-sm">
               ${currentAvailableCash.toLocaleString("en-US", { minimumFractionDigits: 2 })}
             </span>
           </div>
@@ -184,7 +184,7 @@ export default function ExpenseModal({
           <div>
             <label
               htmlFor="expense-amount-input"
-              className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1"
+              className="block text-xs font-bold text-sky-700 uppercase tracking-wider mb-1"
             >
               Monto a Egresar ($ USD) *
             </label>
@@ -201,7 +201,7 @@ export default function ExpenseModal({
                 value={amount}
                 onChange={handleAmountChange}
                 placeholder="0.00"
-                className="w-full pl-8 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-lg font-bold font-mono text-slate-900 focus:bg-white focus:outline-none focus:border-rose-500 transition-all"
+                className="w-full pl-8 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-lg font-bold tabular-nums text-slate-900 focus:bg-white focus:outline-none focus:border-rose-500 transition-all"
               />
             </div>
           </div>
@@ -210,9 +210,9 @@ export default function ExpenseModal({
           <div>
             <label
               htmlFor="expense-category-select"
-              className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1 flex items-center gap-1"
+              className="block text-xs font-bold text-sky-700 uppercase tracking-wider mb-1 flex items-center gap-1"
             >
-              <Tag className="w-3 h-3 text-slate-400" />
+              <Tag className="w-3 h-3 text-sky-500" />
               <span>Categoría del Gasto *</span>
             </label>
             <select
@@ -233,9 +233,9 @@ export default function ExpenseModal({
           <div>
             <label
               htmlFor="expense-concept-input"
-              className="block text-[11px] font-bold text-slate-700 uppercase tracking-wider mb-1 flex items-center gap-1"
+              className="block text-xs font-bold text-sky-700 uppercase tracking-wider mb-1 flex items-center gap-1"
             >
-              <FileText className="w-3 h-3 text-slate-400" />
+              <FileText className="w-3 h-3 text-sky-500" />
               <span>Concepto / Justificación *</span>
             </label>
             <input
@@ -255,8 +255,8 @@ export default function ExpenseModal({
           {/* Advertencia contable */}
           <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-start gap-2 text-[11px] text-slate-500 leading-relaxed">
             <DollarSign className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-            <span>
-              Esta salida restará directamente el saldo de <strong>Efectivo Esperado</strong> en la caja y quedará registrada en el <strong>Corte Z</strong>[cite: 1].
+            <span className="font-medium text-rose-700">
+              Esta salida restará directamente el saldo de <strong>Efectivo Esperado</strong> en la caja y quedará registrada en el <strong>Corte Z</strong>
             </span>
           </div>
 

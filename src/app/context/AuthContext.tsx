@@ -33,6 +33,27 @@ interface AuthContextType {
   logout: () => Promise<void>;
 }
 
+const COOKIE_NAME = "marios_dent_session";
+
+// Asienta la cookie de sesión para que el middleware de Next.js la lea
+function setSessionCookie(sessionData: UserSession) {
+  if (typeof document === "undefined") return;
+  const cookiePayload = JSON.stringify({
+    id: sessionData.id,
+    role: sessionData.role,
+    branch: sessionData.branch,
+  });
+  document.cookie = `${COOKIE_NAME}=${encodeURIComponent(
+    cookiePayload
+  )}; path=/; max-age=86400; SameSite=Lax`;
+}
+
+// Elimina la cookie de sesión
+function removeSessionCookie() {
+  if (typeof document === "undefined") return;
+  document.cookie = `${COOKIE_NAME}=; path=/; max-age=0; SameSite=Lax`;
+}
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -96,10 +117,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             session.user.id,
             session.user.email || ""
           );
-          if (mounted) setUser(profile);
+          if (mounted && profile) {
+            setUser(profile);
+            setSessionCookie(profile);
+          }
         }
       } catch {
-        if (mounted) setUser(null);
+        if (mounted) {
+          setUser(null);
+          removeSessionCookie();
+        }
       } finally {
         if (mounted) setIsLoading(false);
       }
@@ -114,9 +141,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             session.user.id,
             session.user.email || ""
           );
-          setUser(profile);
+          if (profile) {
+            setUser(profile);
+            setSessionCookie(profile);
+          }
         } else {
           setUser(null);
+          removeSessionCookie();
         }
         setIsLoading(false);
       }
@@ -136,7 +167,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     ): Promise<{ error?: string }> => {
       let emailToAuth = identifier.trim().toLowerCase();
 
-      // Si se ingresó un nombre de usuario (ej. 'admin'), se completa con el dominio
+      // Si se ingresó un nombre de usuario (ej. 'admin' o 'maria.g'), se completa con el dominio
       if (!emailToAuth.includes("@")) {
         emailToAuth = `${emailToAuth}@mariosdent.com`;
       }
@@ -163,12 +194,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (expectedRole === "admin" && profile.role !== "admin") {
         await supabase.auth.signOut();
+        removeSessionCookie();
         return {
           error: "Acceso denegado: Esta cuenta no posee permisos de Administrador.",
         };
       }
 
       setUser(profile);
+      setSessionCookie(profile);
 
       if (profile.role === "admin") {
         router.push("/dashboard");
@@ -184,6 +217,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = useCallback(async () => {
     await supabase.auth.signOut();
     setUser(null);
+    removeSessionCookie();
     router.push("/login");
   }, [router]);
 
