@@ -94,7 +94,7 @@ export default function LoginPage() {
           </h1>
 
           <p className="text-sm text-slate-400 leading-relaxed">
-            Control de inventario multi-sucursal, arqueos de turno y ventas ágiles en mostrador[cite: 10].
+            Control de inventario multi-sucursal, arqueos de turno y ventas ágiles en mostrador.
           </p>
         </div>
 
@@ -102,7 +102,7 @@ export default function LoginPage() {
           <span>Terminal ID: POS-MD-01 (Mostrador)</span>
           <div className="flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-slate-400">Servidor en línea (Supabase Auth)</span>
+            <span className="text-slate-400">Servidor en línea</span>
           </div>
         </div>
       </div>
@@ -126,7 +126,7 @@ export default function LoginPage() {
             </h2>
             <p className="text-xs text-slate-500">
               <span className="lg:hidden">Acceso gerencial exclusivo para Administrador</span>
-              <span className="hidden lg:inline">Ingresa con tus credenciales autenticadas[cite: 10]</span>
+              <span className="hidden lg:inline">Ingresa con tus credenciales autenticadas</span>
             </p>
           </div>
 
@@ -222,8 +222,8 @@ export default function LoginPage() {
               <KeyRound className="w-4 h-4 text-sky-600 shrink-0" />
               <span>
                 {role === "cashier"
-                  ? "La sucursal de atención será asignada según tu cuenta[cite: 10]."
-                  : "Acceso con control total de las 3 sucursales e inventario general[cite: 10]."}
+                  ? "La sucursal de atención será asignada según tu cuenta."
+                  : "Acceso con control total de las 3 sucursales e inventario general."}
               </span>
             </div>
 

@@ -671,7 +671,7 @@ export default function DashboardPage() {
                   >
                     <div className="space-y-1 min-w-0 pr-3 flex-1">
                       <div className="flex items-start gap-2 flex-wrap sm:flex-nowrap">
-                        <p className="text-xs font-bold text-slate-800 leading-snug break-words">{item.name}</p>
+                        <p className="text-xs font-bold text-sky-700 leading-snug break-words">{item.name}</p>
                         <span className="text-[10px] tabular-nums font-semibold bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded shrink-0">
                           {item.sku}
                         </span>

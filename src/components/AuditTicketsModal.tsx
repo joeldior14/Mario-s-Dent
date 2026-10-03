@@ -15,6 +15,7 @@ import {
   User,
   ShieldCheck,
   FileSpreadsheet,
+  Eye,
 } from "lucide-react";
 
 // ==========================================
@@ -276,7 +277,7 @@ export default function AuditTicketsModal({
               }`}
             >
               <span>Todos</span>
-              <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-white/20 font-mono">
+              <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-white/20 tabular-nums">
                 {counts.all}
               </span>
             </button>
@@ -292,7 +293,7 @@ export default function AuditTicketsModal({
             >
               <Banknote className="w-3.5 h-3.5" />
               <span>Efectivo</span>
-              <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-white/20 font-mono">
+              <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-white/20 tabular-nums">
                 {counts.cash}
               </span>
             </button>
@@ -308,7 +309,7 @@ export default function AuditTicketsModal({
             >
               <CreditCard className="w-3.5 h-3.5" />
               <span>Tarjeta</span>
-              <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-white/20 font-mono">
+              <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-white/20 tabular-nums">
                 {counts.card}
               </span>
             </button>
@@ -324,7 +325,7 @@ export default function AuditTicketsModal({
             >
               <Building2 className="w-3.5 h-3.5" />
               <span>Transferencia</span>
-              <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-white/20 font-mono">
+              <span className="text-[10px] px-1.5 py-0.2 rounded-md bg-white/20 tabular-nums">
                 {counts.transfer}
               </span>
             </button>
@@ -366,7 +367,7 @@ export default function AuditTicketsModal({
                   >
                     <div className="flex items-center justify-between mb-1.5">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-black text-slate-900 font-mono tracking-tight">
+                        <span className="text-xs font-black text-slate-900 tabular-nums tracking-tight">
                           {ticket.ticketNumber}
                         </span>
                         <span
@@ -385,18 +386,18 @@ export default function AuditTicketsModal({
                             : "Transf."}
                         </span>
                       </div>
-                      <span className="text-xs font-black text-slate-900 font-mono">
+                      <span className="text-xs font-black text-slate-900 tabular-nums">
                         ${ticket.total.toFixed(2)}
                       </span>
                     </div>
 
-                    <div className="flex items-center justify-between text-[11px] text-slate-400">
+                    <div className="flex items-center justify-between text-[11px] text-sky-600">
                       <div className="flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-slate-300" />
+                        <Clock className="w-3 h-3 text-sky-600" />
                         <span>{ticket.time}</span>
                       </div>
                       <div className="flex items-center gap-1 truncate max-w-[140px]">
-                        <User className="w-3 h-3 text-slate-300 shrink-0" />
+                        <User className="w-3 h-3 text-sky-600 shrink-0" />
                         <span className="truncate">{ticket.cashier}</span>
                       </div>
                     </div>
@@ -406,116 +407,115 @@ export default function AuditTicketsModal({
             )}
           </div>
 
-          {/* COLUMNA DERECHA: Visor del Comprobante Digital */}
-          <div className="col-span-12 md:col-span-7 lg:col-span-7 h-full overflow-y-auto p-4 md:p-6 flex items-center justify-center">
-            {selectedTicket ? (
-              <div className="w-full max-w-md bg-white border border-slate-200 rounded-3xl shadow-lg p-6 space-y-4 font-mono">
-                {/* Membrete del Ticket */}
-                <div className="text-center border-b border-dashed border-slate-200 pb-4">
-                  <h3 className="text-sm font-black tracking-wider text-slate-900 uppercase">
-                    MARIO&apos;S DENT
-                  </h3>
-                  <p className="text-[10px] text-slate-500 font-sans mt-0.5">
-                    Depósito Dental Especializado
-                  </p>
-                  <p className="text-[10px] text-slate-400 font-sans">
-                    Sucursal: {selectedTicket.branch}
-                  </p>
-                  <div className="mt-3 flex items-center justify-between text-[11px] text-slate-600 pt-2 border-t border-slate-100">
-                    <span>Folio: <strong className="text-slate-900">{selectedTicket.ticketNumber}</strong></span>
-                    <span>{selectedTicket.date} • {selectedTicket.time}</span>
-                  </div>
-                </div>
+          {/* Columna derecha: Recibo digital */}
+<div className="col-span-5 bg-slate-50/70 p-5 flex flex-col justify-between overflow-y-auto">
+  {selectedTicket ? (
+    <div className="space-y-4">
+      <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-xs tabular-nums text-xs text-slate-600 space-y-3">
+        {/* Cabecera */}
+        <div className="text-center pb-2.5 border-b border-dashed border-slate-200">
+          <p className="font-black text-slate-800 text-sm tracking-wide">MARIO&apos;S DENT</p>
+          <p className="text-[11px] text-slate-500 font-medium">Depósito Dental Especializado</p>
 
-                {/* Lista de Insumos Facturados */}
-                <div className="divide-y divide-slate-100 text-xs">
-                  <div className="pb-1.5 flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                    <span>Descripción</span>
-                    <span>Total</span>
-                  </div>
-                  {selectedTicket.items.map((item, idx) => (
-                    <div key={idx} className="py-2 flex justify-between gap-2">
-                      <div className="truncate pr-2 font-sans">
-                        <p className="font-bold text-slate-800 text-xs truncate">{item.name}</p>
-                        <p className="text-[10px] text-slate-400">
-                          {item.qty} x ${item.unitPrice.toFixed(2)}
-                        </p>
-                      </div>
-                      <span className="font-bold text-slate-900 shrink-0">
-                        ${(item.qty * item.unitPrice).toFixed(2)}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+          {/* Dirección o Departamento de la sucursal */}
+          <p className="text-[10px] text-slate-400 mt-0.5">
+            Sucursal: {selectedTicket.branch && selectedTicket.branch !== "Sin dirección registrada"
+              ? selectedTicket.branch
+              : `Sucursal ${selectedTicket.branch}`}
+          </p>
 
-                {/* Subtotales y Cierre Contable */}
-                <div className="pt-3 border-t border-dashed border-slate-200 space-y-1.5 text-xs text-slate-600">
-                  <div className="flex justify-between">
-                    <span>Subtotal:</span>
-                    <span>${selectedTicket.subtotal.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>IVA (13%):</span>
-                    <span>${selectedTicket.tax.toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm font-black text-slate-900 pt-1.5 border-t border-slate-100">
-                    <span>TOTAL PAGADO:</span>
-                    <span className="text-emerald-600">${selectedTicket.total.toFixed(2)}</span>
-                  </div>
-                </div>
-
-                {/* Información de Liquidación */}
-                <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 text-[11px] space-y-1">
-                  <div className="flex justify-between">
-                    <span className="text-slate-400">Método de cobro:</span>
-                    <span className="font-bold text-slate-800 capitalize">
-                      {selectedTicket.paymentMethod === "cash"
-                        ? "Efectivo en Gaveta"
-                        : selectedTicket.paymentMethod === "card"
-                        ? "Tarjeta POS / Voucher"
-                        : "Transferencia Bancaria"}
-                    </span>
-                  </div>
-                  {selectedTicket.paymentMethod === "cash" && selectedTicket.cashReceived !== undefined && (
-                    <>
-                      <div className="flex justify-between">
-                        <span className="text-slate-400">Efectivo entregado:</span>
-                        <span className="font-bold text-slate-800">
-                          ${selectedTicket.cashReceived.toFixed(2)}
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-slate-400">Cambio devuelto:</span>
-                        <span className="font-bold text-emerald-600">
-                          ${(selectedTicket.changeReturned || 0).toFixed(2)}
-                        </span>
-                      </div>
-                    </>
-                  )}
-                </div>
-
-                <div className="pt-2 flex justify-between items-center text-[10px] text-slate-400 font-sans">
-                  <span>Atendido por: {selectedTicket.cashier}</span>
-                  <button
-                    type="button"
-                    onClick={() => window.print()}
-                    className="flex items-center gap-1 text-sky-600 font-bold hover:underline cursor-pointer"
-                  >
-                    <Printer className="w-3.5 h-3.5" />
-                    Reimprimir Copia
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="text-center p-8 text-slate-400">
-                <Receipt className="w-12 h-12 text-slate-200 mx-auto mb-3" />
-                <p className="text-xs font-bold text-slate-600">Selecciona un ticket del listado</p>
-                <p className="text-[11px] text-slate-400 mt-1 max-w-[200px] mx-auto">
-                  Haz clic sobre una venta a la izquierda para inspeccionar su comprobante térmico digital.
-                </p>
-              </div>
-            )}
+          {/* Ticket numérico correlativo y fecha */}
+          <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-[10px] text-slate-500">
+            <span>
+              Ticket: <strong>{selectedTicket.ticketNumber.replace(/^[A-Za-z]+-[A-Za-z]+-/, "")}</strong>
+            </span>
+            <span>
+              {selectedTicket.date} • {selectedTicket.time}
+            </span>
           </div>
+        </div>
+
+        {/* Detalle de Productos */}
+        <div className="space-y-2 py-1.5 border-b border-dashed border-slate-200">
+          {selectedTicket.items.map((it, idx) => (
+            <div key={idx} className="flex justify-between items-start text-[11px]">
+              <div className="pr-2 leading-tight">
+                <span className="text-slate-800">{it.name}</span>
+                {/* Solo si lleva 2 o más cantidades se muestra la multiplicación */}
+                {it.qty > 1 && (
+                  <span className="block text-[10px] text-slate-400 mt-0.5">
+                    {it.qty} x ${it.unitPrice.toFixed(2)}
+                  </span>
+                )}
+              </div>
+              <span className="font-bold text-slate-800 shrink-0">
+                ${(it.qty * it.unitPrice).toFixed(2)}
+              </span>
+            </div>
+          ))}
+        </div>
+
+        {/* Totales */}
+        <div className="space-y-1 text-[11px] pt-1 border-b border-dashed border-slate-200 pb-2.5">
+          <div className="flex justify-between text-slate-400">
+            <span>Subtotal</span>
+            <span>${selectedTicket.subtotal.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between text-slate-400">
+            <span>IVA (13%)</span>
+            <span>${selectedTicket.tax.toFixed(2)}</span>
+          </div>
+          <div className="flex justify-between text-xs font-bold text-slate-800 pt-1">
+            <span>TOTAL PAGADO:</span>
+            <span className="text-emerald-600 font-extrabold text-sm">
+              ${selectedTicket.total.toFixed(2)}
+            </span>
+          </div>
+        </div>
+
+        {/* Método de pago y Atendido por debajo */}
+        <div className="text-[10px] space-y-1.5 text-slate-500 pt-1">
+          <div className="p-2 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-between">
+            <span className="text-slate-400">Método de cobro:</span>
+            <strong className="text-slate-700 uppercase font-bold">
+              {selectedTicket.paymentMethod === "cash"
+                ? "Efectivo"
+                : selectedTicket.paymentMethod === "card"
+                ? "Tarjeta POS / Voucher"
+                : "Transferencia"}
+            </strong>
+          </div>
+
+          {selectedTicket.paymentMethod === "cash" && (
+            <div className="flex justify-between px-1 text-[10px] text-slate-400">
+              <span>Recibido: ${selectedTicket.cashReceived?.toFixed(2) ?? "0.00"}</span>
+              <span>Cambio: ${selectedTicket.changeReturned?.toFixed(2) ?? "0.00"}</span>
+            </div>
+          )}
+
+          {/* Atendido por ubicado debajo del método de pago */}
+          <p className="text-[11px] text-slate-400 pt-1 border-t border-slate-100">
+            Atendido por: <strong className="text-slate-600">{selectedTicket.cashier}</strong>
+          </p>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => alert(`Reimprimiendo comprobante ${selectedTicket.ticketNumber}...`)}
+        className="w-full flex items-center justify-center gap-2 py-2.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-xl shadow-2xs transition-colors cursor-pointer"
+      >
+        <Printer className="w-3.5 h-3.5 text-sky-600" />
+        <span>Reimprimir Comprobante</span>
+      </button>
+    </div>
+  ) : (
+    <div className="h-full flex flex-col items-center justify-center text-center text-slate-400 p-6">
+      <Eye className="w-8 h-8 stroke-[1.5] mb-2 text-slate-300" />
+      <p className="text-xs">Selecciona un ticket del listado para ver su detalle.</p>
+    </div>
+  )}
+</div>
         </div>
       </div>
     </div>

@@ -473,6 +473,8 @@ export async function getAdminShiftAudit(
 
     if (shiftErr || !shift) return defaultData;
 
+    
+
     // 4. Consultar ventas y egresos vinculados al turno
     const [salesRes, expensesRes] = await Promise.all([
       supabase
@@ -503,11 +505,17 @@ export async function getAdminShiftAudit(
       totalSales = Number(shift.total_sales) || 0;
     }
 
-    const calculatedExpenses = (expensesRes.data || []).reduce(
-      (acc, curr) => acc + (Number(curr.amount) || 0),
-      Number(shift.total_expenses) || 0
-    );
+    let expenses = 0;
 
+    if (shift.status === "closed" && shift.total_expenses !== null && shift.total_expenses !== undefined) {
+      expenses = Number(shift.total_expenses) || 0;
+    } else {
+      expenses = Number((expensesRes.data || []).reduce(
+        (acc, curr) => acc + (Number(curr.amount) || 0), 0));
+    }
+    
+    const cashierProfile = shift.profiles as { full_name?: string; username?: string } | null;
+  const realCashierName = cashierProfile?.full_name || cashierProfile?.username || "Sin cajero asignado";
     return {
       shiftId: shift.id,
       status: (shift.status as "open" | "closed") || "closed",
@@ -519,10 +527,10 @@ export async function getAdminShiftAudit(
       cardSales: card,
       transferSales: transfer,
       totalSales,
-      expenses: calculatedExpenses,
+      expenses: expenses,
       reportedCountedCash: Number(shift.counted_cash) || 0,
       operatorNotes: shift.notes || shift.cashier_notes || "",
-      operatorName: shift.cashier_name || "Maria G.",
+      operatorName: realCashierName,
     };
   } catch (error) {
     console.error("Error en getAdminShiftAudit:", error);

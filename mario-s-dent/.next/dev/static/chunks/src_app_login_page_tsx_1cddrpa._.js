@@ -157,7 +157,7 @@ function LoginPage() {
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                 className: "text-sm text-slate-400 leading-relaxed",
-                                children: "Control de inventario multi-sucursal, arqueos de turno y ventas ágiles en mostrador[cite: 10]."
+                                children: "Control de inventario multi-sucursal, arqueos de turno y ventas ágiles en mostrador."
                             }, void 0, false, {
                                 fileName: "[project]/src/app/login/page.tsx",
                                 lineNumber: 96,
@@ -191,7 +191,7 @@ function LoginPage() {
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                         className: "text-slate-400",
-                                        children: "Servidor en línea (Supabase Auth)"
+                                        children: "Servidor en línea"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/login/page.tsx",
                                         lineNumber: 105,
@@ -263,7 +263,7 @@ function LoginPage() {
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                             className: "hidden lg:inline",
-                                            children: "Ingresa con tus credenciales autenticadas[cite: 10]"
+                                            children: "Ingresa con tus credenciales autenticadas"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/login/page.tsx",
                                             lineNumber: 129,
@@ -527,7 +527,7 @@ function LoginPage() {
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            children: role === "cashier" ? "La sucursal de atención será asignada según tu cuenta[cite: 10]." : "Acceso con control total de las 3 sucursales e inventario general[cite: 10]."
+                                            children: role === "cashier" ? "La sucursal de atención será asignada según tu cuenta." : "Acceso con control total de las 3 sucursales e inventario general."
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/login/page.tsx",
                                             lineNumber: 223,

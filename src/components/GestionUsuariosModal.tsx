@@ -34,8 +34,8 @@ export interface AppUser {
 }
 
 const ROLE_OPTIONS: readonly { value: UserRole; label: string }[] = [
-  { value: "cashier", label: "Cajero (Solo su sucursal)" },
-  { value: "admin", label: "Administrador (Total)" },
+  { value: "cashier", label: "Cajero" },
+  { value: "admin", label: "Administrador" },
 ];
 
 interface UserManagementModalProps {
@@ -281,11 +281,11 @@ export default function UserManagementModal({
               <Users className="w-4 h-4" />
             </div>
             <div>
-              <h3 id={`${modalId}-title`} className="text-sm font-bold text-slate-800">
+              <h3 id={`${modalId}-title`} className="text-sm font-bold text-sky-600">
                 Gestión de Personal & Accesos
               </h3>
-              <p className="text-[11px] text-slate-400">
-                Sincronización de credenciales y sedes fijas (Supabase Auth)
+              <p className="text-xs text-slate-700">
+                Sincronización de credenciales y sedes fijas
               </p>
             </div>
           </div>
@@ -304,7 +304,7 @@ export default function UserManagementModal({
             <button
               type="button"
               onClick={onClose}
-              className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+              className="p-1 rounded-lg text-rose-500 hover:text-white hover:bg-rose-500 transition-colors cursor-pointer"
               title="Cerrar modal"
             >
               <X className="w-4 h-4" />
@@ -323,7 +323,7 @@ export default function UserManagementModal({
 
           {isFormOpen ? (
             <form onSubmit={handleSave} className="space-y-4">
-              <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+              <h4 className="text-xs font-bold text-sky-500 uppercase tracking-wider">
                 {editingUserId ? "Modificar Usuario" : "Registrar Nuevo Cajero / Usuario"}
               </h4>
 
@@ -331,7 +331,7 @@ export default function UserManagementModal({
                 <div>
                   <label
                     htmlFor={`${modalId}-name`}
-                    className="block text-[11px] font-bold text-slate-500 uppercase mb-1"
+                    className="block text-[11px] font-bold text-sky-700 uppercase mb-1"
                   >
                     Nombre Completo *
                   </label>
@@ -349,7 +349,7 @@ export default function UserManagementModal({
                 <div>
                   <label
                     htmlFor={`${modalId}-user`}
-                    className="block text-[11px] font-bold text-slate-500 uppercase mb-1"
+                    className="block text-[11px] font-bold text-sky-700 uppercase mb-1"
                   >
                     Usuario para Login *
                   </label>
@@ -369,9 +369,9 @@ export default function UserManagementModal({
                 <div>
                   <label
                     htmlFor={`${modalId}-branch`}
-                    className="block text-[11px] font-bold text-slate-500 uppercase mb-1"
+                    className="block text-[11px] font-bold text-sky-700 uppercase mb-1"
                   >
-                    Sucursal Asignada (Fija)
+                    Sucursal Asignada *
                   </label>
                   <select
                     id={`${modalId}-branch`}
@@ -390,7 +390,7 @@ export default function UserManagementModal({
                 <div>
                   <label
                     htmlFor={`${modalId}-role`}
-                    className="block text-[11px] font-bold text-slate-500 uppercase mb-1"
+                    className="block text-[11px] font-bold text-sky-700 uppercase mb-1"
                   >
                     Rol
                   </label>
@@ -412,7 +412,7 @@ export default function UserManagementModal({
               <div>
                 <label
                   htmlFor={`${modalId}-pass`}
-                  className="block text-[11px] font-bold text-slate-500 uppercase mb-1"
+                  className="block text-[11px] font-bold text-sky-700 uppercase mb-1"
                 >
                   Contraseña {editingUserId && "(Dejar en blanco para no cambiar)"}
                 </label>
@@ -458,7 +458,7 @@ export default function UserManagementModal({
             <div className="space-y-3">
               <table className="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr className="border-b border-slate-100 text-[10px] font-bold uppercase text-slate-400 bg-slate-50/50">
+                  <tr className="border-b border-slate-100 text-[10px] font-bold uppercase text-sky-700 bg-slate-50/50">
                     <th className="py-2.5 px-3">Usuario / Nombre</th>
                     <th className="py-2.5 px-3">Sucursal Asignada</th>
                     <th className="py-2.5 px-3">Rol</th>
@@ -492,7 +492,7 @@ export default function UserManagementModal({
                           <button
                             type="button"
                             onClick={() => handleOpenEdit(u)}
-                            className="p-1.5 text-slate-400 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-colors cursor-pointer"
+                            className="p-1.5 text-amber-400 hover:text-amber-600 hover:bg-amber-50 rounded-lg transition-colors cursor-pointer"
                             title="Editar usuario"
                           >
                             <Pencil className="w-3.5 h-3.5" />
@@ -500,7 +500,7 @@ export default function UserManagementModal({
                           <button
                             type="button"
                             onClick={() => handleDelete(u.id, u.fullName)}
-                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
+                            className="p-1.5 text-rose-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                             title="Eliminar usuario"
                           >
                             <Trash2 className="w-3.5 h-3.5" />

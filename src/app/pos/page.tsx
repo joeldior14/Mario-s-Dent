@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useEffect, useCallback, useRef, useSyncExternalStore } from "react";
+import { ThermalTicketReceipt, TicketPrintData } from "@/components/ThermalTicketReceipt";
 import Image from "next/image";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
@@ -27,969 +28,544 @@ import {
   Coins,
 } from "lucide-react";
 
-
-
 function ShiftWarningModal({
-
   isOpen,
-
   onClose,
-
 }: {
-
   isOpen: boolean;
-
   onClose: () => void;
-
 }) {
-
   if (!isOpen) return null;
 
-
-
   return (
-
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-xs select-none animate-in fade-in duration-150">
-
       <div className="w-full max-w-sm bg-white border border-slate-200 rounded-2xl shadow-2xl p-6 text-center space-y-4">
-
-        <div className="mx-auto w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200/60 text-amber-600 flex items-center justify-center">
-
+        <div className="mx-auto w-12 h-12 rounded-2xl bg-sky-50 border border-sky-200/60 text-sky-600 flex items-center justify-center">
           <Lock className="w-6 h-6" />
-
         </div>
-
-
 
         <div className="space-y-1.5">
-
-          <h3 className="text-base font-extrabold text-slate-800">
-
+          <h3 className="text-base font-extrabold text-sky-600">
             Turno de Caja Requerido
-
           </h3>
-
-          <p className="text-xs text-slate-500 leading-relaxed">
-
-            No es posible agregar artículos ni cobrar sin abrir un turno previamente. Registra tu fondo inicial para comenzar[cite: 1, 2].
-
+          <p className="text-xs text-slate-700 leading-relaxed">
+            No es posible agregar artículos ni cobrar sin abrir un turno previamente. Registra tu fondo inicial para comenzar.
           </p>
-
         </div>
-
-
 
         <div className="flex items-center gap-2 pt-2">
-
           <button
-
             type="button"
-
             onClick={onClose}
-
             className="flex-1 py-2.5 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors cursor-pointer"
-
           >
-
             Entendido
-
           </button>
-
           <Link
-
             href="/caja"
-
-            className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1.5"
-
+            className="flex-1 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1.5"
           >
-
             <span>Ir a Caja</span>
-
             <ArrowRight className="w-3.5 h-3.5" />
-
           </Link>
-
         </div>
-
       </div>
-
     </div>
-
   );
-
 }
-
-
 
 export interface POSProduct {
-
   id: string;
-
   sku: string;
-
   barcode?: string;
-
   name: string;
-
   brand: string;
-
   category: string;
-
   price: number;
-
   stock: number;
-
   image?: string;
-
 }
-
-
 
 interface CartItem {
-
   id: string;
-
   productId: string;
-
   name: string;
-
   brand: string;
-
   sku: string;
-
   quantity: number;
-
   price: number;
-
   stock: number;
-
 }
-
-
 
 interface DBBranchRelation {
-
   id: string;
-
   name: string;
-
 }
-
-
 
 interface DBBranchInventory {
-
   stock: number | null;
-
   branches: DBBranchRelation | null;
-
 }
-
-
 
 interface DBProductPOS {
-
   id: string;
-
   sku: string;
-
   barcode: string | null;
-
   name: string;
-
   brand: string;
-
   category: string;
-
   price: number;
-
   image_url: string | null;
-
   branch_inventory: DBBranchInventory[] | null;
-
 }
-
-
 
 const CATEGORIES = ["All", "Ortodoncia", "Endodoncia", "Resinas", "Instrumentos", "Desechables"];
-
 const CASH_SUGGESTIONS = [5, 10, 20, 50, 100];
 
-
-
-// Funciones de sincronización externa con localStorage para el carrito
-
+// Funciones de sincronización reactiva con localStorage para el carrito
 function subscribeCart(callback: () => void) {
-
   window.addEventListener("storage", callback);
-
   window.addEventListener("cart_change", callback);
-
   return () => {
-
     window.removeEventListener("storage", callback);
-
     window.removeEventListener("cart_change", callback);
-
   };
-
 }
 
-
-
 export default function PosPage() {
-
   const { isShiftOpen, cashierName } = useShift();
-
   const { user } = useAuth();
 
- 
+  const [lastTicketData, setLastTicketData] = useState<TicketPrintData | null>(null);
 
   // Garantiza que la sucursal provenga de la sesión del usuario logueado
-
   const currentBranch = useMemo(() => {
-
     return user?.branch || "Santa Ana";
-
   }, [user?.branch]);
-
-
 
   const CART_STORAGE_KEY = `pos_cart_${currentBranch}`;
 
-
-
   // Estado de orden
-
   const [orderNumber, setOrderNumber] = useState<number>(() => {
-
     if (typeof window !== "undefined") {
-
       const saved = localStorage.getItem(`pos_order_num_${currentBranch}`);
-
       return saved ? parseInt(saved, 10) : 1;
-
     }
-
     return 1;
-
   });
 
-
-
   const [hasHydrated, setHasHydrated] = useState(false);
-
-
-
   const [showShiftWarning, setShowShiftWarning] = useState(false);
-
   const [products, setProducts] = useState<POSProduct[]>([]);
-
   const [isLoading, setIsLoading] = useState(true);
-
   const [activeCategory, setActiveCategory] = useState("All");
-
   const [searchQuery, setSearchQuery] = useState("");
-
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "card" | "transfer">("cash");
-
   const [cashReceived, setCashReceived] = useState<string>("");
 
-
-
   const [isProcessing, setIsProcessing] = useState(false);
-
   const [ticketSuccess, setTicketSuccess] = useState<string | null>(null);
-
-
 
   const scanInputRef = useRef<HTMLInputElement>(null);
 
-
-
-  // Evita alertas de ESLint en React 19 / Next.js
-
+  // Evita alertas de hidratación en React / Next.js
   useEffect(() => {
-
     queueMicrotask(() => {
-
       setHasHydrated(true);
-
     });
-
   }, []);
 
-
-
   // Sincroniza el correlativo de orden con Supabase para la sucursal activa
-
   useEffect(() => {
-
     let isMounted = true;
 
-
-
     async function syncOrderNum() {
-
       if (!isShiftOpen) {
-
         if (isMounted) setOrderNumber(1);
-
         return;
-
       }
-
-
 
       try {
-
         const nextNum = await getNextOrderNumber(currentBranch);
-
         if (isMounted) {
-
           setOrderNumber(nextNum);
-
           if (typeof window !== "undefined") {
-
             localStorage.setItem(`pos_order_num_${currentBranch}`, nextNum.toString());
-
           }
-
         }
-
       } catch (err) {
-
         console.error("Error al sincronizar número de orden:", err);
-
       }
-
     }
-
-
 
     syncOrderNum();
 
-
-
     return () => {
-
       isMounted = false;
-
     };
-
   }, [currentBranch, isShiftOpen]);
 
-
-
   // Lectura reactiva del carrito desde localStorage
-
   const rawCart = useSyncExternalStore(
-
     subscribeCart,
-
     () => (typeof window !== "undefined" ? localStorage.getItem(CART_STORAGE_KEY) ?? "[]" : "[]"),
-
     () => "[]"
-
   );
-
-
 
   const cart: CartItem[] = useMemo(() => {
-
     try {
-
       return JSON.parse(rawCart) as CartItem[];
-
     } catch {
-
       return [];
-
     }
-
   }, [rawCart]);
 
-
-
   // Actualizador persistente del carrito
-
   const updateCartStorage = useCallback(
-
     (newCart: CartItem[]) => {
-
       if (typeof window !== "undefined") {
-
         localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(newCart));
-
         window.dispatchEvent(new Event("cart_change"));
-
       }
-
     },
-
     [CART_STORAGE_KEY]
-
   );
 
-
-
   const loadBranchProducts = useCallback(async () => {
-
     try {
-
       setIsLoading(true);
-
-
-
       const { data, error } = await supabase
-
         .from("products")
-
         .select(`
-
           id,
-
           sku,
-
           barcode,
-
           name,
-
           brand,
-
           category,
-
           price,
-
           image_url,
-
           branch_inventory (
-
             stock,
-
             branches (
-
               id,
-
               name
-
             )
-
           )
-
         `)
-
         .order("name", { ascending: true });
-
-
 
       if (error) throw error;
 
-
-
       const rawProducts = (data ?? []) as unknown as DBProductPOS[];
 
-
-
       const formatted: POSProduct[] = rawProducts.map((p) => {
-
         const invList = p.branch_inventory ?? [];
-
         const branchMatch = invList.find(
-
           (b) => b.branches?.name?.trim().toLowerCase() === currentBranch.trim().toLowerCase()
-
         );
 
-
-
         return {
-
           id: p.id,
-
           sku: p.sku,
-
           barcode: p.barcode ?? undefined,
-
           name: p.name,
-
           brand: p.brand,
-
           category: p.category,
-
           price: Number(p.price),
-
           stock: branchMatch?.stock ?? 0,
-
           image: p.image_url ?? undefined,
-
         };
-
       });
 
-
-
       setProducts(formatted);
-
     } catch (err) {
-
       console.error("Error al cargar productos del catálogo:", err);
-
     } finally {
-
       setIsLoading(false);
-
     }
-
   }, [currentBranch]);
 
-
-
   useEffect(() => {
-
     let isMounted = true;
-
     const initPOS = async () => {
-
       if (isMounted) {
-
         await loadBranchProducts();
-
       }
-
     };
-
     initPOS();
-
     return () => {
-
       isMounted = false;
-
     };
-
   }, [loadBranchProducts]);
 
-
-
   const filteredProducts = useMemo(() => {
-
     const q = searchQuery.trim().toLowerCase();
-
     return products.filter((prod) => {
-
       const matchCategory =
-
         activeCategory === "All" ||
-
         prod.category.toLowerCase() === activeCategory.toLowerCase();
 
-
-
       const matchSearch =
-
         !q ||
-
         prod.name.toLowerCase().includes(q) ||
-
         prod.brand.toLowerCase().includes(q) ||
-
         prod.sku.toLowerCase().includes(q) ||
-
         (prod.barcode && prod.barcode.toLowerCase().includes(q));
 
-
-
       return matchCategory && matchSearch;
-
     });
-
   }, [products, activeCategory, searchQuery]);
 
-
-
   const handleAddToCart = (product: POSProduct) => {
-
     if (!isShiftOpen) {
-
       setShowShiftWarning(true);
-
       return;
-
     }
-
-
 
     if (product.stock <= 0) return;
 
-
-
     const existingIndex = cart.findIndex((item) => item.productId === product.id);
-
     if (existingIndex > -1) {
-
       if (cart[existingIndex].quantity >= product.stock) return;
-
       const updated = [...cart];
-
       updated[existingIndex] = {
-
         ...updated[existingIndex],
-
         quantity: updated[existingIndex].quantity + 1,
-
       };
-
       updateCartStorage(updated);
-
     } else {
-
       updateCartStorage([
-
         ...cart,
-
         {
-
           id: `cart-${Date.now()}-${product.id}`,
-
           productId: product.id,
-
           name: product.name,
-
           brand: product.brand,
-
           sku: product.sku,
-
           quantity: 1,
-
           price: product.price,
-
           stock: product.stock,
-
         },
-
       ]);
-
     }
-
   };
-
-
 
   const handleScannerKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-
     if (e.key === "Enter") {
-
       e.preventDefault();
 
-
-
       if (!isShiftOpen) {
-
         setShowShiftWarning(true);
-
         setSearchQuery("");
-
         return;
-
       }
-
-
 
       const code = searchQuery.trim().toLowerCase();
-
       if (!code) return;
 
-
-
       const matched = products.find(
-
         (p) =>
-
           (p.barcode && p.barcode.toLowerCase() === code) ||
-
           p.sku.toLowerCase() === code
-
       );
 
-
-
       if (matched) {
-
         handleAddToCart(matched);
-
         setSearchQuery("");
-
       } else {
-
         console.warn("Código no reconocido:", code);
-
       }
-
     }
-
   };
-
-
 
   const handleUpdateQty = (id: string, delta: number) => {
-
     const updated = cart
-
       .map((item) => {
-
         if (item.id === id) {
-
           const nextQty = item.quantity + delta;
-
           if (nextQty > item.stock) return item;
-
           return nextQty > 0 ? { ...item, quantity: nextQty } : null;
-
         }
-
         return item;
-
       })
-
       .filter(Boolean) as CartItem[];
 
-
-
     updateCartStorage(updated);
-
   };
-
-
 
   const handleRemoveItem = (id: string) => {
-
     updateCartStorage(cart.filter((item) => item.id !== id));
-
   };
-
-
 
   const handleClearCart = () => {
-
     if (cart.length === 0) return;
-
     updateCartStorage([]);
-
     setCashReceived("");
-
   };
-
-
 
   const subtotal = useMemo(
-
     () => cart.reduce((acc, item) => acc + item.price * item.quantity, 0),
-
     [cart]
-
   );
-
   const iva = Number((subtotal * 0.13).toFixed(2));
-
   const total = Number((subtotal + iva).toFixed(2));
 
-
-
   const numericCashReceived = parseFloat(cashReceived) || 0;
-
   const changeDue = numericCashReceived >= total ? Number((numericCashReceived - total).toFixed(2)) : 0;
-
   const isCashInsufficient = paymentMethod === "cash" && numericCashReceived > 0 && numericCashReceived < total;
-
   const canCheckout =
-
     cart.length > 0 &&
-
     isShiftOpen &&
-
     !isProcessing &&
-
     (paymentMethod !== "cash" || (numericCashReceived >= total && numericCashReceived > 0));
 
-
-
-  // Manejador de cobro de orden conectado al backend
-
+  // Manejador de cobro de orden conectado al backend y a la cola de impresión
   const handleCheckout = async () => {
-
     if (!canCheckout) {
-
       if (!isShiftOpen) setShowShiftWarning(true);
-
       return;
-
     }
-
-
 
     try {
-
       setIsProcessing(true);
 
-
-
       const cartPayload: POSCartItem[] = cart.map((item) => ({
-
         id: item.productId,
-
         sku: item.sku,
-
         name: item.name,
-
         brand: item.brand,
-
         price: item.price,
-
         quantity: item.quantity,
-
         stock: item.stock,
-
       }));
 
-
-
-      // 1. Guardar la venta en Supabase y descontar stock
-
+      // 1. Guardar la venta en Supabase y descontar inventario
       const result = await processSaleInDB({
-
-  branchName: (user?.branch || currentBranch || "Santa Ana").trim(),
-
-  cashierId: user?.id || null, // 👈 user.id desde useAuth()
-
-  cashierName: cashierName || user?.name || "Cajero",
-
-  paymentMethod,
-
-  items: cart,
-
-  subtotal,
-
-  tax: iva,
-
-  total,
-
-  cashReceived: paymentMethod === "cash" ? Number(cashReceived) : undefined,
-
-  changeReturned: paymentMethod === "cash" ? changeDue : undefined,
-
-});
-
-
-
-      // 2. Feedback visual y reinicio de orden (Aumentar el número correlativo)
-
-      setTicketSuccess(result.ticketNumber);
-
-      updateCartStorage([]);
-
-      setCashReceived("");
-
-     
-
-      setOrderNumber((prev) => {
-
-        const next = prev + 1;
-
-        if (typeof window !== "undefined") {
-
-          localStorage.setItem(`pos_order_num_${currentBranch}`, next.toString());
-
-        }
-
-        return next;
-
+        branchName: (user?.branch || currentBranch || "Santa Ana").trim(),
+        cashierId: user?.id || null,
+        cashierName: cashierName || user?.name || "Cajero",
+        paymentMethod,
+        items: cartPayload,
+        subtotal,
+        tax: iva,
+        total,
+        cashReceived: paymentMethod === "cash" ? numericCashReceived : undefined,
+        changeReturned: paymentMethod === "cash" ? changeDue : undefined,
       });
 
+      // 2. Preparar el payload del ticket para la POS-80
+      const now = new Date();
+      const printPayload: TicketPrintData = {
+        ticketNumber: result.ticketNumber,
+        branch: currentBranch,
+        cashier: cashierName || user?.name || "Cajero",
+        date: now.toLocaleDateString("es-SV"),
+        time: now.toLocaleTimeString("es-SV", { hour: "2-digit", minute: "2-digit" }),
+        paymentMethod,
+        cashReceived: paymentMethod === "cash" ? numericCashReceived : undefined,
+        changeReturned: paymentMethod === "cash" ? changeDue : undefined,
+        subtotal,
+        tax: iva,
+        total,
+        items: cart.map((c) => ({
+          name: c.name,
+          quantity: c.quantity,
+          unitPrice: c.price,
+          subtotal: c.price * c.quantity,
+        })),
+      };
 
+      setLastTicketData(printPayload);
 
-      // 3. Refrescar el stock del catálogo
+      // 3. Disparo directo al servicio de impresión
+      setTimeout(() => {
+        window.print();
+      }, 150);
 
+      // 4. Feedback visual y reinicio de orden
+      setTicketSuccess(result.ticketNumber);
+      updateCartStorage([]);
+      setCashReceived("");
+
+      setOrderNumber((prev) => {
+        const next = prev + 1;
+        if (typeof window !== "undefined") {
+          localStorage.setItem(`pos_order_num_${currentBranch}`, next.toString());
+        }
+        return next;
+      });
+
+      // 5. Refrescar el stock del catálogo
       await loadBranchProducts();
-
     } catch (err: unknown) {
-
       const msg = err instanceof Error ? err.message : "Error al procesar la venta";
-
       alert(msg);
-
     } finally {
-
       setIsProcessing(false);
-
     }
-
   };
 
-
+  const handleReprint = () => {
+    if (!lastTicketData) return;
+    window.print();
+  };
 
   return (
-
     <div className="min-h-screen bg-[#F8FAFC] text-slate-700 flex flex-col font-sans select-none">
-
       <Navbar />
 
-
-
       {/* Banner de turno cerrado */}
-
       {!isShiftOpen && (
-
         <div className="bg-amber-50 border-b border-amber-200 px-6 py-2.5 flex items-center justify-between text-amber-800 text-xs font-semibold">
-
           <div className="flex items-center gap-2">
-
             <Lock className="w-4 h-4 text-amber-600 shrink-0" />
-
-            <span>Turno cerrado: dirígete a Caja para registrar fondo inicial y cobrar[cite: 1, 2].</span>
-
+            <span>Turno cerrado: dirígete a Caja para registrar fondo inicial y cobrar.</span>
           </div>
-
           <Link
-
             href="/caja"
-
             className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold transition-colors shadow-2xs"
-
           >
-
             <span>Ir a Caja</span>
-
             <ArrowRight className="w-3.5 h-3.5" />
-
           </Link>
-
         </div>
-
       )}
 
-
-
-      {/* Banner de venta exitosa */}
-
+      {/* Banner de venta exitosa con opción de Reimpresión */}
       {ticketSuccess && (
         <div className="bg-emerald-600 text-white px-6 py-2.5 flex items-center justify-between text-xs font-bold shadow-md animate-in slide-in-from-top-2">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4" />
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
             <span>
-              ¡Venta registrada con éxito! Comprobante emitido: <strong>{ticketSuccess}</strong>[cite: 1, 4]
+              ¡Venta registrada con éxito! Comprobante emitido: <strong>{ticketSuccess}</strong>
             </span>
           </div>
-          <button
-            type="button"
-            onClick={() => setTicketSuccess(null)}
-            className="p-1 hover:bg-emerald-700 rounded-lg transition-colors cursor-pointer"
-          >
-            <X className="w-4 h-4" />
-          </button>
+
+          <div className="flex items-center gap-2">
+            {lastTicketData && (
+              <button
+                type="button"
+                onClick={handleReprint}
+                className="flex items-center gap-1.5 px-2.5 py-1 bg-white/20 hover:bg-white/30 text-white rounded-lg transition-colors cursor-pointer text-xs"
+                title="Volver a emitir copia física"
+              >
+                <Printer className="w-3.5 h-3.5" />
+                <span>Reimprimir</span>
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => setTicketSuccess(null)}
+              className="p-1 hover:bg-emerald-700 rounded-lg transition-colors cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
       )}
-      <div className="flex-1 flex overflow-hidden">
 
+      <div className="flex-1 flex overflow-hidden">
         {/* PANEL IZQUIERDO: Búsqueda, Filtros y Catálogo */}
         <main className="flex-1 p-6 overflow-y-auto space-y-5">
           <div className="border border-slate-200 rounded-xl p-3 bg-white flex items-center gap-3 shadow-2xs focus-within:border-sky-500 focus-within:ring-2 focus-within:ring-sky-100 transition-all">
@@ -1014,6 +590,7 @@ export default function PosPage() {
               </button>
             )}
           </div>
+
           <div className="flex items-center gap-2 overflow-x-auto pb-1">
             {CATEGORIES.map((cat) => (
               <button
@@ -1031,88 +608,46 @@ export default function PosPage() {
             ))}
           </div>
 
-
-
           {isLoading ? (
-
             <div className="py-24 flex flex-col items-center justify-center text-slate-400 gap-2.5">
-
               <Loader2 className="w-7 h-7 animate-spin text-sky-600" />
-
               <span className="text-xs font-medium">Cargando inventario de {currentBranch}...</span>
-
             </div>
-
           ) : filteredProducts.length > 0 ? (
-
             <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-
               {filteredProducts.map((item) => {
-
                 const isOutOfStock = item.stock <= 0;
 
-
-
                 return (
-
                   <div
-
                     key={item.id}
-
                     onClick={() => handleAddToCart(item)}
-
                     className={`bg-white border rounded-2xl overflow-hidden shadow-xs transition-all flex flex-col group ${
-
                       isOutOfStock
-
                         ? "border-slate-200 opacity-60 cursor-not-allowed"
-
                         : "border-slate-200 hover:border-sky-400 hover:shadow-md cursor-pointer active:scale-[0.98]"
-
                     }`}
-
                   >
-
                     <div className="h-32 bg-slate-50 relative flex items-center justify-center border-b border-slate-100 overflow-hidden">
-
                       {item.image ? (
-
                         <Image
-
                           src={item.image}
-
                           alt={item.name}
-
                           fill
-
                           unoptimized
-
                           sizes="(max-width: 768px) 100vw, 25vw"
-
                           className="object-contain p-2 group-hover:scale-105 transition-transform duration-200"
-
                         />
-
                       ) : (
-
                         <div className="w-10 h-10 border-2 border-slate-300 border-dashed rounded-xl flex items-center justify-center opacity-40 group-hover:opacity-80 transition-opacity">
-
                           <Package className="w-5 h-5 text-slate-400 stroke-[1.5]" />
-
                         </div>
-
                       )}
-
                     </div>
 
-
-
                     <div className="p-3.5 flex-1 flex flex-col justify-between">
-
                       <div>
-
                         <div className="flex items-start justify-between gap-1 mb-1">
-
                           <span className="text-xs font-bold text-slate-700 leading-snug break-words">
                             {item.name}
                           </span>
@@ -1146,6 +681,7 @@ export default function PosPage() {
             </div>
           )}
         </main>
+
         {/* PANEL DERECHO: Orden Actual y Cobro */}
         <aside className="w-[400px] bg-white border-l border-slate-200 flex flex-col h-full shadow-xs shrink-0">
           <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
@@ -1159,11 +695,12 @@ export default function PosPage() {
               type="button"
               onClick={handleClearCart}
               title="Vaciar Orden Completa"
-              className="text-slate-400 hover:text-rose-500 transition-colors p-1 rounded-md hover:bg-rose-50 cursor-pointer"
+              className="text-rose-400 hover:text-rose-500 transition-colors p-1 rounded-md hover:bg-rose-50 cursor-pointer"
             >
               <Trash2 className="w-4 h-4" />
             </button>
           </div>
+
           <div
             className="flex-1 overflow-y-auto px-5 divide-y divide-slate-100"
             suppressHydrationWarning
@@ -1181,14 +718,11 @@ export default function PosPage() {
                 <div key={item.id} className="py-3.5 flex items-center justify-between gap-2">
                   <div className="flex-1 min-w-0 pr-1">
                     <h4
-                      className="text-xs font-bold text-slate-800 leading-snug line-clamp-2 break-words"
+                      className="text-xs font-bold text-slate-600 leading-snug line-clamp-2 break-words"
                       title={item.name}
                     >
                       {item.name}
                     </h4>
-                    <p className="text-[10px] text-slate-400 font-medium truncate mt-0.5">
-                      {item.brand} • <span className="tabular-nums">SKU: {item.sku}</span>
-                    </p>
                   </div>
                   <div className="w-24 shrink-0 flex items-center justify-between border border-slate-200 rounded-lg bg-white shadow-2xs h-7 px-1">
                     <button
@@ -1213,7 +747,7 @@ export default function PosPage() {
                     </button>
                   </div>
                   <div className="w-16 shrink-0 text-right">
-                    <span className="text-xs font-extrabold text-slate-800 tabular-nums tabular-nums block">
+                    <span className="text-xs font-extrabold text-slate-800 tabular-nums block">
                       ${(item.price * item.quantity).toFixed(2)}
                     </span>
                   </div>
@@ -1229,6 +763,7 @@ export default function PosPage() {
               ))
             )}
           </div>
+
           <div className="px-5 py-4 border-t border-slate-100 bg-[#FAFAFA] space-y-2.5 text-xs">
             <div className="flex justify-between text-slate-500">
               <span>Subtotal</span>
@@ -1244,6 +779,7 @@ export default function PosPage() {
                 ${total.toFixed(2)}
               </span>
             </div>
+
             <div className="grid grid-cols-3 gap-2 pt-1">
               <button
                 type="button"
@@ -1288,6 +824,7 @@ export default function PosPage() {
                 <span>Transferencia</span>
               </button>
             </div>
+
             {paymentMethod === "cash" && (
               <div className="pt-2 border-t border-slate-200/80 space-y-2 animate-in fade-in duration-150">
                 <div className="grid grid-cols-2 gap-2">
@@ -1295,7 +832,7 @@ export default function PosPage() {
                     <label className="block text-[10px] font-bold text-slate-600 uppercase tracking-wider mb-1">
                       Dinero Recibido ($)
                     </label>
-                    <div className="relative ">
+                    <div className="relative">
                       <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">
                         $
                       </span>
@@ -1320,7 +857,7 @@ export default function PosPage() {
                     </label>
                     <div className="relative flex items-center h-[34px] px-3 bg-emerald-50/70 border border-emerald-200 rounded-xl">
                       <Coins className="w-3.5 h-3.5 text-emerald-600 mr-1.5 shrink-0" />
-                      <span className="tabular-nums font-extrabold text-sm text-emerald-700 tabular-nums">
+                      <span className="tabular-nums font-extrabold text-sm text-emerald-700">
                         ${changeDue.toFixed(2)}
                       </span>
                     </div>
@@ -1352,6 +889,7 @@ export default function PosPage() {
                 )}
               </div>
             )}
+
             <button
               type="button"
               disabled={!canCheckout}
@@ -1378,11 +916,14 @@ export default function PosPage() {
           </div>
         </aside>
       </div>
+
       <ShiftWarningModal
         isOpen={showShiftWarning}
         onClose={() => setShowShiftWarning(false)}
       />
+
+      {/* Salida invisible en interfaz, activa exclusivamente al imprimir */}
+      <ThermalTicketReceipt data={lastTicketData} />
     </div>
   );
-} 
-
+}

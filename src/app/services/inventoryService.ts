@@ -153,6 +153,7 @@ export interface TicketRecordAudit {
   time: string;
   date: string;
   branch: string;
+  branchAddress?: string | null;
   cashier: string;
   paymentMethod: "cash" | "card" | "transfer";
   subtotal: number;
@@ -265,6 +266,36 @@ interface DBDashboardProductQueryRow {
   category: string;
   price: number;
   branch_inventory: DBDashboardInventoryItem[] | null;
+}
+
+// ==========================================
+// GESTIÓN DE SUCURSALES (BACKEND)
+// ==========================================
+
+export interface BranchRecord {
+  id: string;
+  name: string;
+  code: string;
+  phone: string;
+  address: string;
+  isActive: boolean;
+}
+
+export interface BranchPayload {
+  name: string;
+  code: string;
+  phone?: string;
+  address?: string;
+}
+
+// Interfaz interna para tipar la consulta sin 'any'
+interface DBBranchRow {
+  id: string;
+  name: string;
+  code: string | null;
+  phone: string | null;
+  address: string | null;
+  is_active: boolean | null;
 }
 
 // =========================================================================
@@ -694,23 +725,26 @@ export async function processSaleInDB(payload: CheckoutPayload) {
     throw new Error("El carrito no tiene productos.");
   }
 
+  // 1. Asegurar el ID del cajero en sesión activa
   let effectiveCashierId = cashierId || null;
   if (!effectiveCashierId) {
     const { data: authData } = await supabase.auth.getUser();
     effectiveCashierId = authData.user?.id || null;
   }
 
+  // 2. Obtener la sucursal actual (con código y dirección)
   const cleanBranch = (branchName || "").trim();
   const { data: branch, error: branchErr } = await supabase
     .from("branches")
     .select("id, name")
-    .ilike("name", cleanBranch)
+    .ilike("name", `%${cleanBranch}%`)
     .maybeSingle();
 
   if (branchErr || !branch) {
     throw new Error(`No se encontró la sucursal: "${cleanBranch}"`);
   }
 
+  // 3. Obtener el turno abierto de la sucursal
   const { data: activeShift, error: shiftErr } = await supabase
     .from("cash_shifts")
     .select("id, cashier_id")
@@ -725,9 +759,33 @@ export async function processSaleInDB(payload: CheckoutPayload) {
   }
 
   const finalCashierId = effectiveCashierId || activeShift.cashier_id;
-  const branchPrefix = branch.name.substring(0, 2).toUpperCase();
-  const ticketNumber = `T-${branchPrefix}-${Math.floor(1000 + Math.random() * 9000)}`;
 
+  // 4. GENERAR CORRELATIVO SECUENCIAL GLOBAL (+1)
+  // Prefijo de la sucursal (ej: "SA", "AH", "SO")
+  const branchPrefix = branch.name.substring(0, 2).toUpperCase();
+
+  // Buscar el último ticket emitido históricamente en esta sucursal
+  const { data: lastSale } = await supabase
+    .from("sales")
+    .select("ticket_number")
+    .eq("branch_id", branch.id)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  let nextCorrelative = 1;
+  if (lastSale?.ticket_number) {
+    const matches = lastSale.ticket_number.match(/\d+$/);
+    if (matches) {
+      nextCorrelative = parseInt(matches[0], 10) + 1;
+    }
+  }
+
+  // Formato: T-SO-00000001
+  const formattedSequence = String(nextCorrelative).padStart(8, "0");
+  const ticketNumber = `T-${branchPrefix}-${formattedSequence}`;
+
+  // 5. Inserción en la tabla 'sales'
   const { data: saleData, error: saleErr } = await supabase
     .from("sales")
     .insert([
@@ -754,6 +812,7 @@ export async function processSaleInDB(payload: CheckoutPayload) {
 
   const saleId = saleData.id;
 
+  // 6. Renglones en 'sale_items', descuento de existencias y Kardex
   for (const item of items) {
     await supabase.from("sale_items").insert([
       {
@@ -798,15 +857,13 @@ export async function processSaleInDB(payload: CheckoutPayload) {
   return { ticketNumber, saleId, total };
 }
 
-// =========================================================================
-// 8. CONSULTAR TICKETS PARA AUDITORÍA
-// =========================================================================
+// 7. CONSULTAR TICKETS PARA AUDITORÍA (con dirección de sucursal)
 export async function fetchTicketsByBranchAndDate(
   branchName: string,
   dateStr: string
 ): Promise<TicketRecordAudit[]> {
-  const startOfDay = `${dateStr}T00:00:00.000Z`;
-  const endOfDay = `${dateStr}T23:59:59.999Z`;
+  const startOfDay = `${dateStr}T00:00:00-06:00`;
+  const endOfDay = `${dateStr}T23:59:59.999-06:00`;
 
   const { data, error } = await supabase
     .from("sales")
@@ -820,7 +877,7 @@ export async function fetchTicketsByBranchAndDate(
       cash_received,
       change_given,
       created_at,
-      branches!inner(name),
+      branches!inner(name, address),
       profiles(full_name),
       sale_items(
         id,
@@ -839,9 +896,7 @@ export async function fetchTicketsByBranchAndDate(
     return [];
   }
 
-  const queryRows = (data ?? []) as unknown as DBSaleQueryRow[];
-
-  return queryRows.map((sale: DBSaleQueryRow) => {
+  return (data || []).map((sale: DBSaleQueryRow) => {
     const d = new Date(sale.created_at);
     const branchRecord = Array.isArray(sale.branches) ? sale.branches[0] : sale.branches;
     const profileRecord = Array.isArray(sale.profiles) ? sale.profiles[0] : sale.profiles;
@@ -1067,8 +1122,8 @@ export async function fetchDashboardSalesMetrics(
   };
 
   // 1. Rango del día completo en UTC
-  const startOfDay = `${dateStr}T00:00:00.000Z`;
-  const endOfDay = `${dateStr}T23:59:59.999Z`;
+  const startOfDay = `${dateStr}T00:00:00-06:00`;
+  const endOfDay = `${dateStr}T23:59:59.999-06:00`;
 
   // 2. Resolver el ID de la sucursal si no es consolidado
   let targetBranchId: string | null = null;
@@ -1215,4 +1270,142 @@ export async function fetchBranchesPerformance(
       percentage: pct,
     };
   });
+}
+
+/**
+ * Consulta todas las sucursales ordenadas por nombre
+ */
+export async function fetchBranchesFromDB(): Promise<BranchRecord[]> {
+  const { data, error } = await supabase
+    .from("branches")
+    .select("id, name, phone, address, is_active")
+    .order("name", { ascending: true });
+
+  if (error) {
+    console.error("Error al obtener sucursales:", error.message);
+    throw new Error(error.message);
+  }
+
+  const rows = (data ?? []) as unknown as DBBranchRow[];
+
+  return rows.map((b: DBBranchRow) => ({
+    id: b.id,
+    name: b.name,
+    code: b.code || b.name.substring(0, 2).toUpperCase(),
+    phone: b.phone || "Sin teléfono",
+    address: b.address || "Sin dirección registrada",
+    isActive: b.is_active ?? true,
+  }));
+}
+
+/**
+ * Registra una nueva sucursal y auto-asigna stock inicial en 0 para el catálogo existente
+ */
+export async function createBranchInDB(payload: BranchPayload): Promise<BranchRecord> {
+  const cleanName = payload.name.trim();
+  const cleanCode = payload.code.trim().toUpperCase();
+
+  const { data: newBranch, error } = await supabase
+    .from("branches")
+    .insert([
+      {
+        name: cleanName,
+        code: cleanCode,
+        phone: payload.phone?.trim() || null,
+        address: payload.address?.trim() || null,
+        is_active: true,
+      },
+    ])
+    .select()
+    .single();
+
+  if (error) {
+    if (error.code === "23505") {
+      throw new Error("Ya existe una sucursal con ese nombre o código.");
+    }
+    throw new Error(error.message);
+  }
+
+  // Vincular productos existentes a la nueva sucursal con stock 0
+  const { data: products } = await supabase.from("products").select("id");
+  if (products && products.length > 0) {
+    const rows = products.map((p) => ({
+      branch_id: newBranch.id,
+      product_id: p.id,
+      stock: 0,
+      min_stock: 5,
+    }));
+    await supabase.from("branch_inventory").insert(rows);
+  }
+
+  return {
+    id: newBranch.id,
+    name: newBranch.name,
+    code: newBranch.code || cleanCode,
+    phone: newBranch.phone || "Sin teléfono",
+    address: newBranch.address || "Sin dirección registrada",
+    isActive: newBranch.is_active ?? true,
+  };
+}
+
+/**
+ * Actualiza los datos de una sucursal existente
+ */
+export async function updateBranchInDB(
+  id: string,
+  payload: BranchPayload
+): Promise<void> {
+  const { error } = await supabase
+    .from("branches")
+    .update({
+      name: payload.name.trim(),
+      code: payload.code.trim().toUpperCase(),
+      phone: payload.phone?.trim() || null,
+      address: payload.address?.trim() || null,
+    })
+    .eq("id", id);
+
+  if (error) {
+    if (error.code === "23505") {
+      throw new Error("Ya existe una sucursal con ese nombre o código.");
+    }
+    throw new Error(error.message);
+  }
+}
+
+/**
+ * Alterna el estado activo/inactivo de la sucursal
+ */
+export async function toggleBranchStatusInDB(
+  id: string,
+  currentStatus: boolean
+): Promise<void> {
+  const { error } = await supabase
+    .from("branches")
+    .update({ is_active: !currentStatus })
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+}
+
+/**
+ * Elimina la sucursal validando que no tenga ventas registradas
+ */
+export async function deleteBranchFromDB(id: string): Promise<void> {
+  const { count: salesCount } = await supabase
+    .from("sales")
+    .select("*", { count: "exact", head: true })
+    .eq("branch_id", id);
+
+  if (salesCount && salesCount > 0) {
+    throw new Error(
+      "No se puede eliminar la sucursal porque tiene tickets y ventas vinculadas en el historial contable. En su lugar, desactívala."
+    );
+  }
+
+  await supabase.from("branch_inventory").delete().eq("branch_id", id);
+  await supabase.from("cash_shifts").delete().eq("branch_id", id);
+
+  const { error } = await supabase.from("branches").delete().eq("id", id);
+  if (error) throw new Error(error.message);
 }

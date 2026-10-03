@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   X,
   Store,
@@ -11,51 +11,29 @@ import {
   Trash2,
   Edit2,
   AlertCircle,
+  Loader2,
 } from "lucide-react";
-
-export interface BranchItem {
-  id: string;
-  name: string;
-  code: string;
-  phone: string;
-  address: string;
-  isActive: boolean;
-}
-
-const INITIAL_BRANCHES: BranchItem[] = [
-  {
-    id: "branch-sa",
-    name: "Santa Ana",
-    code: "SA",
-    phone: "2440-1234",
-    address: "Av. Independencia Sur #12, Santa Ana",
-    isActive: true,
-  },
-  {
-    id: "branch-ah",
-    name: "Ahuachapán",
-    code: "AH",
-    phone: "2413-5678",
-    address: "Calle Menéndez Norte #4, Ahuachapán",
-    isActive: true,
-  },
-  {
-    id: "branch-so",
-    name: "Sonsonate",
-    code: "SO",
-    phone: "2451-9012",
-    address: "Paseo 15 de Septiembre #8, Sonsonate",
-    isActive: true,
-  },
-];
+import {
+  fetchBranchesFromDB,
+  createBranchInDB,
+  updateBranchInDB,
+  toggleBranchStatusInDB,
+  deleteBranchFromDB,
+  BranchRecord,
+} from "@/app/services/inventoryService";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
 }
 
-export default function BranchManagementModal({ isOpen, onClose }: Props) {
-  const [branches, setBranches] = useState<BranchItem[]>(INITIAL_BRANCHES);
+export default function BranchManagementModal({ isOpen, onClose, onSuccess }: Props) {
+  const [branches, setBranches] = useState<BranchRecord[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
   const [showForm, setShowForm] = useState(false);
   const [editingBranchId, setEditingBranchId] = useState<string | null>(null);
 
@@ -66,64 +44,123 @@ export default function BranchManagementModal({ isOpen, onClose }: Props) {
     address: "",
   });
 
+  const loadBranches = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setErrorMessage(null);
+      const data = await fetchBranchesFromDB();
+      setBranches(data);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Error al cargar sucursales";
+      setErrorMessage(msg);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Carga asíncrona segura sin cascading renders
+  useEffect(() => {
+    if (!isOpen) return;
+
+    let isMounted = true;
+
+    const executeLoad = async () => {
+      if (isMounted) {
+        await loadBranches();
+      }
+    };
+
+    executeLoad();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isOpen, loadBranches]);
+
+  const handleCloseModal = () => {
+    setShowForm(false);
+    setErrorMessage(null);
+    onClose();
+  };
+
   if (!isOpen) return null;
 
   const handleOpenCreate = () => {
     setEditingBranchId(null);
     setFormData({ name: "", code: "", phone: "", address: "" });
+    setErrorMessage(null);
     setShowForm(true);
   };
 
-  const handleOpenEdit = (branch: BranchItem) => {
+  const handleOpenEdit = (branch: BranchRecord) => {
     setEditingBranchId(branch.id);
     setFormData({
       name: branch.name,
       code: branch.code,
-      phone: branch.phone,
-      address: branch.address,
+      phone: branch.phone === "Sin teléfono" ? "" : branch.phone,
+      address: branch.address === "Sin dirección registrada" ? "" : branch.address,
     });
+    setErrorMessage(null);
     setShowForm(true);
   };
 
-  const handleSave = (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name.trim() || !formData.code.trim()) {
       alert("El nombre y el código de la sucursal son obligatorios.");
       return;
     }
 
-    if (editingBranchId) {
-      setBranches((prev) =>
-        prev.map((b) =>
-          b.id === editingBranchId
-            ? { ...b, ...formData, code: formData.code.toUpperCase() }
-            : b
-        )
-      );
-    } else {
-      const newBranch: BranchItem = {
-        id: `branch-${Date.now()}`,
-        name: formData.name,
-        code: formData.code.toUpperCase(),
-        phone: formData.phone || "Sin teléfono",
-        address: formData.address || "Sin dirección registrada",
-        isActive: true,
-      };
-      setBranches((prev) => [...prev, newBranch]);
+    try {
+      setIsProcessing(true);
+      setErrorMessage(null);
+
+      if (editingBranchId) {
+        await updateBranchInDB(editingBranchId, formData);
+      } else {
+        await createBranchInDB(formData);
+      }
+
+      await loadBranches();
+      setShowForm(false);
+      onSuccess?.();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Error al guardar la sucursal";
+      setErrorMessage(msg);
+    } finally {
+      setIsProcessing(false);
     }
-
-    setShowForm(false);
   };
 
-  const handleToggleActive = (id: string) => {
-    setBranches((prev) =>
-      prev.map((b) => (b.id === id ? { ...b, isActive: !b.isActive } : b))
-    );
+  const handleToggleActive = async (branch: BranchRecord) => {
+    try {
+      setIsProcessing(true);
+      await toggleBranchStatusInDB(branch.id, branch.isActive);
+      setBranches((prev) =>
+        prev.map((b) => (b.id === branch.id ? { ...b, isActive: !b.isActive } : b))
+      );
+      onSuccess?.();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Error al alternar estado";
+      alert(msg);
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
-  const handleDelete = (id: string, name: string) => {
-    if (confirm(`¿Estás seguro de eliminar la sucursal "${name}"?`)) {
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`¿Estás seguro de eliminar la sucursal "${name}"?`)) return;
+
+    try {
+      setIsProcessing(true);
+      await deleteBranchFromDB(id);
       setBranches((prev) => prev.filter((b) => b.id !== id));
+      onSuccess?.();
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Error al eliminar la sucursal";
+      alert(msg);
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -137,26 +174,39 @@ export default function BranchManagementModal({ isOpen, onClose }: Props) {
               <Store className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-sm font-bold text-slate-900">
+              <h2 className="text-sm font-bold text-sky-600">
                 Gestión de Sucursales
               </h2>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-xs text-slate-700">
                 Administración de sedes y puntos de venta de Mario&apos;s Dent
               </p>
             </div>
           </div>
 
           <button
-            onClick={onClose}
-            className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
+            onClick={handleCloseModal}
+            className="p-1.5 text-rose-500 hover:text-white hover:bg-rose-500 rounded-lg transition-colors cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
+        {/* Notificación de Error */}
+        {errorMessage && (
+          <div className="mx-6 mt-4 p-3 rounded-xl bg-rose-50 border border-rose-200 flex items-center gap-2 text-rose-700 text-xs">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{errorMessage}</span>
+          </div>
+        )}
+
         {/* Contenido / Lista y Formulario */}
         <div className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
-          {!showForm ? (
+          {isLoading ? (
+            <div className="py-12 flex flex-col items-center justify-center gap-2 text-slate-400">
+              <Loader2 className="w-6 h-6 animate-spin text-sky-600" />
+              <span className="text-xs">Cargando sucursales desde la base de datos...</span>
+            </div>
+          ) : !showForm ? (
             <>
               <div className="flex items-center justify-between">
                 <span className="text-xs font-semibold text-slate-500">
@@ -165,7 +215,8 @@ export default function BranchManagementModal({ isOpen, onClose }: Props) {
                 <button
                   type="button"
                   onClick={handleOpenCreate}
-                  className="flex items-center gap-1.5 bg-[#0284C7] hover:bg-sky-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-xs transition-colors cursor-pointer"
+                  disabled={isProcessing}
+                  className="flex items-center gap-1.5 bg-[#0284C7] hover:bg-sky-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-xs transition-colors cursor-pointer disabled:opacity-50"
                 >
                   <Plus className="w-3.5 h-3.5" />
                   <span>Nueva Sucursal</span>
@@ -215,8 +266,9 @@ export default function BranchManagementModal({ isOpen, onClose }: Props) {
 
                     <div className="flex items-center gap-1">
                       <button
-                        onClick={() => handleToggleActive(branch.id)}
-                        className={`text-[10px] font-semibold px-2 py-1 rounded-lg border transition-colors cursor-pointer ${
+                        disabled={isProcessing}
+                        onClick={() => handleToggleActive(branch)}
+                        className={`text-[10px] font-semibold px-2 py-1 rounded-lg border transition-colors cursor-pointer disabled:opacity-50 ${
                           branch.isActive
                             ? "border-amber-200 text-amber-700 hover:bg-amber-50"
                             : "border-emerald-200 text-emerald-700 hover:bg-emerald-50"
@@ -225,15 +277,17 @@ export default function BranchManagementModal({ isOpen, onClose }: Props) {
                         {branch.isActive ? "Desactivar" : "Activar"}
                       </button>
                       <button
+                        disabled={isProcessing}
                         onClick={() => handleOpenEdit(branch)}
-                        className="p-1.5 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-lg transition-colors cursor-pointer"
+                        className="p-1.5 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
                         title="Editar"
                       >
                         <Edit2 className="w-3.5 h-3.5" />
                       </button>
                       <button
+                        disabled={isProcessing}
                         onClick={() => handleDelete(branch.id, branch.name)}
-                        className="p-1.5 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-lg transition-colors cursor-pointer"
+                        className="p-1.5 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
                         title="Eliminar"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -244,11 +298,10 @@ export default function BranchManagementModal({ isOpen, onClose }: Props) {
               </div>
             </>
           ) : (
-            /* Formulario de Alta / Edición */
             <form onSubmit={handleSave} className="space-y-4">
               <div className="grid grid-cols-3 gap-3">
                 <div className="col-span-2 space-y-1">
-                  <label className="text-[11px] font-bold text-slate-600 uppercase">
+                  <label className="text-[11px] font-bold text-sky-700 uppercase">
                     Nombre de la Sucursal
                   </label>
                   <input
@@ -281,7 +334,7 @@ export default function BranchManagementModal({ isOpen, onClose }: Props) {
               </div>
 
               <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-600 uppercase">
+                <label className="text-[11px] font-bold text-sky-700 uppercase">
                   Teléfono de Contacto
                 </label>
                 <input
@@ -296,8 +349,8 @@ export default function BranchManagementModal({ isOpen, onClose }: Props) {
               </div>
 
               <div className="space-y-1">
-                <label className="text-[11px] font-bold text-slate-600 uppercase">
-                  Dirección Física
+                <label className="text-[11px] font-bold text-sky-700 uppercase">
+                  Dirección
                 </label>
                 <input
                   type="text"
@@ -313,6 +366,7 @@ export default function BranchManagementModal({ isOpen, onClose }: Props) {
               <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
                 <button
                   type="button"
+                  disabled={isProcessing}
                   onClick={() => setShowForm(false)}
                   className="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-semibold rounded-xl transition-colors cursor-pointer"
                 >
@@ -320,9 +374,11 @@ export default function BranchManagementModal({ isOpen, onClose }: Props) {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors cursor-pointer"
+                  disabled={isProcessing}
+                  className="px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
                 >
-                  {editingBranchId ? "Guardar Cambios" : "Crear Sucursal"}
+                  {isProcessing && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                  <span>{editingBranchId ? "Guardar Cambios" : "Crear Sucursal"}</span>
                 </button>
               </div>
             </form>

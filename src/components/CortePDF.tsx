@@ -36,6 +36,12 @@ export async function downloadCorteZPDF(filename?: string) {
         useCORS: true,
         logging: false,
         backgroundColor: "#ffffff",
+        onclone: (clonedDoc: Document) => {
+          // Remueve las hojas de estilo de Tailwind v4 del documento clonado
+          // para eliminar de raíz cualquier función lab() u oklch() heredada
+          const styleSheets = clonedDoc.querySelectorAll("style, link[rel='stylesheet']");
+          styleSheets.forEach((s) => s.remove());
+        },
       },
       jsPDF: { unit: "mm", format: "letter", orientation: "portrait" as const },
     };
@@ -47,11 +53,9 @@ export async function downloadCorteZPDF(filename?: string) {
   }
 }
 
-// Suscripción segura para hidratación sin cascading renders
 const emptySubscribe = () => () => {};
 
 export default function CorteZPDFTemplate({ data }: { data: CorteZData }) {
-  // Garantiza que solo renderice en cliente sin disparar useEffect ni cascading renders
   const isMounted = useSyncExternalStore(
     emptySubscribe,
     () => true,
@@ -65,294 +69,261 @@ export default function CorteZPDFTemplate({ data }: { data: CorteZData }) {
   const iva = totalSales * 0.13;
   const netSales = totalSales - iva;
 
+  // Estilos base estrictamente en Blanco y Negro
+  const borderThin = "1px solid #000000";
+  const borderThick = "2px solid #000000";
+  const borderLight = "1px solid #d1d5db";
+
   return (
     <div style={{ position: "fixed", left: "-9999px", top: 0, zIndex: -100 }}>
       <div
         id="corte-z-pdf-report"
         style={{
-          width: "800px",
-          minHeight: "1050px",
+          width: "750px",
           backgroundColor: "#ffffff",
-          color: "#0f172a",
+          color: "#000000",
+          fontFamily: "Arial, Helvetica, sans-serif",
+          boxSizing: "border-box",
+          padding: "36px",
+          fontSize: "11px",
+          lineHeight: "1.4",
         }}
-        className="font-sans text-xs p-10 box-border"
       >
         {/* ENCABEZADO Y MEMBRETE */}
         <div
-          style={{ borderColor: "#0f172a" }}
-          className="flex justify-between items-start border-b-2 pb-3 mb-5"
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-end",
+            borderBottom: borderThick,
+            paddingBottom: "12px",
+            marginBottom: "20px",
+          }}
         >
           <div>
             <h1
-              style={{ color: "#0f172a" }}
-              className="text-xl font-black uppercase tracking-tight"
+              style={{
+                fontSize: "18px",
+                fontWeight: "bold",
+                margin: 0,
+                textTransform: "uppercase",
+                letterSpacing: "0.5px",
+              }}
             >
               MARIO&apos;S DENT
             </h1>
-            <p style={{ color: "#475569" }} className="text-xs font-semibold">
+            <p style={{ margin: "3px 0 0 0", fontSize: "11px", color: "#333333" }}>
               Depósito Dental Especializado • Sucursal {data.branch}
             </p>
-            <p style={{ color: "#64748b" }} className="text-[10px]">
+            <p style={{ margin: "2px 0 0 0", fontSize: "10px", color: "#666666" }}>
               PBX: (503) 2440-1234 • Santa Ana, El Salvador
             </p>
           </div>
-          <div className="text-right">
-            <span
-              style={{ backgroundColor: "#0f172a", color: "#ffffff" }}
-              className="inline-block font-bold px-3 py-1 rounded text-[10px] uppercase tracking-wider"
+          <div style={{ textAlign: "right" }}>
+            <div
+              style={{
+                fontSize: "12px",
+                fontWeight: "bold",
+                textTransform: "uppercase",
+                letterSpacing: "0.5px",
+              }}
             >
-              Corte Z - Auditoría Diaria
-            </span>
-            <p
-              suppressHydrationWarning
-              style={{ color: "#1e293b" }}
-              className="font-mono font-bold text-xs mt-1.5"
-            >
+              Corte Z — Balance Diario
+            </div>
+            <div style={{ fontFamily: "monospace", fontSize: "11px", marginTop: "3px" }}>
               Folio: {data.folio}
-            </p>
-            <p
-              suppressHydrationWarning
-              style={{ color: "#64748b" }}
-              className="text-[10px]"
-            >
-              Fecha de Emisión: {data.date}
-            </p>
+            </div>
+            <div style={{ fontSize: "10px", color: "#444444" }}>
+              Emisión: {data.date}
+            </div>
           </div>
         </div>
 
-        {/* METADATOS DE LA JORNADA */}
+        {/* METADATOS DEL TURNO */}
         <div
-          style={{ backgroundColor: "#f8fafc", borderColor: "#e2e8f0" }}
-          className="grid grid-cols-4 gap-4 p-3 border rounded-lg mb-6 text-[11px]"
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(4, 1fr)",
+            gap: "12px",
+            padding: "10px 14px",
+            border: borderLight,
+            marginBottom: "24px",
+            fontSize: "11px",
+          }}
         >
           <div>
-            <span
-              style={{ color: "#94a3b8" }}
-              className="block text-[9px] uppercase font-bold"
-            >
-              Fecha Auditada
+            <span style={{ display: "block", fontSize: "9px", textTransform: "uppercase", color: "#666666" }}>
+              Fecha
             </span>
-            <strong suppressHydrationWarning style={{ color: "#1e293b" }}>
-              {data.date}
-            </strong>
+            <strong>{data.date}</strong>
           </div>
           <div>
-            <span
-              style={{ color: "#94a3b8" }}
-              className="block text-[9px] uppercase font-bold"
-            >
+            <span style={{ display: "block", fontSize: "9px", textTransform: "uppercase", color: "#666666" }}>
               Jornada
             </span>
-            <strong style={{ color: "#1e293b" }}>Jornada Completa</strong>
+            <strong>Completa</strong>
           </div>
           <div>
-            <span
-              style={{ color: "#94a3b8" }}
-              className="block text-[9px] uppercase font-bold"
-            >
+            <span style={{ display: "block", fontSize: "9px", textTransform: "uppercase", color: "#666666" }}>
               Cajero Responsable
             </span>
-            <strong style={{ color: "#1e293b" }}>{data.cashier}</strong>
+            <strong>{data.cashier}</strong>
           </div>
           <div>
-            <span
-              style={{ color: "#94a3b8" }}
-              className="block text-[9px] uppercase font-bold"
-            >
+            <span style={{ display: "block", fontSize: "9px", textTransform: "uppercase", color: "#666666" }}>
               Auditor / Supervisor
             </span>
-            <strong style={{ color: "#1e293b" }}>{data.adminName}</strong>
+            <strong>{data.adminName}</strong>
           </div>
         </div>
 
-        {/* DOS COLUMNAS: INGRESOS VS ARQUEO */}
-        <div className="grid grid-cols-2 gap-6 mb-6">
-          {/* Columna Izquierda: Ingresos por forma de pago */}
-          <div style={{ borderColor: "#e2e8f0" }} className="border rounded-lg p-4">
-            <h2
-              style={{ color: "#1e293b", borderColor: "#e2e8f0" }}
-              className="text-[11px] font-bold uppercase tracking-wider border-b pb-2 mb-3"
-            >
-              1. Desglose de Ventas e Ingresos
-            </h2>
-            <table className="w-full text-[11px]">
-              <tbody style={{ borderColor: "#f1f5f9" }} className="divide-y">
-                <tr>
-                  <td style={{ color: "#475569" }} className="py-1.5">
-                    Ventas en Efectivo
-                  </td>
-                  <td className="py-1.5 font-mono text-right font-semibold">
-                    ${data.cashSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                  </td>
-                </tr>
-                <tr>
-                  <td style={{ color: "#475569" }} className="py-1.5">
-                    Ventas con Tarjeta (POS)
-                  </td>
-                  <td className="py-1.5 font-mono text-right font-semibold">
-                    ${data.cardSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                  </td>
-                </tr>
-                <tr>
-                  <td style={{ color: "#475569" }} className="py-1.5">
-                    Transferencias Bancarias
-                  </td>
-                  <td className="py-1.5 font-mono text-right font-semibold">
-                    ${data.transferSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                  </td>
-                </tr>
-                <tr
-                  style={{ borderColor: "#cbd5e1" }}
-                  className="font-bold border-t"
-                >
-                  <td style={{ color: "#0f172a" }} className="pt-2">
-                    TOTAL INGRESOS BRUTOS
-                  </td>
-                  <td
-                    style={{ color: "#075985" }}
-                    className="pt-2 font-mono text-right"
-                  >
-                    ${totalSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                  </td>
-                </tr>
-                <tr style={{ color: "#64748b" }} className="text-[10px]">
-                  <td className="pt-1">IVA Débito Fiscal (13%)</td>
-                  <td className="pt-1 font-mono text-right">${iva.toFixed(2)}</td>
-                </tr>
-                <tr style={{ color: "#64748b" }} className="text-[10px]">
-                  <td className="pt-0.5">Ventas Gravadas Netas</td>
-                  <td className="pt-0.5 font-mono text-right">${netSales.toFixed(2)}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+        {/* TABLA PRINCIPAL DE VALORES (ESTRUCTURA CONTABLE B&N) */}
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            fontSize: "11px",
+            marginBottom: "24px",
+          }}
+        >
+          <thead>
+            <tr style={{ borderBottom: borderThick, textAlign: "left", fontSize: "10px", textTransform: "uppercase" }}>
+              <th style={{ padding: "6px 0" }}>Descripción Contable</th>
+              <th style={{ padding: "6px 0", textAlign: "right" }}>Monto USD</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style={{ borderBottom: borderLight }}>
+              <td style={{ padding: "6px 0" }}>Ventas en Efectivo</td>
+              <td style={{ padding: "6px 0", textAlign: "right", fontFamily: "monospace" }}>
+                ${data.cashSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+              </td>
+            </tr>
+            <tr style={{ borderBottom: borderLight }}>
+              <td style={{ padding: "6px 0" }}>Ventas con Tarjeta (POS)</td>
+              <td style={{ padding: "6px 0", textAlign: "right", fontFamily: "monospace" }}>
+                ${data.cardSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+              </td>
+            </tr>
+            <tr style={{ borderBottom: borderLight }}>
+              <td style={{ padding: "6px 0" }}>Transferencias Bancarias</td>
+              <td style={{ padding: "6px 0", textAlign: "right", fontFamily: "monospace" }}>
+                ${data.transferSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+              </td>
+            </tr>
+            <tr style={{ borderBottom: borderThin, fontWeight: "bold" }}>
+              <td style={{ padding: "8px 0" }}>TOTAL VENTAS BRUTAS</td>
+              <td style={{ padding: "8px 0", textAlign: "right", fontFamily: "monospace" }}>
+                ${totalSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+              </td>
+            </tr>
+            <tr style={{ color: "#666666", fontSize: "10px" }}>
+              <td style={{ padding: "4px 0 2px 10px" }}>↳ Venta Gravada Neta</td>
+              <td style={{ padding: "4px 0 2px 0", textAlign: "right", fontFamily: "monospace" }}>
+                ${netSales.toFixed(2)}
+              </td>
+            </tr>
+            <tr style={{ color: "#666666", fontSize: "10px", borderBottom: borderLight }}>
+              <td style={{ padding: "2px 0 6px 10px" }}>↳ IVA Débito Fiscal (13%)</td>
+              <td style={{ padding: "2px 0 6px 0", textAlign: "right", fontFamily: "monospace" }}>
+                ${iva.toFixed(2)}
+              </td>
+            </tr>
 
-          {/* Columna Derecha: Conciliación de Efectivo Físico */}
-          <div style={{ borderColor: "#e2e8f0" }} className="border rounded-lg p-4">
-            <h2
-              style={{ color: "#1e293b", borderColor: "#e2e8f0" }}
-              className="text-[11px] font-bold uppercase tracking-wider border-b pb-2 mb-3"
-            >
-              2. Conciliación de Efectivo (Arqueo)
-            </h2>
-            <table className="w-full text-[11px]">
-              <tbody style={{ borderColor: "#f1f5f9" }} className="divide-y">
-                <tr>
-                  <td style={{ color: "#475569" }} className="py-1.5">
-                    (+) Fondo Inicial de Caja
-                  </td>
-                  <td className="py-1.5 font-mono text-right font-semibold">
-                    ${data.initialFund.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                  </td>
-                </tr>
-                <tr>
-                  <td style={{ color: "#475569" }} className="py-1.5">
-                    (+) Ventas en Efectivo
-                  </td>
-                  <td className="py-1.5 font-mono text-right font-semibold">
-                    ${data.cashSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                  </td>
-                </tr>
-                <tr>
-                  <td style={{ color: "#475569" }} className="py-1.5">
-                    (-) Gastos Menores en Efectivo
-                  </td>
-                  <td
-                    style={{ color: "#dc2626" }}
-                    className="py-1.5 font-mono text-right font-semibold"
-                  >
-                    -${data.expenses.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                  </td>
-                </tr>
-                <tr
-                  style={{ borderColor: "#cbd5e1" }}
-                  className="font-bold border-t"
-                >
-                  <td style={{ color: "#1e293b" }} className="pt-2">
-                    Efectivo Teórico Esperado
-                  </td>
-                  <td className="pt-2 font-mono text-right">
-                    ${expectedCash.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                  </td>
-                </tr>
-                <tr>
-                  <td style={{ color: "#475569" }} className="py-1.5">
-                    Efectivo Físico Contado
-                  </td>
-                  <td className="py-1.5 font-mono text-right font-semibold">
-                    ${data.countedCash.toLocaleString("en-US", { minimumFractionDigits: 2 })}
-                  </td>
-                </tr>
-                <tr
-                  style={{ borderColor: "#cbd5e1" }}
-                  className="font-bold border-t"
-                >
-                  <td style={{ color: "#0f172a" }} className="pt-2">
-                    DIFERENCIA FINAL
-                  </td>
-                  <td
-                    style={{
-                      color: data.difference < 0 ? "#dc2626" : "#15803d",
-                    }}
-                    className="pt-2 font-mono text-right"
-                  >
-                    {data.difference >= 0
-                      ? `+$${data.difference.toFixed(2)}`
-                      : `-$${Math.abs(data.difference).toFixed(2)}`}
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+            {/* Espacio separador */}
+            <tr>
+              <td colSpan={2} style={{ height: "14px" }}></td>
+            </tr>
 
-        {/* DICTAMEN DE AUDITORÍA */}
-        <div style={{ borderColor: "#e2e8f0" }} className="border rounded-lg p-4 mb-10">
-          <h2
-            style={{ color: "#1e293b", borderColor: "#e2e8f0" }}
-            className="text-[11px] font-bold uppercase tracking-wider border-b pb-2 mb-2"
-          >
-            3. Dictamen y Resolución de Auditoría
-          </h2>
-          <div className="space-y-1.5 text-[11px]">
-            <p>
-              <strong style={{ color: "#334155" }}>Justificación de la Cajera:</strong>{" "}
-              <span style={{ color: "#475569" }} className="italic">
-                &ldquo;{data.cashierNote}&rdquo;
-              </span>
-            </p>
-            <p>
-              <strong style={{ color: "#334155" }}>Dictamen del Administrador:</strong>{" "}
-              <span
-                style={{ color: "#0f172a" }}
-                className="font-mono font-bold uppercase"
+            {/* Sección Conciliación Efectivo */}
+            <tr style={{ borderBottom: borderLight }}>
+              <td style={{ padding: "6px 0" }}>(+) Fondo Inicial de Apertura</td>
+              <td style={{ padding: "6px 0", textAlign: "right", fontFamily: "monospace" }}>
+                ${data.initialFund.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+              </td>
+            </tr>
+            <tr style={{ borderBottom: borderLight }}>
+              <td style={{ padding: "6px 0" }}>(-) Gastos Operativos Menores</td>
+              <td style={{ padding: "6px 0", textAlign: "right", fontFamily: "monospace" }}>
+                -${data.expenses.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+              </td>
+            </tr>
+            <tr style={{ borderBottom: borderThin }}>
+              <td style={{ padding: "6px 0" }}>(=) Efectivo Teórico Esperado</td>
+              <td style={{ padding: "6px 0", textAlign: "right", fontFamily: "monospace" }}>
+                ${expectedCash.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+              </td>
+            </tr>
+            <tr style={{ borderBottom: borderThick, fontWeight: "bold" }}>
+              <td style={{ padding: "8px 0" }}>Efectivo Físico Contado (Arqueo)</td>
+              <td style={{ padding: "8px 0", textAlign: "right", fontFamily: "monospace" }}>
+                ${data.countedCash.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+              </td>
+            </tr>
+
+            {/* Diferencia Final */}
+            <tr style={{ fontWeight: "bold" }}>
+              <td style={{ padding: "10px 0 0 0", fontSize: "12px", textTransform: "uppercase" }}>
+                Diferencia Final de Caja
+              </td>
+              <td
+                style={{
+                  padding: "10px 0 0 0",
+                  textAlign: "right",
+                  fontFamily: "monospace",
+                  fontSize: "13px",
+                }}
               >
-                [{data.resolutionType}]
-              </span>{" "}
-              — {data.adminNote}
-            </p>
+                {data.difference > 0 && "+"}
+                ${data.difference.toFixed(2)}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        {/* DICTAMEN / NOTAS */}
+        <div
+          style={{
+            borderTop: borderThin,
+            borderBottom: borderThin,
+            padding: "10px 0",
+            marginBottom: "40px",
+            fontSize: "10px",
+          }}
+        >
+          {data.cashierNote && (
+            <div style={{ marginBottom: "4px" }}>
+              <strong>Nota Cajero:</strong> <em>&ldquo;{data.cashierNote}&rdquo;</em>
+            </div>
+          )}
+          <div>
+            <strong>Dictamen de Auditoría:</strong> [{data.resolutionType}]
+            {data.adminNote ? ` — ${data.adminNote}` : " — Conforme"}
           </div>
         </div>
 
         {/* FIRMAS DE CONFORMIDAD */}
-        <div className="grid grid-cols-2 gap-16 pt-12 text-center text-[10px]">
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
+            gap: "80px",
+            textAlign: "center",
+            fontSize: "10px",
+            paddingTop: "20px",
+          }}
+        >
           <div>
-            <div
-              style={{ borderColor: "#94a3b8", color: "#1e293b" }}
-              className="border-t pt-2 font-bold"
-            >
+            <div style={{ borderTop: borderThin, paddingTop: "6px", fontWeight: "bold", textTransform: "uppercase" }}>
               {data.cashier}
             </div>
-            <p style={{ color: "#64748b" }}>Firma del Cajero en Turno</p>
+            <div style={{ color: "#555555", marginTop: "2px" }}>Firma del Cajero</div>
           </div>
           <div>
-            <div
-              style={{ borderColor: "#94a3b8", color: "#1e293b" }}
-              className="border-t pt-2 font-bold"
-            >
+            <div style={{ borderTop: borderThin, paddingTop: "6px", fontWeight: "bold", textTransform: "uppercase" }}>
               {data.adminName}
             </div>
-            <p style={{ color: "#64748b" }}>Firma del Administrador / Auditor</p>
+            <div style={{ color: "#555555", marginTop: "2px" }}>Firma Supervisor / Auditor</div>
           </div>
         </div>
       </div>

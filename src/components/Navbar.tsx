@@ -250,7 +250,7 @@ export default function Navbar() {
           <span className="hidden md:inline text-slate-300">|</span>
           <span
             suppressHydrationWarning
-            className="hidden md:inline text-slate-500 font-mono w-16 text-center tabular-nums font-medium"
+            className="hidden md:inline text-slate-500 tabular-nums w-16 text-center tabular-nums font-medium"
           >
             {currentTime || "--:--:--"}
           </span>

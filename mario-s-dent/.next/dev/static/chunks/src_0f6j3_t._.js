@@ -223,7 +223,7 @@ var _s = __turbopack_context__.k.signature(), _s1 = __turbopack_context__.k.sign
 ;
 const ShiftContext = /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["createContext"])(undefined);
 const SHIFT_STORAGE_KEY = "marios_dent_shift_data";
-// Suscriptor reactivo a cambios de localStorage entre componentes/pestañas
+// Suscriptor reactivo a cambios de localStorage entre componentes y eventos locales
 function subscribe(callback) {
     window.addEventListener("storage", callback);
     window.addEventListener("shift_state_change", callback);
@@ -232,13 +232,13 @@ function subscribe(callback) {
         window.removeEventListener("shift_state_change", callback);
     };
 }
-// Snapshot leído en el cliente
+// Snapshot en el cliente
 function getSnapshot() {
     if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
     ;
     return localStorage.getItem(SHIFT_STORAGE_KEY) ?? "";
 }
-// Snapshot seguro para el render del servidor (SSR)
+// Snapshot seguro para SSR
 function getServerSnapshot() {
     return "";
 }
@@ -249,8 +249,9 @@ function ShiftProvider({ children }) {
         "ShiftProvider.useMemo[parsedData]": ()=>{
             if (!rawShiftData) {
                 return {
+                    shiftId: null,
                     isShiftOpen: false,
-                    cashierName: "Maria G.",
+                    cashierName: "",
                     initialCash: 0,
                     auditStatus: "pending"
                 };
@@ -259,8 +260,9 @@ function ShiftProvider({ children }) {
                 return JSON.parse(rawShiftData);
             } catch  {
                 return {
+                    shiftId: null,
                     isShiftOpen: false,
-                    cashierName: "Maria G.",
+                    cashierName: "",
                     initialCash: 0,
                     auditStatus: "pending"
                 };
@@ -269,7 +271,7 @@ function ShiftProvider({ children }) {
     }["ShiftProvider.useMemo[parsedData]"], [
         rawShiftData
     ]);
-    // Actualizador persistente que notifica a la aplicación
+    // Actualizador de almacenamiento que notifica a toda la app
     const updateStorage = (payload)=>{
         if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
         ;
@@ -281,8 +283,9 @@ function ShiftProvider({ children }) {
         window.dispatchEvent(new Event("shift_state_change"));
     };
     const openShift = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
-        "ShiftProvider.useCallback[openShift]": (amount, cashier)=>{
+        "ShiftProvider.useCallback[openShift]": (amount, cashier, newShiftId)=>{
             updateStorage({
+                shiftId: newShiftId ?? null,
                 isShiftOpen: true,
                 cashierName: cashier,
                 initialCash: amount,
@@ -295,6 +298,11 @@ function ShiftProvider({ children }) {
             updateStorage(null);
         }
     }["ShiftProvider.useCallback[closeShift]"], []);
+    const resetShiftContext = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
+        "ShiftProvider.useCallback[resetShiftContext]": ()=>{
+            updateStorage(null);
+        }
+    }["ShiftProvider.useCallback[resetShiftContext]"], []);
     const resolveAudit = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
         "ShiftProvider.useCallback[resolveAudit]": (_notes, _resolution)=>{
             if ("TURBOPACK compile-time falsy", 0) //TURBOPACK unreachable
@@ -315,22 +323,24 @@ function ShiftProvider({ children }) {
     }["ShiftProvider.useCallback[resolveAudit]"], []);
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(ShiftContext.Provider, {
         value: {
+            shiftId: parsedData.shiftId,
             isShiftOpen: parsedData.isShiftOpen,
             cashierName: parsedData.cashierName,
             initialCash: parsedData.initialCash,
             openShift,
             closeShift,
+            resetShiftContext,
             auditStatus: parsedData.auditStatus,
             resolveAudit
         },
         children: children
     }, void 0, false, {
         fileName: "[project]/src/app/context/ShiftContext.tsx",
-        lineNumber: 117,
+        lineNumber: 127,
         columnNumber: 5
     }, this);
 }
-_s(ShiftProvider, "Xh/G2v2VYhXpA870O1Cn7nzmpRo=", false, function() {
+_s(ShiftProvider, "qYWFpDnpCK8mgJWvupsKZE2KATQ=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useSyncExternalStore"]
     ];

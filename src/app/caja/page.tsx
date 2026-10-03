@@ -12,6 +12,7 @@ import {
   getAdminShiftAudit,
   resolveShiftAuditInDB,
 } from "@/app/services/cashService";
+import { supabase } from "@/lib/supabaseClient";
 import { useSearchParams } from "next/navigation";
 import ConfirmarModal, { DialogType } from "@/components/ConfirmarModal";
 import ExpenseModal, { ExpenseRecord } from "@/components/GastoMenorModal";
@@ -156,6 +157,74 @@ export default function CajaPage() {
     }).format(new Date());
   });
 
+  const [cashierNotes, setCashierNotes] = useState("");
+  const [countedCash, setCountedCash] = useState<number>(0.0);
+  const [expensesList, setExpensesList] = useState<ExpenseRecord[]>([]);
+
+  // =========================================================================
+  // SINCRONIZACIÓN ESTRICTA DEL TURNO POR SUCURSAL DEL CAJERO
+  // =========================================================================
+  useEffect(() => {
+    if (isAdmin) return;
+
+    let isMounted = true;
+
+    async function syncCashierShift() {
+      try {
+        const branchNameQuery = user?.branch || "Santa Ana";
+
+        // 1. Obtener id de la sucursal asignada al cajero
+        const { data: branchData } = await supabase
+          .from("branches")
+          .select("id")
+          .ilike("name", `%${branchNameQuery.trim()}%`)
+          .maybeSingle();
+
+        if (!branchData) {
+          if (isMounted) closeShift();
+          return;
+        }
+
+        // 2. Buscar si la sucursal tiene un turno abierto
+        const { data: openShiftData } = await supabase
+          .from("cash_shifts")
+          .select("id, initial_cash, cashier_id, profiles(full_name)")
+          .eq("branch_id", branchData.id)
+          .eq("status", "open")
+          .order("opened_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (!isMounted) return;
+
+        if (openShiftData) {
+          // Sucursal con turno abierto: sincronizar montos y cajero
+          const shiftUserRecord = Array.isArray(openShiftData.profiles)
+            ? openShiftData.profiles[0]
+            : openShiftData.profiles;
+
+          openShift(
+            Number(openShiftData.initial_cash),
+            shiftUserRecord?.full_name || user?.name || "Operador",
+            openShiftData.id
+          );
+        } else {
+          // NO tiene turno abierto en ESTA sede: forzar cerrado en memoria
+          closeShift();
+          setCountedCash(0.0);
+        }
+      } catch (err) {
+        console.error("Error sincronizando turno de sucursal:", err);
+      }
+    }
+
+    syncCashierShift();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isAdmin, user?.branch, user?.name, openShift, closeShift]);
+
   // Cierre de menús al hacer click fuera
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -218,11 +287,6 @@ export default function CajaPage() {
   // Dictamen contable (Admin)
   const [resolutionType, setResolutionType] = useState<ResolutionType>("MERMA_ACEPTADA");
   const [adminNotes, setAdminNotes] = useState("");
-
-  // Operatoria de cajero
-  const [cashierNotes, setCashierNotes] = useState("");
-  const [countedCash, setCountedCash] = useState<number>(0.0);
-  const [expensesList, setExpensesList] = useState<ExpenseRecord[]>([]);
 
   // Métricas del turno para auditoría
   const [salesMetrics, setSalesMetrics] = useState({
@@ -445,79 +509,79 @@ export default function CajaPage() {
   };
 
   // Cerrar turno (Corte Z)
-  const handleCloseShift = useCallback(() => {
-    const currentCounted = Number(countedCash) || 0;
-    const currentExpected = Number(totals.expectedCash) || 0;
-    const realDiff = Number((currentCounted - currentExpected).toFixed(2));
+const handleCloseShift = () => {
+  const currentCounted = Number(countedCash) || 0;
+  const currentExpected = Number(totals.expectedCash) || 0;
+  const realDiff = Number((currentCounted - currentExpected).toFixed(2));
 
-    if (realDiff !== 0 && !cashierNotes.trim()) {
-      setDialogConfig({
-        isOpen: true,
-        type: "warning",
-        title: "Justificación Requerida",
-        description:
-          "Existe un descuadre en el arqueo de efectivo. Es obligatorio ingresar una justificación antes de realizar el Corte Z.",
-        confirmText: "Entendido",
-        onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
-      });
-      return;
-    }
-
+  if (realDiff !== 0 && !cashierNotes.trim()) {
     setDialogConfig({
       isOpen: true,
       type: "warning",
-      title: "Confirmar Cierre de Turno",
+      title: "Justificación Requerida",
       description:
-        "¿Confirmas el cierre de jornada (Corte Z)? Esta acción asentará el balance final en el sistema y cerrará la caja.",
-      confirmText: "Sí, Cerrar Turno",
-      cancelText: "Cancelar",
-      onConfirm: async () => {
-        try {
-          setIsProcessing(true);
-
-          await closeCashShiftInDB({
-            branchName: effectiveBranch,
-            countedCash: currentCounted,
-            expectedCash: currentExpected,
-            totalSales: totals.totalSales,
-            totalExpenses: totals.expenses,
-            difference: realDiff,
-            notes: cashierNotes,
-          });
-
-          closeShift();
-          setCashierNotes("");
-          setCountedCash(0.0);
-          setExpensesList([]);
-          setSalesBreakdown({ cash: 0, card: 0, transfer: 0, total: 0 });
-
-          setDialogConfig({
-            isOpen: true,
-            type: "success",
-            title: "Turno Cerrado con Éxito",
-            description:
-              "El balance final ha sido asentado correctamente en la base de datos (Corte Z registrado).",
-            confirmText: "Aceptar",
-            onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
-          });
-        } catch (err: unknown) {
-          const msg =
-            err instanceof Error ? err.message : "Error al registrar el cierre de turno";
-          setDialogConfig({
-            isOpen: true,
-            type: "warning",
-            title: "Error de Cierre",
-            description: msg,
-            confirmText: "Aceptar",
-            onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
-          });
-        } finally {
-          setIsProcessing(false);
-        }
-      },
-      onCancel: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
+        "Existe un descuadre en el arqueo de efectivo. Es obligatorio ingresar una justificación antes de realizar el Corte Z.",
+      confirmText: "Entendido",
+      onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
     });
-  }, [totals, cashierNotes, effectiveBranch, countedCash, closeShift]);
+    return;
+  }
+
+  setDialogConfig({
+    isOpen: true,
+    type: "warning",
+    title: "Confirmar Cierre de Turno",
+    description:
+      "¿Confirmas el cierre de jornada (Corte Z)? Esta acción asentará el balance final en el sistema y cerrará la caja.",
+    confirmText: "Sí, Cerrar Turno",
+    cancelText: "Cancelar",
+    onConfirm: async () => {
+      try {
+        setIsProcessing(true);
+
+        await closeCashShiftInDB({
+          branchName: effectiveBranch,
+          countedCash: currentCounted,
+          expectedCash: currentExpected,
+          totalSales: totals.totalSales,
+          totalExpenses: totals.expenses,
+          difference: realDiff,
+          notes: cashierNotes,
+        });
+
+        closeShift();
+        setCashierNotes("");
+        setCountedCash(0.0);
+        setExpensesList([]);
+        setSalesBreakdown({ cash: 0, card: 0, transfer: 0, total: 0 });
+
+        setDialogConfig({
+          isOpen: true,
+          type: "success",
+          title: "Turno Cerrado con Éxito",
+          description:
+            "El balance final ha sido asentado correctamente en la base de datos (Corte Z registrado).",
+          confirmText: "Aceptar",
+          onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
+        });
+      } catch (err: unknown) {
+        const msg =
+          err instanceof Error ? err.message : "Error al registrar el cierre de turno";
+        setDialogConfig({
+          isOpen: true,
+          type: "warning",
+          title: "Error de Cierre",
+          description: msg,
+          confirmText: "Aceptar",
+          onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
+        });
+      } finally {
+        setIsProcessing(false);
+      }
+    },
+    onCancel: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
+  });
+};
 
   // Auditoría dictaminada por Admin
   const handleResolveDiscrepancy = useCallback(() => {
@@ -602,9 +666,7 @@ export default function CajaPage() {
       <Navbar />
 
       <main className="flex-1 p-6 md:p-8 max-w-7xl mx-auto w-full space-y-6">
-        {/* =========================================================================
-            ENCABEZADO DE PANTALLA Y CONTROLES
-           ========================================================================= */}
+        {/* ENCABEZADO */}
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-200/60">
           <div>
             <div className="flex items-center gap-2.5">
@@ -703,7 +765,7 @@ export default function CajaPage() {
                   )}
                 </div>
 
-                {/* 2. SELECTOR CUSTOMIZADO DE FECHA (UN SOLO ICONO SKY + CALENDARIO ELEGANTE) */}
+                {/* 2. SELECTOR CUSTOMIZADO DE FECHA */}
                 <div className="relative" ref={dateRef}>
                   <button
                     type="button"
@@ -861,9 +923,7 @@ export default function CajaPage() {
           </div>
         </header>
 
-        {/* =========================================================================
-            4 TARJETAS SUPERIORES DE TOTALES
-           ========================================================================= */}
+        {/* 4 TARJETAS SUPERIORES DE TOTALES */}
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Fondo Inicial */}
           <div className="bg-white border border-amber-300 border-l-4 border-l-amber-500 rounded-2xl p-4 shadow-xs hover:border-amber-300 transition-all">
@@ -940,11 +1000,9 @@ export default function CajaPage() {
           </div>
         </section>
 
-        {/* =========================================================================
-            CUERPO EN 2 COLUMNAS (DESGLOSE + ARQUEO)
-           ========================================================================= */}
+        {/* CUERPO EN 2 COLUMNAS */}
         <section className="grid grid-cols-12 gap-6 items-start">
-          {/* COLUMNA IZQUIERDA: Desglose por Método de Pago */}
+          {/* Desglose de Ingresos */}
           <div className="col-span-12 lg:col-span-5 space-y-4">
             <div className="flex items-center justify-between px-1">
               <h2 className="text-xs font-black text-sky-600 uppercase tracking-wider">
@@ -999,7 +1057,7 @@ export default function CajaPage() {
               </div>
             </div>
 
-            {/* Listado de Gastos del Turno */}
+            {/* Listado de Gastos */}
             {expensesList.length > 0 && (
               <div className="bg-white border border-slate-200 rounded-2xl p-4 shadow-xs space-y-2.5">
                 <div className="flex items-center justify-between">
@@ -1029,7 +1087,7 @@ export default function CajaPage() {
             )}
           </div>
 
-          {/* COLUMNA DERECHA: Consola de Arqueo y Auditoría */}
+          {/* Arqueo y Auditoría */}
           <div className="col-span-12 lg:col-span-7 bg-white border border-slate-300 rounded-2xl p-6 shadow-xs space-y-5">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
@@ -1118,7 +1176,7 @@ export default function CajaPage() {
               </div>
             </div>
 
-            {/* Cuadro de Conciliación / Diferencia */}
+            {/* Cuadro de Diferencia */}
             <div
               className={`p-4 rounded-xl border flex items-center justify-between transition-colors ${
                 totals.isBalanced
@@ -1168,7 +1226,7 @@ export default function CajaPage() {
               </span>
             </div>
 
-            {/* Justificación obligatoria por descuadre */}
+            {/* Justificación obligatoria */}
             {(totals.isShortage || (isAdmin && !totals.isBalanced)) && (
               <div className="space-y-1.5 animate-in fade-in duration-200">
                 <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-tight">
@@ -1203,7 +1261,7 @@ export default function CajaPage() {
               </div>
             )}
 
-            {/* Acciones del Administrador */}
+            {/* Acciones Admin */}
             {isAdmin ? (
               <div className="pt-3 border-t border-slate-100 space-y-4">
                 <div className="flex items-center justify-between">
@@ -1226,14 +1284,14 @@ export default function CajaPage() {
                         <button
                           type="button"
                           onClick={handleResolveDiscrepancy}
-                          className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-xs transition-colors cursor-pointer"
+                          className="flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold px-4 py-2 rounded-xl shadow-xs transition-colors cursor-pointer"
                         >
                           <ShieldCheck className="w-4 h-4" />
                           <span>Aprobar y Resolver Alerta</span>
                         </button>
                       ) : (
-                        <span className="text-[11px] font-bold text-sky-700 bg-sky-50 border border-sky-200 px-3 py-1.5 rounded-xl flex items-center gap-1.5">
-                          <CheckCircle2 className="w-4 h-4 text-sky-600" /> Resuelto por {user?.name || "Administrador"}
+                        <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-xl flex items-center gap-1.5">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600" /> Resuelto por {user?.name || "Administrador"}
                         </span>
                       )}
                     </>
@@ -1241,7 +1299,7 @@ export default function CajaPage() {
                 </div>
 
                 {!totals.isBalanced && !isAudited && (
-                  <div className="p-3.5 bg-purple-50/50 border border-purple-200 rounded-xl space-y-2.5">
+                  <div className="p-3.5 bg-purple-100/50 border border-purple-200 rounded-xl space-y-2.5">
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] font-bold text-purple-900 uppercase tracking-tight">
                         Dictamen Contable:
@@ -1261,13 +1319,13 @@ export default function CajaPage() {
                       value={adminNotes}
                       onChange={(e) => setAdminNotes(e.target.value)}
                       placeholder="Escriba la justificación contable de la resolución..."
-                      className="w-full text-xs p-2.5 bg-white border border-purple-200 rounded-lg focus:outline-none focus:border-purple-400 placeholder-purple-300"
+                      className="w-full text-xs text-slate-700 font-medium p-2.5 bg-white border border-purple-200 rounded-lg focus:outline-none focus:border-purple-400 placeholder-purple-300"
                     />
                   </div>
                 )}
               </div>
             ) : (
-              /* Acciones del Cajero */
+              /* Acciones Cajero */
               <div className="pt-3 border-t border-slate-100 flex items-center justify-end gap-3">
                 <button
                   type="button"
@@ -1294,9 +1352,7 @@ export default function CajaPage() {
         </section>
       </main>
 
-      {/* =========================================================================
-          MODALES OPERATIVOS
-         ========================================================================= */}
+      {/* MODALES OPERATIVOS */}
       <ExpenseModal
         isOpen={isExpenseModalOpen}
         onClose={() => setIsExpenseModalOpen(false)}

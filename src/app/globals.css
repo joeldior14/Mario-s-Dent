@@ -28,3 +28,30 @@ body {
   font-family: var(--font-mono), monospace;
   font-feature-settings: "tnum" 1;
 }
+
+@media print {
+  /* Oculta toda la app */
+  body * {
+    visibility: hidden;
+  }
+
+  /* Muestra únicamente el contenedor del ticket térmico */
+  #thermal-print-area,
+  #thermal-print-area * {
+    visibility: visible;
+  }
+
+  #thermal-print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 80mm;
+    margin: 0;
+    padding: 0;
+  }
+
+  @page {
+    size: 80mm auto;
+    margin: 0;
+  }
+}

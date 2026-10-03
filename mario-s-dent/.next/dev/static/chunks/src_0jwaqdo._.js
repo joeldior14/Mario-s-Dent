@@ -10,6 +10,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/compiled/react/index.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Navbar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/Navbar.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$cashService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/app/services/cashService.ts [app-client] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/supabaseClient.ts [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/navigation.js [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ConfirmarModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/ConfirmarModal.tsx [app-client] (ecmascript)");
 var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$GastoMenorModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/components/GastoMenorModal.tsx [app-client] (ecmascript)");
@@ -40,6 +41,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 ;
 var _s = __turbopack_context__.k.signature();
 "use client";
+;
 ;
 ;
 ;
@@ -140,6 +142,57 @@ function CajaPage() {
             }).format(new Date());
         }
     }["CajaPage.useState"]);
+    const [cashierNotes, setCashierNotes] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
+    const [countedCash, setCountedCash] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(0.0);
+    const [expensesList, setExpensesList] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
+    // =========================================================================
+    // SINCRONIZACIÓN ESTRICTA DEL TURNO POR SUCURSAL DEL CAJERO
+    // =========================================================================
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "CajaPage.useEffect": ()=>{
+            if (isAdmin) return;
+            let isMounted = true;
+            async function syncCashierShift() {
+                try {
+                    const branchNameQuery = user?.branch || "Santa Ana";
+                    // 1. Obtener id de la sucursal asignada al cajero
+                    const { data: branchData } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id").ilike("name", `%${branchNameQuery.trim()}%`).maybeSingle();
+                    if (!branchData) {
+                        if (isMounted) closeShift();
+                        return;
+                    }
+                    // 2. Buscar si la sucursal tiene un turno abierto
+                    const { data: openShiftData } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").select("id, initial_cash, cashier_id, profiles(full_name)").eq("branch_id", branchData.id).eq("status", "open").order("opened_at", {
+                        ascending: false
+                    }).limit(1).maybeSingle();
+                    if (!isMounted) return;
+                    if (openShiftData) {
+                        // Sucursal con turno abierto: sincronizar montos y cajero
+                        const shiftUserRecord = Array.isArray(openShiftData.profiles) ? openShiftData.profiles[0] : openShiftData.profiles;
+                        openShift(Number(openShiftData.initial_cash), shiftUserRecord?.full_name || user?.name || "Operador", openShiftData.id);
+                    } else {
+                        // NO tiene turno abierto en ESTA sede: forzar cerrado en memoria
+                        closeShift();
+                        setCountedCash(0.0);
+                    }
+                } catch (err) {
+                    console.error("Error sincronizando turno de sucursal:", err);
+                }
+            }
+            syncCashierShift();
+            return ({
+                "CajaPage.useEffect": ()=>{
+                    isMounted = false;
+                }
+            })["CajaPage.useEffect"];
+        }
+    }["CajaPage.useEffect"], [
+        isAdmin,
+        user?.branch,
+        user?.name,
+        openShift,
+        closeShift
+    ]);
     // Cierre de menús al hacer click fuera
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
         "CajaPage.useEffect": ()=>{
@@ -233,10 +286,6 @@ function CajaPage() {
     // Dictamen contable (Admin)
     const [resolutionType, setResolutionType] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("MERMA_ACEPTADA");
     const [adminNotes, setAdminNotes] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
-    // Operatoria de cajero
-    const [cashierNotes, setCashierNotes] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
-    const [countedCash, setCountedCash] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(0.0);
-    const [expensesList, setExpensesList] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
     // Métricas del turno para auditoría
     const [salesMetrics, setSalesMetrics] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({
         shiftId: null,
@@ -481,113 +530,87 @@ function CajaPage() {
         }
     };
     // Cerrar turno (Corte Z)
-    const handleCloseShift = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
-        "CajaPage.useCallback[handleCloseShift]": ()=>{
-            const currentCounted = Number(countedCash) || 0;
-            const currentExpected = Number(totals.expectedCash) || 0;
-            const realDiff = Number((currentCounted - currentExpected).toFixed(2));
-            if (realDiff !== 0 && !cashierNotes.trim()) {
-                setDialogConfig({
-                    isOpen: true,
-                    type: "warning",
-                    title: "Justificación Requerida",
-                    description: "Existe un descuadre en el arqueo de efectivo. Es obligatorio ingresar una justificación antes de realizar el Corte Z.",
-                    confirmText: "Entendido",
-                    onConfirm: {
-                        "CajaPage.useCallback[handleCloseShift]": ()=>setDialogConfig({
-                                "CajaPage.useCallback[handleCloseShift]": (prev)=>({
-                                        ...prev,
-                                        isOpen: false
-                                    })
-                            }["CajaPage.useCallback[handleCloseShift]"])
-                    }["CajaPage.useCallback[handleCloseShift]"]
-                });
-                return;
-            }
+    const handleCloseShift = ()=>{
+        const currentCounted = Number(countedCash) || 0;
+        const currentExpected = Number(totals.expectedCash) || 0;
+        const realDiff = Number((currentCounted - currentExpected).toFixed(2));
+        if (realDiff !== 0 && !cashierNotes.trim()) {
             setDialogConfig({
                 isOpen: true,
                 type: "warning",
-                title: "Confirmar Cierre de Turno",
-                description: "¿Confirmas el cierre de jornada (Corte Z)? Esta acción asentará el balance final en el sistema y cerrará la caja.",
-                confirmText: "Sí, Cerrar Turno",
-                cancelText: "Cancelar",
-                onConfirm: {
-                    "CajaPage.useCallback[handleCloseShift]": async ()=>{
-                        try {
-                            setIsProcessing(true);
-                            await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$cashService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["closeCashShiftInDB"])({
-                                branchName: effectiveBranch,
-                                countedCash: currentCounted,
-                                expectedCash: currentExpected,
-                                totalSales: totals.totalSales,
-                                totalExpenses: totals.expenses,
-                                difference: realDiff,
-                                notes: cashierNotes
-                            });
-                            closeShift();
-                            setCashierNotes("");
-                            setCountedCash(0.0);
-                            setExpensesList([]);
-                            setSalesBreakdown({
-                                cash: 0,
-                                card: 0,
-                                transfer: 0,
-                                total: 0
-                            });
-                            setDialogConfig({
-                                isOpen: true,
-                                type: "success",
-                                title: "Turno Cerrado con Éxito",
-                                description: "El balance final ha sido asentado correctamente en la base de datos (Corte Z registrado).",
-                                confirmText: "Aceptar",
-                                onConfirm: {
-                                    "CajaPage.useCallback[handleCloseShift]": ()=>setDialogConfig({
-                                            "CajaPage.useCallback[handleCloseShift]": (prev)=>({
-                                                    ...prev,
-                                                    isOpen: false
-                                                })
-                                        }["CajaPage.useCallback[handleCloseShift]"])
-                                }["CajaPage.useCallback[handleCloseShift]"]
-                            });
-                        } catch (err) {
-                            const msg = err instanceof Error ? err.message : "Error al registrar el cierre de turno";
-                            setDialogConfig({
-                                isOpen: true,
-                                type: "warning",
-                                title: "Error de Cierre",
-                                description: msg,
-                                confirmText: "Aceptar",
-                                onConfirm: {
-                                    "CajaPage.useCallback[handleCloseShift]": ()=>setDialogConfig({
-                                            "CajaPage.useCallback[handleCloseShift]": (prev)=>({
-                                                    ...prev,
-                                                    isOpen: false
-                                                })
-                                        }["CajaPage.useCallback[handleCloseShift]"])
-                                }["CajaPage.useCallback[handleCloseShift]"]
-                            });
-                        } finally{
-                            setIsProcessing(false);
-                        }
-                    }
-                }["CajaPage.useCallback[handleCloseShift]"],
-                onCancel: {
-                    "CajaPage.useCallback[handleCloseShift]": ()=>setDialogConfig({
-                            "CajaPage.useCallback[handleCloseShift]": (prev)=>({
+                title: "Justificación Requerida",
+                description: "Existe un descuadre en el arqueo de efectivo. Es obligatorio ingresar una justificación antes de realizar el Corte Z.",
+                confirmText: "Entendido",
+                onConfirm: ()=>setDialogConfig((prev)=>({
+                            ...prev,
+                            isOpen: false
+                        }))
+            });
+            return;
+        }
+        setDialogConfig({
+            isOpen: true,
+            type: "warning",
+            title: "Confirmar Cierre de Turno",
+            description: "¿Confirmas el cierre de jornada (Corte Z)? Esta acción asentará el balance final en el sistema y cerrará la caja.",
+            confirmText: "Sí, Cerrar Turno",
+            cancelText: "Cancelar",
+            onConfirm: async ()=>{
+                try {
+                    setIsProcessing(true);
+                    await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$cashService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["closeCashShiftInDB"])({
+                        branchName: effectiveBranch,
+                        countedCash: currentCounted,
+                        expectedCash: currentExpected,
+                        totalSales: totals.totalSales,
+                        totalExpenses: totals.expenses,
+                        difference: realDiff,
+                        notes: cashierNotes
+                    });
+                    closeShift();
+                    setCashierNotes("");
+                    setCountedCash(0.0);
+                    setExpensesList([]);
+                    setSalesBreakdown({
+                        cash: 0,
+                        card: 0,
+                        transfer: 0,
+                        total: 0
+                    });
+                    setDialogConfig({
+                        isOpen: true,
+                        type: "success",
+                        title: "Turno Cerrado con Éxito",
+                        description: "El balance final ha sido asentado correctamente en la base de datos (Corte Z registrado).",
+                        confirmText: "Aceptar",
+                        onConfirm: ()=>setDialogConfig((prev)=>({
                                     ...prev,
                                     isOpen: false
-                                })
-                        }["CajaPage.useCallback[handleCloseShift]"])
-                }["CajaPage.useCallback[handleCloseShift]"]
-            });
-        }
-    }["CajaPage.useCallback[handleCloseShift]"], [
-        totals,
-        cashierNotes,
-        effectiveBranch,
-        countedCash,
-        closeShift
-    ]);
+                                }))
+                    });
+                } catch (err) {
+                    const msg = err instanceof Error ? err.message : "Error al registrar el cierre de turno";
+                    setDialogConfig({
+                        isOpen: true,
+                        type: "warning",
+                        title: "Error de Cierre",
+                        description: msg,
+                        confirmText: "Aceptar",
+                        onConfirm: ()=>setDialogConfig((prev)=>({
+                                    ...prev,
+                                    isOpen: false
+                                }))
+                    });
+                } finally{
+                    setIsProcessing(false);
+                }
+            },
+            onCancel: ()=>setDialogConfig((prev)=>({
+                        ...prev,
+                        isOpen: false
+                    }))
+        });
+    };
     // Auditoría dictaminada por Admin
     const handleResolveDiscrepancy = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
         "CajaPage.useCallback[handleResolveDiscrepancy]": ()=>{
@@ -710,7 +733,7 @@ function CajaPage() {
         children: [
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$Navbar$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                 fileName: "[project]/src/app/caja/page.tsx",
-                lineNumber: 602,
+                lineNumber: 666,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
@@ -729,7 +752,7 @@ function CajaPage() {
                                                 children: "Control de caja"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 611,
+                                                lineNumber: 673,
                                                 columnNumber: 15
                                             }, this),
                                             isAdmin ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -739,14 +762,14 @@ function CajaPage() {
                                                         className: "w-3.5 h-3.5 text-purple-600"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 616,
+                                                        lineNumber: 678,
                                                         columnNumber: 19
                                                     }, this),
                                                     "Auditoría Administrativa"
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 615,
+                                                lineNumber: 677,
                                                 columnNumber: 17
                                             }, this) : isShiftOpen ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 className: "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-50 text-emerald-700 border border-emerald-200",
@@ -755,27 +778,27 @@ function CajaPage() {
                                                         className: "w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 621,
+                                                        lineNumber: 683,
                                                         columnNumber: 19
                                                     }, this),
                                                     "Turno en Curso"
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 620,
+                                                lineNumber: 682,
                                                 columnNumber: 17
                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 className: "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-100 text-slate-600 border border-rose-500",
                                                 children: "Turno Cerrado"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 625,
+                                                lineNumber: 687,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 610,
+                                        lineNumber: 672,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -783,13 +806,13 @@ function CajaPage() {
                                         children: "Cajón de efectivo, conciliación de ventas y cierre diario (Corte Z)"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 630,
+                                        lineNumber: 692,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/caja/page.tsx",
-                                lineNumber: 609,
+                                lineNumber: 671,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -815,12 +838,12 @@ function CajaPage() {
                                                                 className: "w-3.5 h-3.5"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 651,
+                                                                lineNumber: 713,
                                                                 columnNumber: 23
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                            lineNumber: 650,
+                                                            lineNumber: 712,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -831,7 +854,7 @@ function CajaPage() {
                                                                     children: "Sede"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                                    lineNumber: 654,
+                                                                    lineNumber: 716,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -839,26 +862,26 @@ function CajaPage() {
                                                                     children: selectedBranch
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                                    lineNumber: 657,
+                                                                    lineNumber: 719,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                            lineNumber: 653,
+                                                            lineNumber: 715,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$down$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDown$3e$__["ChevronDown"], {
                                                             className: `w-3.5 h-3.5 text-slate-400 ml-1 transition-transform duration-200 ${isBranchOpen ? "rotate-180 text-sky-600" : ""}`
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                            lineNumber: 661,
+                                                            lineNumber: 723,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                    lineNumber: 640,
+                                                    lineNumber: 702,
                                                     columnNumber: 19
                                                 }, this),
                                                 isBranchOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -869,7 +892,7 @@ function CajaPage() {
                                                             children: "Seleccionar Sede"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                            lineNumber: 670,
+                                                            lineNumber: 732,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -891,7 +914,7 @@ function CajaPage() {
                                                                                     className: `w-3.5 h-3.5 ${isSelected ? "text-sky-600" : "text-slate-400"}`
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                                                    lineNumber: 691,
+                                                                                    lineNumber: 753,
                                                                                     columnNumber: 33
                                                                                 }, this),
                                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -901,7 +924,7 @@ function CajaPage() {
                                                                                             children: branch.name
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                                                            lineNumber: 693,
+                                                                                            lineNumber: 755,
                                                                                             columnNumber: 35
                                                                                         }, this),
                                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -909,50 +932,50 @@ function CajaPage() {
                                                                                             children: branch.state
                                                                                         }, void 0, false, {
                                                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                                                            lineNumber: 694,
+                                                                                            lineNumber: 756,
                                                                                             columnNumber: 35
                                                                                         }, this)
                                                                                     ]
                                                                                 }, void 0, true, {
                                                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                                                    lineNumber: 692,
+                                                                                    lineNumber: 754,
                                                                                     columnNumber: 33
                                                                                 }, this)
                                                                             ]
                                                                         }, void 0, true, {
                                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                                            lineNumber: 690,
+                                                                            lineNumber: 752,
                                                                             columnNumber: 31
                                                                         }, this),
                                                                         isSelected && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$check$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Check$3e$__["Check"], {
                                                                             className: "w-3.5 h-3.5 text-sky-600"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                                            lineNumber: 697,
+                                                                            lineNumber: 759,
                                                                             columnNumber: 46
                                                                         }, this)
                                                                     ]
                                                                 }, branch.name, true, {
                                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                                    lineNumber: 677,
+                                                                    lineNumber: 739,
                                                                     columnNumber: 29
                                                                 }, this);
                                                             })
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                            lineNumber: 673,
+                                                            lineNumber: 735,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                    lineNumber: 669,
+                                                    lineNumber: 731,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/caja/page.tsx",
-                                            lineNumber: 639,
+                                            lineNumber: 701,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -973,12 +996,12 @@ function CajaPage() {
                                                                 className: "w-3.5 h-3.5 text-sky-600"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 719,
+                                                                lineNumber: 781,
                                                                 columnNumber: 23
                                                             }, this)
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                            lineNumber: 718,
+                                                            lineNumber: 780,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -989,7 +1012,7 @@ function CajaPage() {
                                                                     children: "Fecha"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                                    lineNumber: 723,
+                                                                    lineNumber: 785,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -997,26 +1020,26 @@ function CajaPage() {
                                                                     children: selectedDate
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                                    lineNumber: 726,
+                                                                    lineNumber: 788,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                            lineNumber: 722,
+                                                            lineNumber: 784,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$down$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronDown$3e$__["ChevronDown"], {
                                                             className: `w-3.5 h-3.5 text-slate-400 ml-1 transition-transform duration-200 ${isDateOpen ? "rotate-180 text-sky-600" : ""}`
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                            lineNumber: 731,
+                                                            lineNumber: 793,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                    lineNumber: 708,
+                                                    lineNumber: 770,
                                                     columnNumber: 19
                                                 }, this),
                                                 isDateOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1034,7 +1057,7 @@ function CajaPage() {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                                    lineNumber: 741,
+                                                                    lineNumber: 803,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1048,12 +1071,12 @@ function CajaPage() {
                                                                                 className: "w-4 h-4"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                                lineNumber: 752,
+                                                                                lineNumber: 814,
                                                                                 columnNumber: 29
                                                                             }, this)
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                                            lineNumber: 745,
+                                                                            lineNumber: 807,
                                                                             columnNumber: 27
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1064,24 +1087,24 @@ function CajaPage() {
                                                                                 className: "w-4 h-4"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                                lineNumber: 761,
+                                                                                lineNumber: 823,
                                                                                 columnNumber: 29
                                                                             }, this)
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                                            lineNumber: 754,
+                                                                            lineNumber: 816,
                                                                             columnNumber: 27
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                                    lineNumber: 744,
+                                                                    lineNumber: 806,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                            lineNumber: 740,
+                                                            lineNumber: 802,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1091,12 +1114,12 @@ function CajaPage() {
                                                                     children: d
                                                                 }, d, false, {
                                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                                    lineNumber: 768,
+                                                                    lineNumber: 830,
                                                                     columnNumber: 27
                                                                 }, this))
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                            lineNumber: 766,
+                                                            lineNumber: 828,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1113,13 +1136,13 @@ function CajaPage() {
                                                                     children: item.day
                                                                 }, idx, false, {
                                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                                    lineNumber: 778,
+                                                                    lineNumber: 840,
                                                                     columnNumber: 29
                                                                 }, this);
                                                             })
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                            lineNumber: 774,
+                                                            lineNumber: 836,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1142,7 +1165,7 @@ function CajaPage() {
                                                                     children: "Hoy"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                                    lineNumber: 800,
+                                                                    lineNumber: 862,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1152,25 +1175,25 @@ function CajaPage() {
                                                                     children: "Cerrar"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                                    lineNumber: 817,
+                                                                    lineNumber: 879,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                            lineNumber: 799,
+                                                            lineNumber: 861,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                    lineNumber: 739,
+                                                    lineNumber: 801,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/caja/page.tsx",
-                                            lineNumber: 707,
+                                            lineNumber: 769,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1182,26 +1205,26 @@ function CajaPage() {
                                                     className: "w-3.5 h-3.5 text-sky-600"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                    lineNumber: 835,
+                                                    lineNumber: 897,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                     children: "Auditar Tickets"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                    lineNumber: 836,
+                                                    lineNumber: 898,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/caja/page.tsx",
-                                            lineNumber: 830,
+                                            lineNumber: 892,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/caja/page.tsx",
-                                    lineNumber: 637,
+                                    lineNumber: 699,
                                     columnNumber: 15
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "flex items-center gap-3",
@@ -1214,7 +1237,7 @@ function CajaPage() {
                                                     children: currentDateDisplay
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                    lineNumber: 842,
+                                                    lineNumber: 904,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1222,7 +1245,7 @@ function CajaPage() {
                                                     children: "|"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                    lineNumber: 843,
+                                                    lineNumber: 905,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1233,19 +1256,19 @@ function CajaPage() {
                                                             children: activeOperatorName
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                            lineNumber: 845,
+                                                            lineNumber: 907,
                                                             columnNumber: 31
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                    lineNumber: 844,
+                                                    lineNumber: 906,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/caja/page.tsx",
-                                            lineNumber: 841,
+                                            lineNumber: 903,
                                             columnNumber: 17
                                         }, this),
                                         !isShiftOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1257,37 +1280,37 @@ function CajaPage() {
                                                     className: "w-4 h-4"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                    lineNumber: 855,
+                                                    lineNumber: 917,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                     children: "Iniciar Turno"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                    lineNumber: 856,
+                                                    lineNumber: 918,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/app/caja/page.tsx",
-                                            lineNumber: 850,
+                                            lineNumber: 912,
                                             columnNumber: 19
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/app/caja/page.tsx",
-                                    lineNumber: 840,
+                                    lineNumber: 902,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/src/app/caja/page.tsx",
-                                lineNumber: 635,
+                                lineNumber: 697,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/caja/page.tsx",
-                        lineNumber: 608,
+                        lineNumber: 670,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -1304,7 +1327,7 @@ function CajaPage() {
                                                 children: "Fondo Inicial"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 871,
+                                                lineNumber: 931,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1313,18 +1336,18 @@ function CajaPage() {
                                                     className: "w-4 h-4"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                    lineNumber: 875,
+                                                    lineNumber: 935,
                                                     columnNumber: 17
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 874,
+                                                lineNumber: 934,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 870,
+                                        lineNumber: 930,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1337,7 +1360,7 @@ function CajaPage() {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 878,
+                                        lineNumber: 938,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1345,13 +1368,13 @@ function CajaPage() {
                                         children: "Gaveta en apertura"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 881,
+                                        lineNumber: 941,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/caja/page.tsx",
-                                lineNumber: 869,
+                                lineNumber: 929,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1365,7 +1388,7 @@ function CajaPage() {
                                                 children: "Ventas Totales"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 889,
+                                                lineNumber: 949,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1374,18 +1397,18 @@ function CajaPage() {
                                                     className: "w-4 h-4"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                    lineNumber: 893,
+                                                    lineNumber: 953,
                                                     columnNumber: 17
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 892,
+                                                lineNumber: 952,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 888,
+                                        lineNumber: 948,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1398,7 +1421,7 @@ function CajaPage() {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 896,
+                                        lineNumber: 956,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1406,13 +1429,13 @@ function CajaPage() {
                                         children: "Todos los métodos de pago"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 899,
+                                        lineNumber: 959,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/caja/page.tsx",
-                                lineNumber: 887,
+                                lineNumber: 947,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1426,7 +1449,7 @@ function CajaPage() {
                                                 children: "Gastos Menores"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 907,
+                                                lineNumber: 967,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1435,18 +1458,18 @@ function CajaPage() {
                                                     className: "w-4 h-4"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                    lineNumber: 911,
+                                                    lineNumber: 971,
                                                     columnNumber: 17
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 910,
+                                                lineNumber: 970,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 906,
+                                        lineNumber: 966,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1456,7 +1479,7 @@ function CajaPage() {
                                         })}` : "$0.00"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 914,
+                                        lineNumber: 974,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1464,13 +1487,13 @@ function CajaPage() {
                                         children: "Egresos de caja chica"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 919,
+                                        lineNumber: 979,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/caja/page.tsx",
-                                lineNumber: 905,
+                                lineNumber: 965,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1484,7 +1507,7 @@ function CajaPage() {
                                                 children: "Total Esperado"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 927,
+                                                lineNumber: 987,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1493,18 +1516,18 @@ function CajaPage() {
                                                     className: "w-4 h-4"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                    lineNumber: 931,
+                                                    lineNumber: 991,
                                                     columnNumber: 17
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 930,
+                                                lineNumber: 990,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 926,
+                                        lineNumber: 986,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1517,7 +1540,7 @@ function CajaPage() {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 934,
+                                        lineNumber: 994,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1525,19 +1548,19 @@ function CajaPage() {
                                         children: "Fondo + Ventas - Gastos"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 937,
+                                        lineNumber: 997,
                                         columnNumber: 13
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/caja/page.tsx",
-                                lineNumber: 925,
+                                lineNumber: 985,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/caja/page.tsx",
-                        lineNumber: 867,
+                        lineNumber: 927,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -1553,12 +1576,12 @@ function CajaPage() {
                                             children: "Desglose de Ingresos"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/caja/page.tsx",
-                                            lineNumber: 950,
+                                            lineNumber: 1008,
                                             columnNumber: 15
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 949,
+                                        lineNumber: 1007,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1576,12 +1599,12 @@ function CajaPage() {
                                                                     className: "w-5 h-5"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                                    lineNumber: 960,
+                                                                    lineNumber: 1018,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 959,
+                                                                lineNumber: 1017,
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1590,18 +1613,18 @@ function CajaPage() {
                                                                     children: "Efectivo"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                                    lineNumber: 963,
+                                                                    lineNumber: 1021,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 962,
+                                                                lineNumber: 1020,
                                                                 columnNumber: 19
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 958,
+                                                        lineNumber: 1016,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1614,13 +1637,13 @@ function CajaPage() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 966,
+                                                        lineNumber: 1024,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 957,
+                                                lineNumber: 1015,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1635,12 +1658,12 @@ function CajaPage() {
                                                                     className: "w-5 h-5"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                                    lineNumber: 975,
+                                                                    lineNumber: 1033,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 974,
+                                                                lineNumber: 1032,
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1649,18 +1672,18 @@ function CajaPage() {
                                                                     children: "Tarjeta"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                                    lineNumber: 978,
+                                                                    lineNumber: 1036,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 977,
+                                                                lineNumber: 1035,
                                                                 columnNumber: 19
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 973,
+                                                        lineNumber: 1031,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1673,13 +1696,13 @@ function CajaPage() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 981,
+                                                        lineNumber: 1039,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 972,
+                                                lineNumber: 1030,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1694,12 +1717,12 @@ function CajaPage() {
                                                                     className: "w-5 h-5"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                                    lineNumber: 990,
+                                                                    lineNumber: 1048,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 989,
+                                                                lineNumber: 1047,
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1708,18 +1731,18 @@ function CajaPage() {
                                                                     children: "Transferencia"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                                    lineNumber: 993,
+                                                                    lineNumber: 1051,
                                                                     columnNumber: 21
                                                                 }, this)
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 992,
+                                                                lineNumber: 1050,
                                                                 columnNumber: 19
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 988,
+                                                        lineNumber: 1046,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1732,19 +1755,19 @@ function CajaPage() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 996,
+                                                        lineNumber: 1054,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 987,
+                                                lineNumber: 1045,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 955,
+                                        lineNumber: 1013,
                                         columnNumber: 13
                                     }, this),
                                     expensesList.length > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1762,7 +1785,7 @@ function CajaPage() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 1006,
+                                                        lineNumber: 1064,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1773,13 +1796,13 @@ function CajaPage() {
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 1009,
+                                                        lineNumber: 1067,
                                                         columnNumber: 19
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 1005,
+                                                lineNumber: 1063,
                                                 columnNumber: 17
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1794,7 +1817,7 @@ function CajaPage() {
                                                                         children: exp.concept
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                                        lineNumber: 1017,
+                                                                        lineNumber: 1075,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1802,13 +1825,13 @@ function CajaPage() {
                                                                         children: exp.category
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                                        lineNumber: 1020,
+                                                                        lineNumber: 1078,
                                                                         columnNumber: 25
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 1016,
+                                                                lineNumber: 1074,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1819,30 +1842,30 @@ function CajaPage() {
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 1022,
+                                                                lineNumber: 1080,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, idx, true, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 1015,
+                                                        lineNumber: 1073,
                                                         columnNumber: 21
                                                     }, this))
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 1013,
+                                                lineNumber: 1071,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 1004,
+                                        lineNumber: 1062,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/caja/page.tsx",
-                                lineNumber: 948,
+                                lineNumber: 1006,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1858,7 +1881,7 @@ function CajaPage() {
                                                         children: isAdmin ? "Auditoría de Arqueo (Corte Z)" : "Arqueo de Caja (Efectivo)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 1036,
+                                                        lineNumber: 1094,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1866,13 +1889,13 @@ function CajaPage() {
                                                         children: isAdmin ? "Fiscalización de valores reportados y dictamen contable" : "Ingrese el conteo físico de billetes y monedas en gaveta"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 1039,
+                                                        lineNumber: 1097,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 1035,
+                                                lineNumber: 1093,
                                                 columnNumber: 15
                                             }, this),
                                             isAdmin && !totals.isBalanced && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1883,14 +1906,14 @@ function CajaPage() {
                                                             className: "w-3.5 h-3.5 text-sky-600"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                            lineNumber: 1056,
+                                                            lineNumber: 1114,
                                                             columnNumber: 23
                                                         }, this),
                                                         "Auditado y Resuelto"
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                    lineNumber: 1055,
+                                                    lineNumber: 1113,
                                                     columnNumber: 21
                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
                                                     children: [
@@ -1898,25 +1921,25 @@ function CajaPage() {
                                                             className: "w-3.5 h-3.5 text-rose-600"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                            lineNumber: 1061,
+                                                            lineNumber: 1119,
                                                             columnNumber: 23
                                                         }, this),
                                                         "Pendiente de Resolución"
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                    lineNumber: 1060,
+                                                    lineNumber: 1118,
                                                     columnNumber: 21
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 1047,
+                                                lineNumber: 1105,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 1034,
+                                        lineNumber: 1092,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1929,7 +1952,7 @@ function CajaPage() {
                                                         children: "Efectivo Contado"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 1072,
+                                                        lineNumber: 1130,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1940,7 +1963,7 @@ function CajaPage() {
                                                                 children: "$"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 1076,
+                                                                lineNumber: 1134,
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1954,19 +1977,19 @@ function CajaPage() {
                                                                 className: `w-full pl-8 pr-3 h-11 border border-slate-200 rounded-xl text-sm font-bold tabular-nums focus:outline-none transition-colors ${isShiftOpen && !isAdmin ? "bg-slate-50 text-slate-900 focus:bg-white focus:border-sky-500" : "bg-slate-100 text-slate-500 cursor-not-allowed"}`
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 1079,
+                                                                lineNumber: 1137,
                                                                 columnNumber: 19
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 1075,
+                                                        lineNumber: 1133,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 1071,
+                                                lineNumber: 1129,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1976,7 +1999,7 @@ function CajaPage() {
                                                         children: "Efectivo Esperado en Gaveta"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 1103,
+                                                        lineNumber: 1161,
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1987,7 +2010,7 @@ function CajaPage() {
                                                                 children: "$"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 1107,
+                                                                lineNumber: 1165,
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -1998,25 +2021,25 @@ function CajaPage() {
                                                                 className: "w-full pl-8 pr-3 h-11 bg-slate-100/80 border border-slate-200 rounded-xl text-sm font-bold tabular-nums text-slate-600 cursor-not-allowed select-none"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 1110,
+                                                                lineNumber: 1168,
                                                                 columnNumber: 19
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 1106,
+                                                        lineNumber: 1164,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 1102,
+                                                lineNumber: 1160,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 1070,
+                                        lineNumber: 1128,
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2029,19 +2052,19 @@ function CajaPage() {
                                                         className: "w-5 h-5 text-emerald-600 shrink-0"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 1135,
+                                                        lineNumber: 1193,
                                                         columnNumber: 19
                                                     }, this) : isAudited ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$shield$2d$check$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ShieldCheck$3e$__["ShieldCheck"], {
                                                         className: "w-5 h-5 text-sky-600 shrink-0"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 1137,
+                                                        lineNumber: 1195,
                                                         columnNumber: 19
                                                     }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$triangle$2d$alert$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__AlertTriangle$3e$__["AlertTriangle"], {
                                                         className: `w-5 h-5 shrink-0 ${totals.isSurplus ? "text-blue-600" : "text-rose-600"}`
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 1139,
+                                                        lineNumber: 1197,
                                                         columnNumber: 19
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2051,7 +2074,7 @@ function CajaPage() {
                                                                 children: totals.isBalanced ? "Cuadre Exacto" : isAudited ? "Descuadre Auditado y Resuelto" : totals.isSurplus ? "Diferencia: Sobrante de Efectivo" : "Diferencia: Faltante de Efectivo"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 1142,
+                                                                lineNumber: 1200,
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2059,19 +2082,19 @@ function CajaPage() {
                                                                 children: totals.isBalanced ? "El conteo físico coincide al 100% con el efectivo esperado." : isAudited ? `Discrepancia conciliada bajo el dictamen [${resolutionType}].` : totals.isSurplus ? "Hay más dinero físico en gaveta del registrado en sistema." : "El efectivo físico es menor al balance contable exigido."
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 1151,
+                                                                lineNumber: 1209,
                                                                 columnNumber: 19
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 1141,
+                                                        lineNumber: 1199,
                                                         columnNumber: 17
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 1133,
+                                                lineNumber: 1191,
                                                 columnNumber: 15
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2079,13 +2102,13 @@ function CajaPage() {
                                                 children: totals.isBalanced ? "$0.00" : totals.isSurplus ? `+$${totals.difference.toFixed(2)}` : `-$${Math.abs(totals.difference).toFixed(2)}`
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 1162,
+                                                lineNumber: 1220,
                                                 columnNumber: 15
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 1122,
+                                        lineNumber: 1180,
                                         columnNumber: 13
                                     }, this),
                                     (totals.isShortage || isAdmin && !totals.isBalanced) && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2100,13 +2123,13 @@ function CajaPage() {
                                                         children: "*(Obligatorio para cerrar turno)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 1177,
+                                                        lineNumber: 1235,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 1174,
+                                                lineNumber: 1232,
                                                 columnNumber: 17
                                             }, this),
                                             isAdmin ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2114,7 +2137,7 @@ function CajaPage() {
                                                 children: salesMetrics.operatorNotes ? `“${salesMetrics.operatorNotes}”` : "No se registró ninguna observación por el operador en este turno."
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 1184,
+                                                lineNumber: 1242,
                                                 columnNumber: 19
                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("textarea", {
                                                 rows: 2,
@@ -2125,13 +2148,13 @@ function CajaPage() {
                                                 className: `w-full p-3 border rounded-xl text-xs focus:outline-none transition-colors ${!cashierNotes.trim() ? "border-rose-300 bg-rose-50/25 placeholder-rose-300 focus:border-rose-500" : "border-slate-200 bg-slate-50 text-slate-800 focus:border-sky-500 focus:bg-white"} ${!isShiftOpen ? "bg-slate-100 cursor-not-allowed" : ""}`
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 1190,
+                                                lineNumber: 1248,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 1173,
+                                        lineNumber: 1231,
                                         columnNumber: 15
                                     }, this),
                                     isAdmin ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2151,25 +2174,25 @@ function CajaPage() {
                                                                     className: "w-3.5 h-3.5 text-emerald-600"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                                    lineNumber: 1218,
+                                                                    lineNumber: 1276,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                     children: "Descargar Corte Z"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                                    lineNumber: 1219,
+                                                                    lineNumber: 1277,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                            lineNumber: 1211,
+                                                            lineNumber: 1269,
                                                             columnNumber: 21
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 1210,
+                                                        lineNumber: 1268,
                                                         columnNumber: 19
                                                     }, this),
                                                     !totals.isBalanced && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -2182,20 +2205,20 @@ function CajaPage() {
                                                                     className: "w-4 h-4"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                                    lineNumber: 1231,
+                                                                    lineNumber: 1289,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                     children: "Aprobar y Resolver Alerta"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                                    lineNumber: 1232,
+                                                                    lineNumber: 1290,
                                                                     columnNumber: 27
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                            lineNumber: 1226,
+                                                            lineNumber: 1284,
                                                             columnNumber: 25
                                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                             className: "text-[11px] font-bold text-emerald-700 bg-emerald-100 border border-emerald-200 px-3 py-1.5 rounded-xl flex items-center gap-1.5",
@@ -2204,7 +2227,7 @@ function CajaPage() {
                                                                     className: "w-4 h-4 text-emerald-600"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/caja/page.tsx",
-                                                                    lineNumber: 1236,
+                                                                    lineNumber: 1294,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 " Resuelto por ",
@@ -2212,18 +2235,18 @@ function CajaPage() {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/src/app/caja/page.tsx",
-                                                            lineNumber: 1235,
+                                                            lineNumber: 1293,
                                                             columnNumber: 25
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 1224,
+                                                        lineNumber: 1282,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 1209,
+                                                lineNumber: 1267,
                                                 columnNumber: 17
                                             }, this),
                                             !totals.isBalanced && !isAudited && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2237,7 +2260,7 @@ function CajaPage() {
                                                                 children: "Dictamen Contable:"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 1246,
+                                                                lineNumber: 1304,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -2250,7 +2273,7 @@ function CajaPage() {
                                                                         children: "Ajuste Aceptado (Merma)"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                                        lineNumber: 1254,
+                                                                        lineNumber: 1312,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -2258,7 +2281,7 @@ function CajaPage() {
                                                                         children: "Cobro a Cajero / Nómina"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                                        lineNumber: 1255,
+                                                                        lineNumber: 1313,
                                                                         columnNumber: 25
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("option", {
@@ -2266,19 +2289,19 @@ function CajaPage() {
                                                                         children: "Error Corregido en POS"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                                        lineNumber: 1256,
+                                                                        lineNumber: 1314,
                                                                         columnNumber: 25
                                                                     }, this)
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                                lineNumber: 1249,
+                                                                lineNumber: 1307,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 1245,
+                                                        lineNumber: 1303,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -2289,21 +2312,21 @@ function CajaPage() {
                                                         className: "w-full text-xs text-slate-700 font-medium p-2.5 bg-white border border-purple-200 rounded-lg focus:outline-none focus:border-purple-400 placeholder-purple-300"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 1259,
+                                                        lineNumber: 1317,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 1244,
+                                                lineNumber: 1302,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 1208,
+                                        lineNumber: 1266,
                                         columnNumber: 15
-                                    }, this) : /* Acciones del Cajero */ /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                    }, this) : /* Acciones Cajero */ /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "pt-3 border-t border-slate-100 flex items-center justify-end gap-3",
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2314,7 +2337,7 @@ function CajaPage() {
                                                 children: "Registrar Gasto Menor"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 1272,
+                                                lineNumber: 1330,
                                                 columnNumber: 17
                                             }, this),
                                             isShiftOpen && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2326,44 +2349,44 @@ function CajaPage() {
                                                         className: "w-3.5 h-3.5"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 1287,
+                                                        lineNumber: 1345,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                         children: "Cerrar Turno (Corte Z)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
-                                                        lineNumber: 1288,
+                                                        lineNumber: 1346,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/caja/page.tsx",
-                                                lineNumber: 1282,
+                                                lineNumber: 1340,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/caja/page.tsx",
-                                        lineNumber: 1271,
+                                        lineNumber: 1329,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/caja/page.tsx",
-                                lineNumber: 1033,
+                                lineNumber: 1091,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/caja/page.tsx",
-                        lineNumber: 946,
+                        lineNumber: 1004,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/src/app/caja/page.tsx",
-                lineNumber: 604,
+                lineNumber: 668,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$GastoMenorModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -2373,7 +2396,7 @@ function CajaPage() {
                 currentAvailableCash: totals.expectedCash > 0 ? totals.expectedCash : Number(initialCash) || countedCash || 0.0
             }, void 0, false, {
                 fileName: "[project]/src/app/caja/page.tsx",
-                lineNumber: 1300,
+                lineNumber: 1356,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$AuditTicketsModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -2384,7 +2407,7 @@ function CajaPage() {
                 selectedShift: "Jornada Completa"
             }, void 0, false, {
                 fileName: "[project]/src/app/caja/page.tsx",
-                lineNumber: 1311,
+                lineNumber: 1367,
                 columnNumber: 7
             }, this),
             !isAdmin && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$OpenShiftModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -2394,7 +2417,7 @@ function CajaPage() {
                 onConfirm: handleOpenShiftConfirm
             }, void 0, false, {
                 fileName: "[project]/src/app/caja/page.tsx",
-                lineNumber: 1320,
+                lineNumber: 1376,
                 columnNumber: 9
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ConfirmarModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -2408,7 +2431,7 @@ function CajaPage() {
                 onCancel: dialogConfig.onCancel
             }, void 0, false, {
                 fileName: "[project]/src/app/caja/page.tsx",
-                lineNumber: 1329,
+                lineNumber: 1385,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$CortePDF$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -2431,17 +2454,17 @@ function CajaPage() {
                 }
             }, void 0, false, {
                 fileName: "[project]/src/app/caja/page.tsx",
-                lineNumber: 1340,
+                lineNumber: 1396,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/src/app/caja/page.tsx",
-        lineNumber: 601,
+        lineNumber: 665,
         columnNumber: 5
     }, this);
 }
-_s(CajaPage, "cUQzOBoeXs/APOpxK89I82kG64s=", false, function() {
+_s(CajaPage, "wMaWBARCj9DAb5D5MX2WFNyhgJ0=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$context$2f$ShiftContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useShift"],
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useSearchParams"],
@@ -2733,6 +2756,8 @@ async function getAdminShiftAudit(branchName, dateStr) {
         } else {
             expenses = Number((expensesRes.data || []).reduce((acc, curr)=>acc + (Number(curr.amount) || 0), 0));
         }
+        const cashierProfile = shift.profiles;
+        const realCashierName = cashierProfile?.full_name || cashierProfile?.username || "Sin cajero asignado";
         return {
             shiftId: shift.id,
             status: shift.status || "closed",
@@ -2747,7 +2772,7 @@ async function getAdminShiftAudit(branchName, dateStr) {
             expenses: expenses,
             reportedCountedCash: Number(shift.counted_cash) || 0,
             operatorNotes: shift.notes || shift.cashier_notes || "",
-            operatorName: shift.cashier_name || "Maria G."
+            operatorName: realCashierName
         };
     } catch (error) {
         console.error("Error en getAdminShiftAudit:", error);
@@ -2768,6 +2793,822 @@ async function resolveShiftAuditInDB(payload) {
         throw new Error(`Error al asentar la resolución contable: ${error.message}`);
     }
     return data;
+}
+if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
+    __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
+}
+}),
+"[project]/src/app/services/inventoryService.ts [app-client] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "adjustProductStockInDB",
+    ()=>adjustProductStockInDB,
+    "createBranchInDB",
+    ()=>createBranchInDB,
+    "createProductInDB",
+    ()=>createProductInDB,
+    "deleteBranchFromDB",
+    ()=>deleteBranchFromDB,
+    "deleteProductFromDB",
+    ()=>deleteProductFromDB,
+    "fetchBranchesFromDB",
+    ()=>fetchBranchesFromDB,
+    "fetchBranchesPerformance",
+    ()=>fetchBranchesPerformance,
+    "fetchDashboardSalesMetrics",
+    ()=>fetchDashboardSalesMetrics,
+    "fetchDashboardStockAlerts",
+    ()=>fetchDashboardStockAlerts,
+    "fetchProductKardex",
+    ()=>fetchProductKardex,
+    "fetchTicketsByBranchAndDate",
+    ()=>fetchTicketsByBranchAndDate,
+    "processSaleInDB",
+    ()=>processSaleInDB,
+    "searchDashboardInventory",
+    ()=>searchDashboardInventory,
+    "toggleBranchStatusInDB",
+    ()=>toggleBranchStatusInDB,
+    "transferProductStockInDB",
+    ()=>transferProductStockInDB,
+    "updateBranchInDB",
+    ()=>updateBranchInDB,
+    "updateProductInDB",
+    ()=>updateProductInDB
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/lib/supabaseClient.ts [app-client] (ecmascript)");
+;
+async function createProductInDB(payload) {
+    const cleanSku = payload.sku.trim().toUpperCase();
+    const cleanBarcode = payload.barcode?.trim() || null;
+    const cleanBrand = payload.brand?.trim() ? payload.brand.trim() : "Genérico";
+    const { data: newProduct, error: productError } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("products").insert([
+        {
+            sku: cleanSku,
+            barcode: cleanBarcode,
+            name: payload.name.trim(),
+            brand: cleanBrand,
+            category: payload.category,
+            description: payload.description.trim(),
+            cost: Number(payload.cost),
+            price: Number(payload.price),
+            image_url: payload.image || null
+        }
+    ]).select().single();
+    if (productError) {
+        if (productError.code === "23505") {
+            throw new Error("Ya existe un producto registrado con ese SKU o Código de Barras.");
+        }
+        throw productError;
+    }
+    const { data: branches, error: branchError } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id, name");
+    if (branchError) throw branchError;
+    const inventoryRows = (branches || []).map((b)=>{
+        let stock = 0;
+        if (b.name === "Santa Ana") stock = payload.initialStock?.santaAna ?? 0;
+        if (b.name === "Ahuachapán") stock = payload.initialStock?.ahuachapan ?? 0;
+        if (b.name === "Sonsonate") stock = payload.initialStock?.sonsonate ?? 0;
+        return {
+            branch_id: b.id,
+            product_id: newProduct.id,
+            stock,
+            min_stock: 5
+        };
+    });
+    const { error: invError } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").insert(inventoryRows);
+    if (invError) throw invError;
+    return newProduct;
+}
+async function adjustProductStockInDB(payload) {
+    const { productId, branchName, type, quantity, reason, userId } = payload;
+    const delta = type === "add" ? quantity : -quantity;
+    const { data: branch, error: branchErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id").eq("name", branchName).single();
+    if (branchErr || !branch) {
+        throw new Error(`No se encontró la sucursal: ${branchName}`);
+    }
+    const { data: currentInv, error: invErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").select("id, stock").eq("product_id", productId).eq("branch_id", branch.id).single();
+    if (invErr || !currentInv) {
+        throw new Error("No existe registro de inventario para este producto en esta sucursal.");
+    }
+    const currentStock = currentInv.stock ?? 0;
+    const newStock = currentStock + delta;
+    if (newStock < 0) {
+        throw new Error(`Stock insuficiente. Solo hay ${currentStock} unidades disponibles.`);
+    }
+    const { error: updateErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").update({
+        stock: newStock
+    }).eq("id", currentInv.id);
+    if (updateErr) throw updateErr;
+    const movementType = type === "add" ? "INGRESO" : "AJUSTE";
+    const { error: movErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("stock_movements").insert([
+        {
+            product_id: productId,
+            branch_id: branch.id,
+            user_id: userId || null,
+            movement_type: movementType,
+            quantity: delta,
+            stock_after: newStock,
+            reference: reason
+        }
+    ]);
+    if (movErr) {
+        console.error("Error al registrar movimiento en Kardex:", movErr.message);
+    }
+    return {
+        newStock
+    };
+}
+async function updateProductInDB(payload) {
+    const cleanSku = payload.sku.trim().toUpperCase();
+    const cleanBarcode = payload.barcode?.trim() || null;
+    const cleanBrand = payload.brand?.trim() ? payload.brand.trim() : "Genérico";
+    const { error: productErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("products").update({
+        sku: cleanSku,
+        barcode: cleanBarcode,
+        name: payload.name.trim(),
+        brand: cleanBrand,
+        category: payload.category,
+        description: payload.description.trim(),
+        cost: Number(payload.cost),
+        price: Number(payload.price),
+        image_url: payload.image || null
+    }).eq("id", payload.id);
+    if (productErr) {
+        if (productErr.code === "23505") {
+            throw new Error("Ya existe un producto con ese SKU o Código de Barras.");
+        }
+        throw productErr;
+    }
+    const { data: branchList, error: branchErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id, name");
+    if (branchErr) throw branchErr;
+    const normalize = (str)=>str.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+    const updatePromises = (branchList || []).map((b)=>{
+        const branchData = payload.branches.find((entry)=>normalize(entry.branchName) === normalize(b.name));
+        const stockToSet = branchData ? Math.max(0, Number(branchData.stock) || 0) : 0;
+        return __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").upsert({
+            branch_id: b.id,
+            product_id: payload.id,
+            stock: stockToSet
+        }, {
+            onConflict: "branch_id,product_id"
+        });
+    });
+    const results = await Promise.all(updatePromises);
+    const failedUpsert = results.find((r)=>r.error);
+    if (failedUpsert?.error) throw failedUpsert.error;
+    return true;
+}
+async function deleteProductFromDB(productId) {
+    const { error: invErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").delete().eq("product_id", productId);
+    if (invErr) {
+        console.error("Error al eliminar inventario de sucursales:", invErr);
+        throw new Error(`Error en branch_inventory: ${invErr.message}`);
+    }
+    const { error: movErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("stock_movements").delete().eq("product_id", productId);
+    if (movErr) {
+        console.error("Error al eliminar historial de movimientos:", movErr);
+        throw new Error(`Error en stock_movements: ${movErr.message}`);
+    }
+    const { error: productErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("products").delete().eq("id", productId);
+    if (productErr) {
+        console.error("Error al eliminar producto maestro:", productErr);
+        throw new Error(`Error en products: ${productErr.message}`);
+    }
+    return true;
+}
+async function transferProductStockInDB(payload) {
+    const { productId, sourceBranchName, targetBranchName, quantity, userId } = payload;
+    if (sourceBranchName === targetBranchName) {
+        throw new Error("La sucursal de origen y destino no pueden ser iguales.");
+    }
+    if (quantity <= 0) {
+        throw new Error("La cantidad debe ser mayor a 0.");
+    }
+    const { data: branches, error: branchErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id, name").in("name", [
+        sourceBranchName,
+        targetBranchName
+    ]);
+    if (branchErr || !branches || branches.length < 2) {
+        throw new Error("No se pudieron verificar las sucursales de origen y destino.");
+    }
+    const sourceBranch = branches.find((b)=>b.name === sourceBranchName);
+    const targetBranch = branches.find((b)=>b.name === targetBranchName);
+    const { data: sourceInv, error: srcInvErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").select("id, stock").eq("product_id", productId).eq("branch_id", sourceBranch.id).single();
+    if (srcInvErr || !sourceInv) {
+        throw new Error(`El producto no tiene registro de stock en ${sourceBranchName}.`);
+    }
+    const currentSourceStock = sourceInv.stock ?? 0;
+    if (currentSourceStock < quantity) {
+        throw new Error(`Stock insuficiente en ${sourceBranchName}. Disponible: ${currentSourceStock}, solicitado: ${quantity}.`);
+    }
+    const { data: targetInv } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").select("id, stock").eq("product_id", productId).eq("branch_id", targetBranch.id).maybeSingle();
+    const currentTargetStock = targetInv?.stock ?? 0;
+    const newSourceStock = currentSourceStock - quantity;
+    const newTargetStock = currentTargetStock + quantity;
+    const { error: updateSrcErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").update({
+        stock: newSourceStock
+    }).eq("id", sourceInv.id);
+    if (updateSrcErr) throw updateSrcErr;
+    const { error: upsertTgtErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").upsert({
+        branch_id: targetBranch.id,
+        product_id: productId,
+        stock: newTargetStock
+    }, {
+        onConflict: "branch_id,product_id"
+    });
+    if (upsertTgtErr) throw upsertTgtErr;
+    const movements = [
+        {
+            product_id: productId,
+            branch_id: sourceBranch.id,
+            user_id: userId || null,
+            movement_type: "TRASLADO",
+            quantity: -quantity,
+            stock_after: newSourceStock,
+            reference: `Traslado enviado hacia ${targetBranchName}`
+        },
+        {
+            product_id: productId,
+            branch_id: targetBranch.id,
+            user_id: userId || null,
+            movement_type: "TRASLADO",
+            quantity: quantity,
+            stock_after: newTargetStock,
+            reference: `Traslado recibido desde ${sourceBranchName}`
+        }
+    ];
+    const { error: movErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("stock_movements").insert(movements);
+    if (movErr) {
+        console.error("Aviso Kardex:", movErr.message);
+    }
+    return {
+        newSourceStock,
+        newTargetStock
+    };
+}
+async function fetchProductKardex(productId, branchName) {
+    let query = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("stock_movements").select(`
+      id,
+      created_at,
+      movement_type,
+      quantity,
+      stock_after,
+      reference,
+      branches (
+        id,
+        name
+      ),
+      profiles (
+        id,
+        full_name,
+        username
+      )
+    `).eq("product_id", productId).order("created_at", {
+        ascending: false
+    });
+    if (branchName && branchName !== "ALL" && branchName !== "Todas las sedes") {
+        const { data: branchData } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id").ilike("name", branchName).maybeSingle();
+        if (branchData) {
+            query = query.eq("branch_id", branchData.id);
+        }
+    }
+    const { data, error } = await query;
+    if (error) {
+        console.error("Error al consultar Kardex:", error);
+        throw new Error(`Error en Kardex: ${error.message}`);
+    }
+    const movementRows = data ?? [];
+    return movementRows.map((row)=>{
+        const branchRecord = Array.isArray(row.branches) ? row.branches[0] : row.branches;
+        const profileRecord = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
+        const dateObj = new Date(row.created_at);
+        const formattedDate = dateObj.toLocaleDateString("es-SV", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true
+        });
+        return {
+            id: row.id,
+            date: formattedDate,
+            type: row.movement_type,
+            branch: branchRecord?.name ?? "Sin sede",
+            user: profileRecord?.full_name ?? profileRecord?.username ?? "Sistema",
+            quantity: Number(row.quantity),
+            stockAfter: Number(row.stock_after),
+            reference: row.reference ?? "Sin detalle"
+        };
+    });
+}
+async function processSaleInDB(payload) {
+    const { branchName, cashierId, paymentMethod, items, subtotal, tax, total, cashReceived, changeReturned } = payload;
+    if (!items || items.length === 0) {
+        throw new Error("El carrito no tiene productos.");
+    }
+    // 1. Asegurar el ID del cajero en sesión activa
+    let effectiveCashierId = cashierId || null;
+    if (!effectiveCashierId) {
+        const { data: authData } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].auth.getUser();
+        effectiveCashierId = authData.user?.id || null;
+    }
+    // 2. Obtener la sucursal actual (con código y dirección)
+    const cleanBranch = (branchName || "").trim();
+    const { data: branch, error: branchErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id, name").ilike("name", `%${cleanBranch}%`).maybeSingle();
+    if (branchErr || !branch) {
+        throw new Error(`No se encontró la sucursal: "${cleanBranch}"`);
+    }
+    // 3. Obtener el turno abierto de la sucursal
+    const { data: activeShift, error: shiftErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").select("id, cashier_id").eq("branch_id", branch.id).eq("status", "open").order("opened_at", {
+        ascending: false
+    }).limit(1).maybeSingle();
+    if (shiftErr || !activeShift) {
+        throw new Error("No hay un turno de caja abierto en esta sucursal para asociar la venta.");
+    }
+    const finalCashierId = effectiveCashierId || activeShift.cashier_id;
+    // 4. GENERAR CORRELATIVO SECUENCIAL GLOBAL (+1)
+    // Prefijo de la sucursal (ej: "SA", "AH", "SO")
+    const branchPrefix = branch.name.substring(0, 2).toUpperCase();
+    // Buscar el último ticket emitido históricamente en esta sucursal
+    const { data: lastSale } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sales").select("ticket_number").eq("branch_id", branch.id).order("created_at", {
+        ascending: false
+    }).limit(1).maybeSingle();
+    let nextCorrelative = 1;
+    if (lastSale?.ticket_number) {
+        const matches = lastSale.ticket_number.match(/\d+$/);
+        if (matches) {
+            nextCorrelative = parseInt(matches[0], 10) + 1;
+        }
+    }
+    // Formato: T-SO-00000001
+    const formattedSequence = String(nextCorrelative).padStart(8, "0");
+    const ticketNumber = `T-${branchPrefix}-${formattedSequence}`;
+    // 5. Inserción en la tabla 'sales'
+    const { data: saleData, error: saleErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sales").insert([
+        {
+            ticket_number: ticketNumber,
+            branch_id: branch.id,
+            shift_id: activeShift.id,
+            cashier_id: finalCashierId,
+            payment_method: paymentMethod,
+            subtotal: Number(subtotal),
+            tax: Number(tax),
+            total: Number(total),
+            cash_received: cashReceived ? Number(cashReceived) : null,
+            change_given: changeReturned ? Number(changeReturned) : null,
+            created_at: new Date().toISOString()
+        }
+    ]).select("id").single();
+    if (saleErr || !saleData) {
+        throw new Error(`Error al guardar en tabla 'sales': ${saleErr?.message}`);
+    }
+    const saleId = saleData.id;
+    // 6. Renglones en 'sale_items', descuento de existencias y Kardex
+    for (const item of items){
+        await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sale_items").insert([
+            {
+                sale_id: saleId,
+                product_id: item.id,
+                quantity: item.quantity,
+                unit_price: item.price,
+                subtotal: Number((item.price * item.quantity).toFixed(2))
+            }
+        ]);
+        const { data: invRecord } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").select("id, stock").eq("product_id", item.id).eq("branch_id", branch.id).maybeSingle();
+        const currentStock = invRecord?.stock ?? 0;
+        const newStock = Math.max(0, currentStock - item.quantity);
+        if (invRecord) {
+            await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").update({
+                stock: newStock
+            }).eq("id", invRecord.id);
+        }
+        await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("stock_movements").insert([
+            {
+                product_id: item.id,
+                branch_id: branch.id,
+                user_id: finalCashierId,
+                movement_type: "VENTA_POS",
+                quantity: -item.quantity,
+                stock_after: newStock,
+                reference: `Ticket #${ticketNumber}`
+            }
+        ]);
+    }
+    return {
+        ticketNumber,
+        saleId,
+        total
+    };
+}
+async function fetchTicketsByBranchAndDate(branchName, dateStr) {
+    const startOfDay = `${dateStr}T00:00:00-06:00`;
+    const endOfDay = `${dateStr}T23:59:59.999-06:00`;
+    const { data, error } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sales").select(`
+      id,
+      ticket_number,
+      payment_method,
+      subtotal,
+      tax,
+      total,
+      cash_received,
+      change_given,
+      created_at,
+      branches!inner(name, address),
+      profiles(full_name),
+      sale_items(
+        id,
+        quantity,
+        unit_price,
+        products(name)
+      )
+    `).ilike("branches.name", `%${branchName.trim()}%`).gte("created_at", startOfDay).lte("created_at", endOfDay).order("created_at", {
+        ascending: false
+    });
+    if (error) {
+        console.error("Error al consultar ventas para auditoría:", error);
+        return [];
+    }
+    return (data || []).map((sale)=>{
+        const d = new Date(sale.created_at);
+        const branchRecord = Array.isArray(sale.branches) ? sale.branches[0] : sale.branches;
+        const profileRecord = Array.isArray(sale.profiles) ? sale.profiles[0] : sale.profiles;
+        return {
+            id: sale.id,
+            ticketNumber: sale.ticket_number || "S/F",
+            time: d.toLocaleTimeString("es-SV", {
+                hour: "2-digit",
+                minute: "2-digit"
+            }),
+            date: dateStr,
+            branch: branchRecord?.name || branchName,
+            cashier: profileRecord?.full_name || "Cajero",
+            paymentMethod: sale.payment_method || "cash",
+            subtotal: Number(sale.subtotal) || 0,
+            tax: Number(sale.tax) || 0,
+            total: Number(sale.total) || 0,
+            cashReceived: sale.cash_received ? Number(sale.cash_received) : undefined,
+            changeReturned: sale.change_given ? Number(sale.change_given) : undefined,
+            items: (sale.sale_items || []).map((it)=>{
+                const prod = Array.isArray(it.products) ? it.products[0] : it.products;
+                return {
+                    name: prod?.name || "Insumo Dental",
+                    qty: Number(it.quantity) || 1,
+                    unitPrice: Number(it.unit_price) || 0
+                };
+            })
+        };
+    });
+}
+async function searchDashboardInventory(query, branchKey = "all") {
+    const cleanQuery = query.trim();
+    if (!cleanQuery) return [];
+    let targetBranchId = null;
+    if (branchKey !== "all") {
+        let branchNamePattern = "";
+        if (branchKey === "santa-ana") branchNamePattern = "Santa Ana";
+        if (branchKey === "ahuachapan") branchNamePattern = "Ahuachapán";
+        if (branchKey === "sonsonate") branchNamePattern = "Sonsonate";
+        const { data: bData } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id").ilike("name", `%${branchNamePattern}%`).maybeSingle();
+        targetBranchId = bData?.id ?? null;
+    }
+    const { data, error } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("products").select(`
+      id,
+      sku,
+      barcode,
+      name,
+      brand,
+      category,
+      price,
+      branch_inventory (
+        stock,
+        branch_id,
+        branches (
+          id,
+          name
+        )
+      )
+    `).or(`name.ilike.%${cleanQuery}%,sku.ilike.%${cleanQuery}%,barcode.ilike.%${cleanQuery}%`).limit(10);
+    if (error) {
+        console.error("Error al buscar productos en Dashboard:", error.message);
+        return [];
+    }
+    const queryRows = data ?? [];
+    const results = [];
+    queryRows.forEach((prod)=>{
+        const invList = prod.branch_inventory ?? [];
+        if (targetBranchId) {
+            const branchInv = invList.find((bi)=>bi.branch_id === targetBranchId);
+            results.push({
+                id: prod.id,
+                sku: prod.sku,
+                barcode: prod.barcode,
+                name: prod.name,
+                brand: prod.brand,
+                category: prod.category,
+                price: Number(prod.price) || 0,
+                stock: branchInv?.stock ?? 0,
+                branchName: branchInv?.branches?.name ?? "Sede seleccionada"
+            });
+        } else {
+            const totalStock = invList.reduce((acc, curr)=>acc + (Number(curr.stock) || 0), 0);
+            results.push({
+                id: prod.id,
+                sku: prod.sku,
+                barcode: prod.barcode,
+                name: prod.name,
+                brand: prod.brand,
+                category: prod.category,
+                price: Number(prod.price) || 0,
+                stock: totalStock,
+                branchName: "Todas las sedes (Red)"
+            });
+        }
+    });
+    return results;
+}
+async function fetchDashboardStockAlerts(branchKey = "all") {
+    let targetBranchId = null;
+    if (branchKey !== "all") {
+        let branchPattern = "";
+        if (branchKey === "santa-ana") branchPattern = "Santa Ana";
+        if (branchKey === "ahuachapan") branchPattern = "Ahuachapán";
+        if (branchKey === "sonsonate") branchPattern = "Sonsonate";
+        const { data: bData } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id").ilike("name", `%${branchPattern}%`).maybeSingle();
+        if (bData) targetBranchId = bData.id;
+    }
+    let query = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").select(`
+      id,
+      stock,
+      branch_id,
+      branches (
+        id,
+        name
+      ),
+      products (
+        id,
+        name,
+        brand
+      )
+    `).lte("stock", 5).order("stock", {
+        ascending: true
+    });
+    if (targetBranchId) {
+        query = query.eq("branch_id", targetBranchId);
+    }
+    const { data, error } = await query;
+    if (error || !data) {
+        console.error("Error al consultar alertas de stock:", error?.message);
+        return {
+            lowStockItems: [],
+            outOfStockItems: []
+        };
+    }
+    const queryRows = data ?? [];
+    const lowStockItems = [];
+    const outOfStockItems = [];
+    queryRows.forEach((row)=>{
+        const prod = Array.isArray(row.products) ? row.products[0] : row.products;
+        const branch = Array.isArray(row.branches) ? row.branches[0] : row.branches;
+        const currentStock = Number(row.stock) || 0;
+        if (!prod) return;
+        const alertItem = {
+            id: `${row.id}-${prod.id}`,
+            name: prod.name || "Insumo Dental",
+            brand: prod.brand || "Genérico",
+            branch: branch?.name || "Sede",
+            stock: currentStock
+        };
+        if (currentStock === 0) {
+            outOfStockItems.push(alertItem);
+        } else if (currentStock > 0 && currentStock <= 5) {
+            lowStockItems.push(alertItem);
+        }
+    });
+    return {
+        lowStockItems,
+        outOfStockItems
+    };
+}
+async function fetchDashboardSalesMetrics(dateStr, branchKey = "all") {
+    const defaultMetrics = {
+        totalIncome: 0,
+        totalTickets: 0,
+        estimatedProfit: 0,
+        trend: "+0.0%",
+        paymentMethods: {
+            card: 0,
+            transfer: 0,
+            cash: 0
+        },
+        breakdownAmounts: {
+            card: 0,
+            transfer: 0,
+            cash: 0
+        }
+    };
+    // 1. Rango del día completo en UTC
+    const startOfDay = `${dateStr}T00:00:00-06:00`;
+    const endOfDay = `${dateStr}T23:59:59.999-06:00`;
+    // 2. Resolver el ID de la sucursal si no es consolidado
+    let targetBranchId = null;
+    if (branchKey !== "all") {
+        let branchNamePattern = "";
+        if (branchKey === "santa-ana") branchNamePattern = "Santa Ana";
+        if (branchKey === "ahuachapan") branchNamePattern = "Ahuachapán";
+        if (branchKey === "sonsonate") branchNamePattern = "Sonsonate";
+        const { data: branchData } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id").ilike("name", `%${branchNamePattern}%`).maybeSingle();
+        if (!branchData) return defaultMetrics;
+        targetBranchId = branchData.id;
+    }
+    // 3. Consultar las ventas de la fecha
+    let query = __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sales").select("id, total, subtotal, payment_method, branch_id").gte("created_at", startOfDay).lte("created_at", endOfDay);
+    if (targetBranchId) {
+        query = query.eq("branch_id", targetBranchId);
+    }
+    const { data: sales, error } = await query;
+    if (error || !sales || sales.length === 0) {
+        return defaultMetrics;
+    }
+    let totalIncome = 0;
+    let cardAmount = 0;
+    let transferAmount = 0;
+    let cashAmount = 0;
+    sales.forEach((sale)=>{
+        const amt = Number(sale.total) || 0;
+        totalIncome += amt;
+        if (sale.payment_method === "card") cardAmount += amt;
+        else if (sale.payment_method === "transfer") transferAmount += amt;
+        else if (sale.payment_method === "cash") cashAmount += amt;
+    });
+    // Cálculo porcentual para el donut SVG
+    const cardPercent = totalIncome > 0 ? Math.round(cardAmount / totalIncome * 100) : 0;
+    const transferPercent = totalIncome > 0 ? Math.round(transferAmount / totalIncome * 100) : 0;
+    const cashPercent = totalIncome > 0 ? Math.max(0, 100 - (cardPercent + transferPercent)) : 0;
+    // Margen bruto estimado sobre costo medio comercial (aprox 35% del subtotal)
+    const estimatedProfit = Number((totalIncome * 0.35).toFixed(2));
+    return {
+        totalIncome,
+        totalTickets: sales.length,
+        estimatedProfit,
+        trend: totalIncome > 0 ? "+100%" : "+0.0%",
+        paymentMethods: {
+            card: cardPercent,
+            transfer: transferPercent,
+            cash: cashPercent
+        },
+        breakdownAmounts: {
+            card: cardAmount,
+            transfer: transferAmount,
+            cash: cashAmount
+        }
+    };
+}
+async function fetchBranchesPerformance(dateStr) {
+    const startOfDay = `${dateStr}T00:00:00.000Z`;
+    const endOfDay = `${dateStr}T23:59:59.999Z`;
+    // 1. Obtener el listado maestro de sucursales
+    const { data: branches, error: branchErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id, name").order("name", {
+        ascending: true
+    });
+    if (branchErr || !branches) {
+        console.error("Error al obtener sucursales:", branchErr?.message);
+        return [];
+    }
+    // 2. Consultar las ventas de la fecha
+    const { data: sales, error: salesErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sales").select("branch_id, total").gte("created_at", startOfDay).lte("created_at", endOfDay);
+    if (salesErr) {
+        console.error("Error al obtener ventas por sede:", salesErr.message);
+    }
+    const salesList = sales || [];
+    let grandTotal = 0;
+    // 3. Acumular tickets e ingresos por branch_id
+    const branchMap = new Map();
+    branches.forEach((b)=>{
+        branchMap.set(b.id, {
+            tickets: 0,
+            income: 0
+        });
+    });
+    salesList.forEach((s)=>{
+        const amt = Number(s.total) || 0;
+        grandTotal += amt;
+        const current = branchMap.get(s.branch_id);
+        if (current) {
+            current.tickets += 1;
+            current.income += amt;
+        }
+    });
+    // 4. Formatear y calcular el porcentaje relativo de la barra
+    return branches.map((b)=>{
+        const stats = branchMap.get(b.id) || {
+            tickets: 0,
+            income: 0
+        };
+        const pct = grandTotal > 0 ? Math.round(stats.income / grandTotal * 100) : 0;
+        // Mapeo de key legible para selección en la interfaz
+        let key = "santa-ana";
+        const lower = b.name.toLowerCase();
+        if (lower.includes("ahuachap")) key = "ahuachapan";
+        if (lower.includes("sonso")) key = "sonsonate";
+        return {
+            id: key,
+            name: b.name.includes("Santa Ana") ? "Santa Ana (Matriz)" : b.name,
+            ticketsCount: stats.tickets,
+            totalIncome: stats.income,
+            percentage: pct
+        };
+    });
+}
+async function fetchBranchesFromDB() {
+    const { data, error } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id, name, phone, address, is_active").order("name", {
+        ascending: true
+    });
+    if (error) {
+        console.error("Error al obtener sucursales:", error.message);
+        throw new Error(error.message);
+    }
+    const rows = data ?? [];
+    return rows.map((b)=>({
+            id: b.id,
+            name: b.name,
+            code: b.code || b.name.substring(0, 2).toUpperCase(),
+            phone: b.phone || "Sin teléfono",
+            address: b.address || "Sin dirección registrada",
+            isActive: b.is_active ?? true
+        }));
+}
+async function createBranchInDB(payload) {
+    const cleanName = payload.name.trim();
+    const cleanCode = payload.code.trim().toUpperCase();
+    const { data: newBranch, error } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").insert([
+        {
+            name: cleanName,
+            code: cleanCode,
+            phone: payload.phone?.trim() || null,
+            address: payload.address?.trim() || null,
+            is_active: true
+        }
+    ]).select().single();
+    if (error) {
+        if (error.code === "23505") {
+            throw new Error("Ya existe una sucursal con ese nombre o código.");
+        }
+        throw new Error(error.message);
+    }
+    // Vincular productos existentes a la nueva sucursal con stock 0
+    const { data: products } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("products").select("id");
+    if (products && products.length > 0) {
+        const rows = products.map((p)=>({
+                branch_id: newBranch.id,
+                product_id: p.id,
+                stock: 0,
+                min_stock: 5
+            }));
+        await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").insert(rows);
+    }
+    return {
+        id: newBranch.id,
+        name: newBranch.name,
+        code: newBranch.code || cleanCode,
+        phone: newBranch.phone || "Sin teléfono",
+        address: newBranch.address || "Sin dirección registrada",
+        isActive: newBranch.is_active ?? true
+    };
+}
+async function updateBranchInDB(id, payload) {
+    const { error } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").update({
+        name: payload.name.trim(),
+        code: payload.code.trim().toUpperCase(),
+        phone: payload.phone?.trim() || null,
+        address: payload.address?.trim() || null
+    }).eq("id", id);
+    if (error) {
+        if (error.code === "23505") {
+            throw new Error("Ya existe una sucursal con ese nombre o código.");
+        }
+        throw new Error(error.message);
+    }
+}
+async function toggleBranchStatusInDB(id, currentStatus) {
+    const { error } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").update({
+        is_active: !currentStatus
+    }).eq("id", id);
+    if (error) throw new Error(error.message);
+}
+async function deleteBranchFromDB(id) {
+    const { count: salesCount } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sales").select("*", {
+        count: "exact",
+        head: true
+    }).eq("branch_id", id);
+    if (salesCount && salesCount > 0) {
+        throw new Error("No se puede eliminar la sucursal porque tiene tickets y ventas vinculadas en el historial contable. En su lugar, desactívala.");
+    }
+    await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").delete().eq("branch_id", id);
+    await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").delete().eq("branch_id", id);
+    const { error } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").delete().eq("id", id);
+    if (error) throw new Error(error.message);
 }
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
@@ -2795,6 +3636,7 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$user$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__User$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/user.mjs [app-client] (ecmascript) <export default as User>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$shield$2d$check$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ShieldCheck$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/shield-check.mjs [app-client] (ecmascript) <export default as ShieldCheck>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$file$2d$spreadsheet$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__FileSpreadsheet$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/file-spreadsheet.mjs [app-client] (ecmascript) <export default as FileSpreadsheet>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$eye$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Eye$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/eye.mjs [app-client] (ecmascript) <export default as Eye>");
 ;
 var _s = __turbopack_context__.k.signature();
 "use client";
@@ -2953,12 +3795,12 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                         className: "w-5 h-5"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                        lineNumber: 217,
+                                        lineNumber: 218,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                    lineNumber: 216,
+                                    lineNumber: 217,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2971,7 +3813,7 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                                     children: "Auditoría de Comprobantes y Tickets"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                    lineNumber: 221,
+                                                    lineNumber: 222,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2981,20 +3823,20 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                                             className: "w-4 h-4 text-sky-600"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                            lineNumber: 225,
+                                                            lineNumber: 226,
                                                             columnNumber: 19
                                                         }, this),
                                                         "Fiscalización Diaria"
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                    lineNumber: 224,
+                                                    lineNumber: 225,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                            lineNumber: 220,
+                                            lineNumber: 221,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -3008,45 +3850,45 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                                             children: branchName
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                            lineNumber: 230,
+                                                            lineNumber: 231,
                                                             columnNumber: 33
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                    lineNumber: 230,
+                                                    lineNumber: 231,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                     children: "•"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                    lineNumber: 231,
+                                                    lineNumber: 232,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                     children: selectedShift
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                    lineNumber: 232,
+                                                    lineNumber: 233,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                            lineNumber: 229,
+                                            lineNumber: 230,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                    lineNumber: 219,
+                                    lineNumber: 220,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                            lineNumber: 215,
+                            lineNumber: 216,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3059,20 +3901,20 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                             className: "w-3.5 h-3.5 text-sky-600"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                            lineNumber: 239,
+                                            lineNumber: 240,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                             children: selectedDate
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                            lineNumber: 240,
+                                            lineNumber: 241,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                    lineNumber: 238,
+                                    lineNumber: 239,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3083,24 +3925,24 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                         className: "w-4 h-4"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                        lineNumber: 248,
+                                        lineNumber: 249,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                    lineNumber: 243,
+                                    lineNumber: 244,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                            lineNumber: 237,
+                            lineNumber: 238,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                    lineNumber: 214,
+                    lineNumber: 215,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3113,7 +3955,7 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                     className: "w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                    lineNumber: 258,
+                                    lineNumber: 259,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -3124,13 +3966,13 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                     className: "w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:border-sky-500 transition-colors"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                    lineNumber: 259,
+                                    lineNumber: 260,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                            lineNumber: 257,
+                            lineNumber: 258,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3145,7 +3987,7 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                             children: "Todos"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                            lineNumber: 278,
+                                            lineNumber: 279,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3153,13 +3995,13 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                             children: counts.all
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                            lineNumber: 279,
+                                            lineNumber: 280,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                    lineNumber: 269,
+                                    lineNumber: 270,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3171,14 +4013,14 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                             className: "w-3.5 h-3.5"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                            lineNumber: 293,
+                                            lineNumber: 294,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                             children: "Efectivo"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                            lineNumber: 294,
+                                            lineNumber: 295,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3186,13 +4028,13 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                             children: counts.cash
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                            lineNumber: 295,
+                                            lineNumber: 296,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                    lineNumber: 284,
+                                    lineNumber: 285,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3204,14 +4046,14 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                             className: "w-3.5 h-3.5"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                            lineNumber: 309,
+                                            lineNumber: 310,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                             children: "Tarjeta"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                            lineNumber: 310,
+                                            lineNumber: 311,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3219,13 +4061,13 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                             children: counts.card
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                            lineNumber: 311,
+                                            lineNumber: 312,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                    lineNumber: 300,
+                                    lineNumber: 301,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3237,14 +4079,14 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                             className: "w-3.5 h-3.5"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                            lineNumber: 325,
+                                            lineNumber: 326,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                             children: "Transferencia"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                            lineNumber: 326,
+                                            lineNumber: 327,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3252,25 +4094,25 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                             children: counts.transfer
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                            lineNumber: 327,
+                                            lineNumber: 328,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                    lineNumber: 316,
+                                    lineNumber: 317,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                            lineNumber: 268,
+                            lineNumber: 269,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                    lineNumber: 256,
+                    lineNumber: 257,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3285,7 +4127,7 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                         className: "w-8 h-8 border-2 border-sky-600 border-t-transparent rounded-full animate-spin mb-3"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                        lineNumber: 343,
+                                        lineNumber: 344,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -3293,13 +4135,13 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                         children: "Cargando tickets de la jornada..."
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                        lineNumber: 344,
+                                        lineNumber: 345,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                lineNumber: 342,
+                                lineNumber: 343,
                                 columnNumber: 15
                             }, this) : filteredTickets.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "h-full flex flex-col items-center justify-center p-8 text-center border-2 border-dashed border-slate-200 rounded-2xl bg-white/60",
@@ -3308,7 +4150,7 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                         className: "w-10 h-10 text-slate-300 mb-2.5"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                        lineNumber: 348,
+                                        lineNumber: 349,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -3316,7 +4158,7 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                         children: "No hay tickets registrados"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                        lineNumber: 349,
+                                        lineNumber: 350,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -3330,13 +4172,13 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                        lineNumber: 350,
+                                        lineNumber: 351,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                lineNumber: 347,
+                                lineNumber: 348,
                                 columnNumber: 15
                             }, this) : filteredTickets.map((ticket)=>{
                                 const isSelected = selectedTicket?.id === ticket.id;
@@ -3355,7 +4197,7 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                                             children: ticket.ticketNumber
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                            lineNumber: 369,
+                                                            lineNumber: 370,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3363,13 +4205,13 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                                             children: ticket.paymentMethod === "cash" ? "Efectivo" : ticket.paymentMethod === "card" ? "Tarjeta" : "Transf."
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                            lineNumber: 372,
+                                                            lineNumber: 373,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                    lineNumber: 368,
+                                                    lineNumber: 369,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3380,13 +4222,13 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                    lineNumber: 388,
+                                                    lineNumber: 389,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                            lineNumber: 367,
+                                            lineNumber: 368,
                                             columnNumber: 21
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3399,20 +4241,20 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                                             className: "w-3 h-3 text-sky-600"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                            lineNumber: 395,
+                                                            lineNumber: 396,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                             children: ticket.time
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                            lineNumber: 396,
+                                                            lineNumber: 397,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                    lineNumber: 394,
+                                                    lineNumber: 395,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3422,7 +4264,7 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                                             className: "w-3 h-3 text-sky-600 shrink-0"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                            lineNumber: 399,
+                                                            lineNumber: 400,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3430,473 +4272,418 @@ function AuditTicketsModal({ isOpen, onClose, branchName, selectedDate, selected
                                                             children: ticket.cashier
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                            lineNumber: 400,
+                                                            lineNumber: 401,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                    lineNumber: 398,
+                                                    lineNumber: 399,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                            lineNumber: 393,
+                                            lineNumber: 394,
                                             columnNumber: 21
                                         }, this)
                                     ]
                                 }, ticket.id, true, {
                                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                    lineNumber: 358,
+                                    lineNumber: 359,
                                     columnNumber: 19
                                 }, this);
                             })
                         }, void 0, false, {
                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                            lineNumber: 340,
+                            lineNumber: 341,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "col-span-12 md:col-span-7 lg:col-span-7 h-full overflow-y-auto p-4 md:p-6 flex items-center justify-center",
+                            className: "col-span-5 bg-slate-50/70 p-5 flex flex-col justify-between overflow-y-auto",
                             children: selectedTicket ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "w-full max-w-md bg-white border border-slate-200 rounded-3xl shadow-lg p-6 space-y-4 tabular-nums",
+                                className: "space-y-4",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "text-center border-b border-dashed border-slate-200 pb-4",
+                                        className: "bg-white border border-slate-200 rounded-xl p-5 shadow-xs tabular-nums text-xs text-slate-600 space-y-3",
                                         children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h3", {
-                                                className: "text-sm font-black tracking-wider text-slate-900 uppercase",
-                                                children: "MARIO'S DENT"
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                lineNumber: 415,
-                                                columnNumber: 19
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                className: "text-[10px] text-slate-500 font-sans mt-0.5",
-                                                children: "Depósito Dental Especializado"
-                                            }, void 0, false, {
-                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                lineNumber: 418,
-                                                columnNumber: 19
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                className: "text-[10px] text-slate-400 font-sans",
-                                                children: [
-                                                    "Sucursal: ",
-                                                    selectedTicket.branch
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                lineNumber: 421,
-                                                columnNumber: 19
-                                            }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "mt-3 flex items-center justify-between text-[11px] text-slate-600 pt-2 border-t border-slate-100",
+                                                className: "text-center pb-2.5 border-b border-dashed border-slate-200",
                                                 children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                        className: "font-black text-slate-800 text-sm tracking-wide",
+                                                        children: "MARIO'S DENT"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                        lineNumber: 417,
+                                                        columnNumber: 11
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                        className: "text-[11px] text-slate-500 font-medium",
+                                                        children: "Depósito Dental Especializado"
+                                                    }, void 0, false, {
+                                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                        lineNumber: 418,
+                                                        columnNumber: 11
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                        className: "text-[10px] text-slate-400 mt-0.5",
                                                         children: [
-                                                            "Folio: ",
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                                                                className: "text-slate-900",
-                                                                children: selectedTicket.ticketNumber
-                                                            }, void 0, false, {
+                                                            "Sucursal: ",
+                                                            selectedTicket.branch && selectedTicket.branch !== "Sin dirección registrada" ? selectedTicket.branch : `Sucursal ${selectedTicket.branch}`
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                        lineNumber: 421,
+                                                        columnNumber: 11
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "flex items-center justify-between mt-2 pt-2 border-t border-slate-100 text-[10px] text-slate-500",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                children: [
+                                                                    "Ticket: ",
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                                                        children: selectedTicket.ticketNumber.replace(/^[A-Za-z]+-[A-Za-z]+-/, "")
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                                        lineNumber: 430,
+                                                                        columnNumber: 23
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
                                                                 fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                                lineNumber: 425,
-                                                                columnNumber: 34
+                                                                lineNumber: 429,
+                                                                columnNumber: 13
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                children: [
+                                                                    selectedTicket.date,
+                                                                    " • ",
+                                                                    selectedTicket.time
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                                lineNumber: 432,
+                                                                columnNumber: 13
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                        lineNumber: 425,
-                                                        columnNumber: 21
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        children: [
-                                                            selectedTicket.date,
-                                                            " • ",
-                                                            selectedTicket.time
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                        lineNumber: 426,
-                                                        columnNumber: 21
+                                                        lineNumber: 428,
+                                                        columnNumber: 11
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                lineNumber: 424,
-                                                columnNumber: 19
+                                                lineNumber: 416,
+                                                columnNumber: 9
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "space-y-2 py-1.5 border-b border-dashed border-slate-200",
+                                                children: selectedTicket.items.map((it, idx)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "flex justify-between items-start text-[11px]",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                className: "pr-2 leading-tight",
+                                                                children: [
+                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                        className: "text-slate-800",
+                                                                        children: it.name
+                                                                    }, void 0, false, {
+                                                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                                        lineNumber: 443,
+                                                                        columnNumber: 17
+                                                                    }, this),
+                                                                    it.qty > 1 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                        className: "block text-[10px] text-slate-400 mt-0.5",
+                                                                        children: [
+                                                                            it.qty,
+                                                                            " x $",
+                                                                            it.unitPrice.toFixed(2)
+                                                                        ]
+                                                                    }, void 0, true, {
+                                                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                                        lineNumber: 446,
+                                                                        columnNumber: 19
+                                                                    }, this)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                                lineNumber: 442,
+                                                                columnNumber: 15
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                className: "font-bold text-slate-800 shrink-0",
+                                                                children: [
+                                                                    "$",
+                                                                    (it.qty * it.unitPrice).toFixed(2)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                                lineNumber: 451,
+                                                                columnNumber: 15
+                                                            }, this)
+                                                        ]
+                                                    }, idx, true, {
+                                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                        lineNumber: 441,
+                                                        columnNumber: 13
+                                                    }, this))
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                lineNumber: 439,
+                                                columnNumber: 9
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "space-y-1 text-[11px] pt-1 border-b border-dashed border-slate-200 pb-2.5",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "flex justify-between text-slate-400",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                children: "Subtotal"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                                lineNumber: 461,
+                                                                columnNumber: 13
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                children: [
+                                                                    "$",
+                                                                    selectedTicket.subtotal.toFixed(2)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                                lineNumber: 462,
+                                                                columnNumber: 13
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                        lineNumber: 460,
+                                                        columnNumber: 11
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "flex justify-between text-slate-400",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                children: "IVA (13%)"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                                lineNumber: 465,
+                                                                columnNumber: 13
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                children: [
+                                                                    "$",
+                                                                    selectedTicket.tax.toFixed(2)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                                lineNumber: 466,
+                                                                columnNumber: 13
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                        lineNumber: 464,
+                                                        columnNumber: 11
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "flex justify-between text-xs font-bold text-slate-800 pt-1",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                children: "TOTAL PAGADO:"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                                lineNumber: 469,
+                                                                columnNumber: 13
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                className: "text-emerald-600 font-extrabold text-sm",
+                                                                children: [
+                                                                    "$",
+                                                                    selectedTicket.total.toFixed(2)
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                                lineNumber: 470,
+                                                                columnNumber: 13
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                        lineNumber: 468,
+                                                        columnNumber: 11
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                lineNumber: 459,
+                                                columnNumber: 9
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                className: "text-[10px] space-y-1.5 text-slate-500 pt-1",
+                                                children: [
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "p-2 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-between",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                className: "text-slate-400",
+                                                                children: "Método de cobro:"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                                lineNumber: 479,
+                                                                columnNumber: 13
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                                                className: "text-slate-700 uppercase font-bold",
+                                                                children: selectedTicket.paymentMethod === "cash" ? "Efectivo" : selectedTicket.paymentMethod === "card" ? "Tarjeta POS / Voucher" : "Transferencia"
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                                lineNumber: 480,
+                                                                columnNumber: 13
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                        lineNumber: 478,
+                                                        columnNumber: 11
+                                                    }, this),
+                                                    selectedTicket.paymentMethod === "cash" && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                        className: "flex justify-between px-1 text-[10px] text-slate-400",
+                                                        children: [
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                children: [
+                                                                    "Recibido: $",
+                                                                    selectedTicket.cashReceived?.toFixed(2) ?? "0.00"
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                                lineNumber: 491,
+                                                                columnNumber: 15
+                                                            }, this),
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                children: [
+                                                                    "Cambio: $",
+                                                                    selectedTicket.changeReturned?.toFixed(2) ?? "0.00"
+                                                                ]
+                                                            }, void 0, true, {
+                                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                                lineNumber: 492,
+                                                                columnNumber: 15
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                        lineNumber: 490,
+                                                        columnNumber: 13
+                                                    }, this),
+                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                                        className: "text-[11px] text-slate-400 pt-1 border-t border-slate-100",
+                                                        children: [
+                                                            "Atendido por: ",
+                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                                                className: "text-slate-600",
+                                                                children: selectedTicket.cashier
+                                                            }, void 0, false, {
+                                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                                lineNumber: 498,
+                                                                columnNumber: 27
+                                                            }, this)
+                                                        ]
+                                                    }, void 0, true, {
+                                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                        lineNumber: 497,
+                                                        columnNumber: 11
+                                                    }, this)
+                                                ]
+                                            }, void 0, true, {
+                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
+                                                lineNumber: 477,
+                                                columnNumber: 9
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
                                         lineNumber: 414,
-                                        columnNumber: 17
+                                        columnNumber: 7
                                     }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "divide-y divide-slate-100 text-xs",
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                        type: "button",
+                                        onClick: ()=>alert(`Reimprimiendo comprobante ${selectedTicket.ticketNumber}...`),
+                                        className: "w-full flex items-center justify-center gap-2 py-2.5 bg-white border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-xl shadow-2xs transition-colors cursor-pointer",
                                         children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "pb-1.5 flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        children: "Descripción"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                        lineNumber: 433,
-                                                        columnNumber: 21
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        children: "Total"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                        lineNumber: 434,
-                                                        columnNumber: 21
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$printer$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Printer$3e$__["Printer"], {
+                                                className: "w-3.5 h-3.5 text-sky-600"
+                                            }, void 0, false, {
                                                 fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                lineNumber: 432,
-                                                columnNumber: 19
+                                                lineNumber: 508,
+                                                columnNumber: 9
                                             }, this),
-                                            selectedTicket.items.map((item, idx)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "py-2 flex justify-between gap-2",
-                                                    children: [
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                            className: "truncate pr-2 font-sans",
-                                                            children: [
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                                    className: "font-bold text-slate-800 text-xs truncate",
-                                                                    children: item.name
-                                                                }, void 0, false, {
-                                                                    fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                                    lineNumber: 439,
-                                                                    columnNumber: 25
-                                                                }, this),
-                                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                                    className: "text-[10px] text-slate-400",
-                                                                    children: [
-                                                                        item.qty,
-                                                                        " x $",
-                                                                        item.unitPrice.toFixed(2)
-                                                                    ]
-                                                                }, void 0, true, {
-                                                                    fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                                    lineNumber: 440,
-                                                                    columnNumber: 25
-                                                                }, this)
-                                                            ]
-                                                        }, void 0, true, {
-                                                            fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                            lineNumber: 438,
-                                                            columnNumber: 23
-                                                        }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                            className: "font-bold text-slate-900 shrink-0",
-                                                            children: [
-                                                                "$",
-                                                                (item.qty * item.unitPrice).toFixed(2)
-                                                            ]
-                                                        }, void 0, true, {
-                                                            fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                            lineNumber: 444,
-                                                            columnNumber: 23
-                                                        }, this)
-                                                    ]
-                                                }, idx, true, {
-                                                    fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                    lineNumber: 437,
-                                                    columnNumber: 21
-                                                }, this))
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                        lineNumber: 431,
-                                        columnNumber: 17
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "pt-3 border-t border-dashed border-slate-200 space-y-1.5 text-xs text-slate-600",
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "flex justify-between",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        children: "Subtotal:"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                        lineNumber: 454,
-                                                        columnNumber: 21
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        children: [
-                                                            "$",
-                                                            selectedTicket.subtotal.toFixed(2)
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                        lineNumber: 455,
-                                                        columnNumber: 21
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                lineNumber: 453,
-                                                columnNumber: 19
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "flex justify-between",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        children: "IVA (13%):"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                        lineNumber: 458,
-                                                        columnNumber: 21
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        children: [
-                                                            "$",
-                                                            selectedTicket.tax.toFixed(2)
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                        lineNumber: 459,
-                                                        columnNumber: 21
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                lineNumber: 457,
-                                                columnNumber: 19
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "flex justify-between text-sm font-black text-slate-900 pt-1.5 border-t border-slate-100",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        children: "TOTAL PAGADO:"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                        lineNumber: 462,
-                                                        columnNumber: 21
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        className: "text-emerald-600",
-                                                        children: [
-                                                            "$",
-                                                            selectedTicket.total.toFixed(2)
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                        lineNumber: 463,
-                                                        columnNumber: 21
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                lineNumber: 461,
-                                                columnNumber: 19
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                        lineNumber: 452,
-                                        columnNumber: 17
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "p-3 bg-slate-50 rounded-2xl border border-slate-100 text-[11px] space-y-1",
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                className: "flex justify-between",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        className: "text-slate-400",
-                                                        children: "Método de cobro:"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                        lineNumber: 470,
-                                                        columnNumber: 21
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        className: "font-bold text-slate-800 capitalize",
-                                                        children: selectedTicket.paymentMethod === "cash" ? "Efectivo en Gaveta" : selectedTicket.paymentMethod === "card" ? "Tarjeta POS / Voucher" : "Transferencia Bancaria"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                        lineNumber: 471,
-                                                        columnNumber: 21
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                lineNumber: 469,
-                                                columnNumber: 19
-                                            }, this),
-                                            selectedTicket.paymentMethod === "cash" && selectedTicket.cashReceived !== undefined && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "flex justify-between",
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "text-slate-400",
-                                                                children: "Efectivo entregado:"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                                lineNumber: 482,
-                                                                columnNumber: 25
-                                                            }, this),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "font-bold text-slate-800",
-                                                                children: [
-                                                                    "$",
-                                                                    selectedTicket.cashReceived.toFixed(2)
-                                                                ]
-                                                            }, void 0, true, {
-                                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                                lineNumber: 483,
-                                                                columnNumber: 25
-                                                            }, this)
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                        lineNumber: 481,
-                                                        columnNumber: 23
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                        className: "flex justify-between",
-                                                        children: [
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "text-slate-400",
-                                                                children: "Cambio devuelto:"
-                                                            }, void 0, false, {
-                                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                                lineNumber: 488,
-                                                                columnNumber: 25
-                                                            }, this),
-                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "font-bold text-emerald-600",
-                                                                children: [
-                                                                    "$",
-                                                                    (selectedTicket.changeReturned || 0).toFixed(2)
-                                                                ]
-                                                            }, void 0, true, {
-                                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                                lineNumber: 489,
-                                                                columnNumber: 25
-                                                            }, this)
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                        lineNumber: 487,
-                                                        columnNumber: 23
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                lineNumber: 480,
-                                                columnNumber: 21
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                        lineNumber: 468,
-                                        columnNumber: 17
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                        className: "pt-2 flex justify-between items-center text-[10px] text-slate-400 font-sans",
-                                        children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                children: [
-                                                    "Atendido por: ",
-                                                    selectedTicket.cashier
-                                                ]
-                                            }, void 0, true, {
+                                                children: "Reimprimir Comprobante"
+                                            }, void 0, false, {
                                                 fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                lineNumber: 498,
-                                                columnNumber: 19
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                type: "button",
-                                                onClick: ()=>window.print(),
-                                                className: "flex items-center gap-1 text-sky-600 font-bold hover:underline cursor-pointer",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$printer$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Printer$3e$__["Printer"], {
-                                                        className: "w-3.5 h-3.5"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                        lineNumber: 504,
-                                                        columnNumber: 21
-                                                    }, this),
-                                                    "Reimprimir Copia"
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                                lineNumber: 499,
-                                                columnNumber: 19
+                                                lineNumber: 509,
+                                                columnNumber: 9
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                        lineNumber: 497,
-                                        columnNumber: 17
+                                        lineNumber: 503,
+                                        columnNumber: 7
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                lineNumber: 412,
-                                columnNumber: 15
+                                lineNumber: 413,
+                                columnNumber: 5
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "text-center p-8 text-slate-400",
+                                className: "h-full flex flex-col items-center justify-center text-center text-slate-400 p-6",
                                 children: [
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$receipt$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Receipt$3e$__["Receipt"], {
-                                        className: "w-12 h-12 text-slate-200 mx-auto mb-3"
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$eye$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Eye$3e$__["Eye"], {
+                                        className: "w-8 h-8 stroke-[1.5] mb-2 text-slate-300"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                        lineNumber: 511,
-                                        columnNumber: 17
+                                        lineNumber: 514,
+                                        columnNumber: 7
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                        className: "text-xs font-bold text-slate-600",
-                                        children: "Selecciona un ticket del listado"
+                                        className: "text-xs",
+                                        children: "Selecciona un ticket del listado para ver su detalle."
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                        lineNumber: 512,
-                                        columnNumber: 17
-                                    }, this),
-                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                        className: "text-[11px] text-slate-400 mt-1 max-w-[200px] mx-auto",
-                                        children: "Haz clic sobre una venta a la izquierda para inspeccionar su comprobante térmico digital."
-                                    }, void 0, false, {
-                                        fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                        lineNumber: 513,
-                                        columnNumber: 17
+                                        lineNumber: 515,
+                                        columnNumber: 7
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                                lineNumber: 510,
-                                columnNumber: 15
+                                lineNumber: 513,
+                                columnNumber: 5
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                            lineNumber: 410,
-                            columnNumber: 11
+                            lineNumber: 411,
+                            columnNumber: 1
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/AuditTicketsModal.tsx",
-                    lineNumber: 337,
+                    lineNumber: 338,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/AuditTicketsModal.tsx",
-            lineNumber: 209,
+            lineNumber: 210,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/components/AuditTicketsModal.tsx",
-        lineNumber: 207,
+        lineNumber: 208,
         columnNumber: 5
     }, this);
 }
@@ -4143,7 +4930,13 @@ async function downloadCorteZPDF(filename) {
                 scale: 2,
                 useCORS: true,
                 logging: false,
-                backgroundColor: "#ffffff"
+                backgroundColor: "#ffffff",
+                onclone: (clonedDoc)=>{
+                    // Remueve las hojas de estilo de Tailwind v4 del documento clonado
+                    // para eliminar de raíz cualquier función lab() u oklch() heredada
+                    const styleSheets = clonedDoc.querySelectorAll("style, link[rel='stylesheet']");
+                    styleSheets.forEach((s)=>s.remove());
+                }
             },
             jsPDF: {
                 unit: "mm",
@@ -4157,11 +4950,9 @@ async function downloadCorteZPDF(filename) {
         alert("Hubo un error al generar la descarga del PDF.");
     }
 }
-// Suscripción segura para hidratación sin cascading renders
 const emptySubscribe = ()=>()=>{};
 function CorteZPDFTemplate({ data }) {
     _s();
-    // Garantiza que solo renderice en cliente sin disparar useEffect ni cascading renders
     const isMounted = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useSyncExternalStore"])(emptySubscribe, {
         "CorteZPDFTemplate.useSyncExternalStore[isMounted]": ()=>true
     }["CorteZPDFTemplate.useSyncExternalStore[isMounted]"], {
@@ -4172,6 +4963,10 @@ function CorteZPDFTemplate({ data }) {
     const totalSales = data.cashSales + data.cardSales + data.transferSales;
     const iva = totalSales * 0.13;
     const netSales = totalSales - iva;
+    // Estilos base estrictamente en Blanco y Negro
+    const borderThin = "1px solid #000000";
+    const borderThick = "2px solid #000000";
+    const borderLight = "1px solid #d1d5db";
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
         style: {
             position: "fixed",
@@ -4182,233 +4977,190 @@ function CorteZPDFTemplate({ data }) {
         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
             id: "corte-z-pdf-report",
             style: {
-                width: "800px",
-                minHeight: "1050px",
+                width: "750px",
                 backgroundColor: "#ffffff",
-                color: "#0f172a"
+                color: "#000000",
+                fontFamily: "Arial, Helvetica, sans-serif",
+                boxSizing: "border-box",
+                padding: "36px",
+                fontSize: "11px",
+                lineHeight: "1.4"
             },
-            className: "font-sans text-xs p-10 box-border",
             children: [
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     style: {
-                        borderColor: "#0f172a"
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-end",
+                        borderBottom: borderThick,
+                        paddingBottom: "12px",
+                        marginBottom: "20px"
                     },
-                    className: "flex justify-between items-start border-b-2 pb-3 mb-5",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
                                     style: {
-                                        color: "#0f172a"
+                                        fontSize: "18px",
+                                        fontWeight: "bold",
+                                        margin: 0,
+                                        textTransform: "uppercase",
+                                        letterSpacing: "0.5px"
                                     },
-                                    className: "text-xl font-black uppercase tracking-tight",
                                     children: "MARIO'S DENT"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 86,
+                                    lineNumber: 104,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                     style: {
-                                        color: "#475569"
+                                        margin: "3px 0 0 0",
+                                        fontSize: "11px",
+                                        color: "#333333"
                                     },
-                                    className: "text-xs font-semibold",
                                     children: [
                                         "Depósito Dental Especializado • Sucursal ",
                                         data.branch
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 92,
+                                    lineNumber: 115,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                     style: {
-                                        color: "#64748b"
+                                        margin: "2px 0 0 0",
+                                        fontSize: "10px",
+                                        color: "#666666"
                                     },
-                                    className: "text-[10px]",
                                     children: "PBX: (503) 2440-1234 • Santa Ana, El Salvador"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 95,
+                                    lineNumber: 118,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/CortePDF.tsx",
-                            lineNumber: 85,
+                            lineNumber: 103,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "text-right",
+                            style: {
+                                textAlign: "right"
+                            },
                             children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     style: {
-                                        backgroundColor: "#0f172a",
-                                        color: "#ffffff"
+                                        fontSize: "12px",
+                                        fontWeight: "bold",
+                                        textTransform: "uppercase",
+                                        letterSpacing: "0.5px"
                                     },
-                                    className: "inline-block font-bold px-3 py-1 rounded text-[10px] uppercase tracking-wider",
-                                    children: "Corte Z - Auditoría Diaria"
+                                    children: "Corte Z — Balance Diario"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 100,
+                                    lineNumber: 123,
                                     columnNumber: 13
                                 }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                    suppressHydrationWarning: true,
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     style: {
-                                        color: "#1e293b"
+                                        fontFamily: "monospace",
+                                        fontSize: "11px",
+                                        marginTop: "3px"
                                     },
-                                    className: "font-mono font-bold text-xs mt-1.5",
                                     children: [
                                         "Folio: ",
                                         data.folio
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 106,
+                                    lineNumber: 133,
                                     columnNumber: 13
                                 }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                    suppressHydrationWarning: true,
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     style: {
-                                        color: "#64748b"
+                                        fontSize: "10px",
+                                        color: "#444444"
                                     },
-                                    className: "text-[10px]",
                                     children: [
-                                        "Fecha de Emisión: ",
+                                        "Emisión: ",
                                         data.date
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 113,
+                                    lineNumber: 136,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/CortePDF.tsx",
-                            lineNumber: 99,
+                            lineNumber: 122,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/CortePDF.tsx",
-                    lineNumber: 81,
+                    lineNumber: 93,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     style: {
-                        backgroundColor: "#f8fafc",
-                        borderColor: "#e2e8f0"
+                        display: "grid",
+                        gridTemplateColumns: "repeat(4, 1fr)",
+                        gap: "12px",
+                        padding: "10px 14px",
+                        border: borderLight,
+                        marginBottom: "24px",
+                        fontSize: "11px"
                     },
-                    className: "grid grid-cols-4 gap-4 p-3 border rounded-lg mb-6 text-[11px]",
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                     style: {
-                                        color: "#94a3b8"
+                                        display: "block",
+                                        fontSize: "9px",
+                                        textTransform: "uppercase",
+                                        color: "#666666"
                                     },
-                                    className: "block text-[9px] uppercase font-bold",
-                                    children: "Fecha Auditada"
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 129,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                                    suppressHydrationWarning: true,
-                                    style: {
-                                        color: "#1e293b"
-                                    },
-                                    children: data.date
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 135,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/src/components/CortePDF.tsx",
-                            lineNumber: 128,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                    style: {
-                                        color: "#94a3b8"
-                                    },
-                                    className: "block text-[9px] uppercase font-bold",
-                                    children: "Jornada"
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 140,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                                    style: {
-                                        color: "#1e293b"
-                                    },
-                                    children: "Jornada Completa"
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 146,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/src/components/CortePDF.tsx",
-                            lineNumber: 139,
-                            columnNumber: 11
-                        }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                    style: {
-                                        color: "#94a3b8"
-                                    },
-                                    className: "block text-[9px] uppercase font-bold",
-                                    children: "Cajero Responsable"
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 149,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                                    style: {
-                                        color: "#1e293b"
-                                    },
-                                    children: data.cashier
+                                    children: "Fecha"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
                                     lineNumber: 155,
                                     columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                    children: data.date
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/CortePDF.tsx",
+                                    lineNumber: 158,
+                                    columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/CortePDF.tsx",
-                            lineNumber: 148,
+                            lineNumber: 154,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                     style: {
-                                        color: "#94a3b8"
+                                        display: "block",
+                                        fontSize: "9px",
+                                        textTransform: "uppercase",
+                                        color: "#666666"
                                     },
-                                    className: "block text-[9px] uppercase font-bold",
-                                    children: "Auditor / Supervisor"
+                                    children: "Jornada"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 158,
+                                    lineNumber: 161,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                                    style: {
-                                        color: "#1e293b"
-                                    },
-                                    children: data.adminName
+                                    children: "Completa"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
                                     lineNumber: 164,
@@ -4417,690 +5169,724 @@ function CorteZPDFTemplate({ data }) {
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/CortePDF.tsx",
-                            lineNumber: 157,
-                            columnNumber: 11
-                        }, this)
-                    ]
-                }, void 0, true, {
-                    fileName: "[project]/src/components/CortePDF.tsx",
-                    lineNumber: 124,
-                    columnNumber: 9
-                }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "grid grid-cols-2 gap-6 mb-6",
-                    children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            style: {
-                                borderColor: "#e2e8f0"
-                            },
-                            className: "border rounded-lg p-4",
-                            children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                                    style: {
-                                        color: "#1e293b",
-                                        borderColor: "#e2e8f0"
-                                    },
-                                    className: "text-[11px] font-bold uppercase tracking-wider border-b pb-2 mb-3",
-                                    children: "1. Desglose de Ventas e Ingresos"
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 172,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("table", {
-                                    className: "w-full text-[11px]",
-                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
-                                        style: {
-                                            borderColor: "#f1f5f9"
-                                        },
-                                        className: "divide-y",
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                        style: {
-                                                            color: "#475569"
-                                                        },
-                                                        className: "py-1.5",
-                                                        children: "Ventas en Efectivo"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/components/CortePDF.tsx",
-                                                        lineNumber: 181,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                        className: "py-1.5 font-mono text-right font-semibold",
-                                                        children: [
-                                                            "$",
-                                                            data.cashSales.toLocaleString("en-US", {
-                                                                minimumFractionDigits: 2
-                                                            })
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/src/components/CortePDF.tsx",
-                                                        lineNumber: 184,
-                                                        columnNumber: 19
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/src/components/CortePDF.tsx",
-                                                lineNumber: 180,
-                                                columnNumber: 17
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                        style: {
-                                                            color: "#475569"
-                                                        },
-                                                        className: "py-1.5",
-                                                        children: "Ventas con Tarjeta (POS)"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/components/CortePDF.tsx",
-                                                        lineNumber: 189,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                        className: "py-1.5 font-mono text-right font-semibold",
-                                                        children: [
-                                                            "$",
-                                                            data.cardSales.toLocaleString("en-US", {
-                                                                minimumFractionDigits: 2
-                                                            })
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/src/components/CortePDF.tsx",
-                                                        lineNumber: 192,
-                                                        columnNumber: 19
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/src/components/CortePDF.tsx",
-                                                lineNumber: 188,
-                                                columnNumber: 17
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                        style: {
-                                                            color: "#475569"
-                                                        },
-                                                        className: "py-1.5",
-                                                        children: "Transferencias Bancarias"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/components/CortePDF.tsx",
-                                                        lineNumber: 197,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                        className: "py-1.5 font-mono text-right font-semibold",
-                                                        children: [
-                                                            "$",
-                                                            data.transferSales.toLocaleString("en-US", {
-                                                                minimumFractionDigits: 2
-                                                            })
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/src/components/CortePDF.tsx",
-                                                        lineNumber: 200,
-                                                        columnNumber: 19
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/src/components/CortePDF.tsx",
-                                                lineNumber: 196,
-                                                columnNumber: 17
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
-                                                style: {
-                                                    borderColor: "#cbd5e1"
-                                                },
-                                                className: "font-bold border-t",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                        style: {
-                                                            color: "#0f172a"
-                                                        },
-                                                        className: "pt-2",
-                                                        children: "TOTAL INGRESOS BRUTOS"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/components/CortePDF.tsx",
-                                                        lineNumber: 208,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                        style: {
-                                                            color: "#075985"
-                                                        },
-                                                        className: "pt-2 font-mono text-right",
-                                                        children: [
-                                                            "$",
-                                                            totalSales.toLocaleString("en-US", {
-                                                                minimumFractionDigits: 2
-                                                            })
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/src/components/CortePDF.tsx",
-                                                        lineNumber: 211,
-                                                        columnNumber: 19
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/src/components/CortePDF.tsx",
-                                                lineNumber: 204,
-                                                columnNumber: 17
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
-                                                style: {
-                                                    color: "#64748b"
-                                                },
-                                                className: "text-[10px]",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                        className: "pt-1",
-                                                        children: "IVA Débito Fiscal (13%)"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/components/CortePDF.tsx",
-                                                        lineNumber: 219,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                        className: "pt-1 font-mono text-right",
-                                                        children: [
-                                                            "$",
-                                                            iva.toFixed(2)
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/src/components/CortePDF.tsx",
-                                                        lineNumber: 220,
-                                                        columnNumber: 19
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/src/components/CortePDF.tsx",
-                                                lineNumber: 218,
-                                                columnNumber: 17
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
-                                                style: {
-                                                    color: "#64748b"
-                                                },
-                                                className: "text-[10px]",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                        className: "pt-0.5",
-                                                        children: "Ventas Gravadas Netas"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/components/CortePDF.tsx",
-                                                        lineNumber: 223,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                        className: "pt-0.5 font-mono text-right",
-                                                        children: [
-                                                            "$",
-                                                            netSales.toFixed(2)
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/src/components/CortePDF.tsx",
-                                                        lineNumber: 224,
-                                                        columnNumber: 19
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/src/components/CortePDF.tsx",
-                                                lineNumber: 222,
-                                                columnNumber: 17
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/src/components/CortePDF.tsx",
-                                        lineNumber: 179,
-                                        columnNumber: 15
-                                    }, this)
-                                }, void 0, false, {
-                                    fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 178,
-                                    columnNumber: 13
-                                }, this)
-                            ]
-                        }, void 0, true, {
-                            fileName: "[project]/src/components/CortePDF.tsx",
-                            lineNumber: 171,
+                            lineNumber: 160,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            style: {
-                                borderColor: "#e2e8f0"
-                            },
-                            className: "border rounded-lg p-4",
                             children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                     style: {
-                                        color: "#1e293b",
-                                        borderColor: "#e2e8f0"
+                                        display: "block",
+                                        fontSize: "9px",
+                                        textTransform: "uppercase",
+                                        color: "#666666"
                                     },
-                                    className: "text-[11px] font-bold uppercase tracking-wider border-b pb-2 mb-3",
-                                    children: "2. Conciliación de Efectivo (Arqueo)"
+                                    children: "Cajero Responsable"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 232,
+                                    lineNumber: 167,
                                     columnNumber: 13
                                 }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("table", {
-                                    className: "w-full text-[11px]",
-                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
-                                        style: {
-                                            borderColor: "#f1f5f9"
-                                        },
-                                        className: "divide-y",
-                                        children: [
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                        style: {
-                                                            color: "#475569"
-                                                        },
-                                                        className: "py-1.5",
-                                                        children: "(+) Fondo Inicial de Caja"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/components/CortePDF.tsx",
-                                                        lineNumber: 241,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                        className: "py-1.5 font-mono text-right font-semibold",
-                                                        children: [
-                                                            "$",
-                                                            data.initialFund.toLocaleString("en-US", {
-                                                                minimumFractionDigits: 2
-                                                            })
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/src/components/CortePDF.tsx",
-                                                        lineNumber: 244,
-                                                        columnNumber: 19
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/src/components/CortePDF.tsx",
-                                                lineNumber: 240,
-                                                columnNumber: 17
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                        style: {
-                                                            color: "#475569"
-                                                        },
-                                                        className: "py-1.5",
-                                                        children: "(+) Ventas en Efectivo"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/components/CortePDF.tsx",
-                                                        lineNumber: 249,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                        className: "py-1.5 font-mono text-right font-semibold",
-                                                        children: [
-                                                            "$",
-                                                            data.cashSales.toLocaleString("en-US", {
-                                                                minimumFractionDigits: 2
-                                                            })
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/src/components/CortePDF.tsx",
-                                                        lineNumber: 252,
-                                                        columnNumber: 19
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/src/components/CortePDF.tsx",
-                                                lineNumber: 248,
-                                                columnNumber: 17
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                        style: {
-                                                            color: "#475569"
-                                                        },
-                                                        className: "py-1.5",
-                                                        children: "(-) Gastos Menores en Efectivo"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/components/CortePDF.tsx",
-                                                        lineNumber: 257,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                        style: {
-                                                            color: "#dc2626"
-                                                        },
-                                                        className: "py-1.5 font-mono text-right font-semibold",
-                                                        children: [
-                                                            "-$",
-                                                            data.expenses.toLocaleString("en-US", {
-                                                                minimumFractionDigits: 2
-                                                            })
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/src/components/CortePDF.tsx",
-                                                        lineNumber: 260,
-                                                        columnNumber: 19
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/src/components/CortePDF.tsx",
-                                                lineNumber: 256,
-                                                columnNumber: 17
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
-                                                style: {
-                                                    borderColor: "#cbd5e1"
-                                                },
-                                                className: "font-bold border-t",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                        style: {
-                                                            color: "#1e293b"
-                                                        },
-                                                        className: "pt-2",
-                                                        children: "Efectivo Teórico Esperado"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/components/CortePDF.tsx",
-                                                        lineNumber: 271,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                        className: "pt-2 font-mono text-right",
-                                                        children: [
-                                                            "$",
-                                                            expectedCash.toLocaleString("en-US", {
-                                                                minimumFractionDigits: 2
-                                                            })
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/src/components/CortePDF.tsx",
-                                                        lineNumber: 274,
-                                                        columnNumber: 19
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/src/components/CortePDF.tsx",
-                                                lineNumber: 267,
-                                                columnNumber: 17
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                        style: {
-                                                            color: "#475569"
-                                                        },
-                                                        className: "py-1.5",
-                                                        children: "Efectivo Físico Contado"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/components/CortePDF.tsx",
-                                                        lineNumber: 279,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                        className: "py-1.5 font-mono text-right font-semibold",
-                                                        children: [
-                                                            "$",
-                                                            data.countedCash.toLocaleString("en-US", {
-                                                                minimumFractionDigits: 2
-                                                            })
-                                                        ]
-                                                    }, void 0, true, {
-                                                        fileName: "[project]/src/components/CortePDF.tsx",
-                                                        lineNumber: 282,
-                                                        columnNumber: 19
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/src/components/CortePDF.tsx",
-                                                lineNumber: 278,
-                                                columnNumber: 17
-                                            }, this),
-                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
-                                                style: {
-                                                    borderColor: "#cbd5e1"
-                                                },
-                                                className: "font-bold border-t",
-                                                children: [
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                        style: {
-                                                            color: "#0f172a"
-                                                        },
-                                                        className: "pt-2",
-                                                        children: "DIFERENCIA FINAL"
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/components/CortePDF.tsx",
-                                                        lineNumber: 290,
-                                                        columnNumber: 19
-                                                    }, this),
-                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                        style: {
-                                                            color: data.difference < 0 ? "#dc2626" : "#15803d"
-                                                        },
-                                                        className: "pt-2 font-mono text-right",
-                                                        children: data.difference >= 0 ? `+$${data.difference.toFixed(2)}` : `-$${Math.abs(data.difference).toFixed(2)}`
-                                                    }, void 0, false, {
-                                                        fileName: "[project]/src/components/CortePDF.tsx",
-                                                        lineNumber: 293,
-                                                        columnNumber: 19
-                                                    }, this)
-                                                ]
-                                            }, void 0, true, {
-                                                fileName: "[project]/src/components/CortePDF.tsx",
-                                                lineNumber: 286,
-                                                columnNumber: 17
-                                            }, this)
-                                        ]
-                                    }, void 0, true, {
-                                        fileName: "[project]/src/components/CortePDF.tsx",
-                                        lineNumber: 239,
-                                        columnNumber: 15
-                                    }, this)
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                    children: data.cashier
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 238,
+                                    lineNumber: 170,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/CortePDF.tsx",
-                            lineNumber: 231,
+                            lineNumber: 166,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                    style: {
+                                        display: "block",
+                                        fontSize: "9px",
+                                        textTransform: "uppercase",
+                                        color: "#666666"
+                                    },
+                                    children: "Auditor / Supervisor"
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/CortePDF.tsx",
+                                    lineNumber: 173,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                    children: data.adminName
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/CortePDF.tsx",
+                                    lineNumber: 176,
+                                    columnNumber: 13
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/src/components/CortePDF.tsx",
+                            lineNumber: 172,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/CortePDF.tsx",
-                    lineNumber: 169,
+                    lineNumber: 143,
                     columnNumber: 9
                 }, this),
-                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("table", {
                     style: {
-                        borderColor: "#e2e8f0"
+                        width: "100%",
+                        borderCollapse: "collapse",
+                        fontSize: "11px",
+                        marginBottom: "24px"
                     },
-                    className: "border rounded-lg p-4 mb-10",
                     children: [
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
-                            style: {
-                                color: "#1e293b",
-                                borderColor: "#e2e8f0"
-                            },
-                            className: "text-[11px] font-bold uppercase tracking-wider border-b pb-2 mb-2",
-                            children: "3. Dictamen y Resolución de Auditoría"
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("thead", {
+                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
+                                style: {
+                                    borderBottom: borderThick,
+                                    textAlign: "left",
+                                    fontSize: "10px",
+                                    textTransform: "uppercase"
+                                },
+                                children: [
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                        style: {
+                                            padding: "6px 0"
+                                        },
+                                        children: "Descripción Contable"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/CortePDF.tsx",
+                                        lineNumber: 191,
+                                        columnNumber: 15
+                                    }, this),
+                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
+                                        style: {
+                                            padding: "6px 0",
+                                            textAlign: "right"
+                                        },
+                                        children: "Monto USD"
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/CortePDF.tsx",
+                                        lineNumber: 192,
+                                        columnNumber: 15
+                                    }, this)
+                                ]
+                            }, void 0, true, {
+                                fileName: "[project]/src/components/CortePDF.tsx",
+                                lineNumber: 190,
+                                columnNumber: 13
+                            }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/components/CortePDF.tsx",
-                            lineNumber: 311,
+                            lineNumber: 189,
                             columnNumber: 11
                         }, this),
-                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                            className: "space-y-1.5 text-[11px]",
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
                             children: [
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
+                                    style: {
+                                        borderBottom: borderLight
+                                    },
                                     children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
                                             style: {
-                                                color: "#334155"
+                                                padding: "6px 0"
                                             },
-                                            children: "Justificación de la Cajera:"
+                                            children: "Ventas en Efectivo"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/CortePDF.tsx",
-                                            lineNumber: 319,
+                                            lineNumber: 197,
                                             columnNumber: 15
                                         }, this),
-                                        " ",
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
                                             style: {
-                                                color: "#475569"
+                                                padding: "6px 0",
+                                                textAlign: "right",
+                                                fontFamily: "monospace"
                                             },
-                                            className: "italic",
                                             children: [
-                                                "“",
-                                                data.cashierNote,
-                                                "”"
+                                                "$",
+                                                data.cashSales.toLocaleString("en-US", {
+                                                    minimumFractionDigits: 2
+                                                })
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CortePDF.tsx",
-                                            lineNumber: 320,
+                                            lineNumber: 198,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 318,
+                                    lineNumber: 196,
                                     columnNumber: 13
                                 }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
+                                    style: {
+                                        borderBottom: borderLight
+                                    },
                                     children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
                                             style: {
-                                                color: "#334155"
+                                                padding: "6px 0"
                                             },
-                                            children: "Dictamen del Administrador:"
+                                            children: "Ventas con Tarjeta (POS)"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/CortePDF.tsx",
-                                            lineNumber: 325,
+                                            lineNumber: 203,
                                             columnNumber: 15
                                         }, this),
-                                        " ",
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
                                             style: {
-                                                color: "#0f172a"
+                                                padding: "6px 0",
+                                                textAlign: "right",
+                                                fontFamily: "monospace"
                                             },
-                                            className: "font-mono font-bold uppercase",
                                             children: [
-                                                "[",
-                                                data.resolutionType,
-                                                "]"
+                                                "$",
+                                                data.cardSales.toLocaleString("en-US", {
+                                                    minimumFractionDigits: 2
+                                                })
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CortePDF.tsx",
-                                            lineNumber: 326,
+                                            lineNumber: 204,
                                             columnNumber: 15
-                                        }, this),
-                                        " ",
-                                        "— ",
-                                        data.adminNote
+                                        }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 324,
+                                    lineNumber: 202,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
+                                    style: {
+                                        borderBottom: borderLight
+                                    },
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                            style: {
+                                                padding: "6px 0"
+                                            },
+                                            children: "Transferencias Bancarias"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/CortePDF.tsx",
+                                            lineNumber: 209,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                            style: {
+                                                padding: "6px 0",
+                                                textAlign: "right",
+                                                fontFamily: "monospace"
+                                            },
+                                            children: [
+                                                "$",
+                                                data.transferSales.toLocaleString("en-US", {
+                                                    minimumFractionDigits: 2
+                                                })
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/CortePDF.tsx",
+                                            lineNumber: 210,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/CortePDF.tsx",
+                                    lineNumber: 208,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
+                                    style: {
+                                        borderBottom: borderThin,
+                                        fontWeight: "bold"
+                                    },
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                            style: {
+                                                padding: "8px 0"
+                                            },
+                                            children: "TOTAL VENTAS BRUTAS"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/CortePDF.tsx",
+                                            lineNumber: 215,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                            style: {
+                                                padding: "8px 0",
+                                                textAlign: "right",
+                                                fontFamily: "monospace"
+                                            },
+                                            children: [
+                                                "$",
+                                                totalSales.toLocaleString("en-US", {
+                                                    minimumFractionDigits: 2
+                                                })
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/CortePDF.tsx",
+                                            lineNumber: 216,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/CortePDF.tsx",
+                                    lineNumber: 214,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
+                                    style: {
+                                        color: "#666666",
+                                        fontSize: "10px"
+                                    },
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                            style: {
+                                                padding: "4px 0 2px 10px"
+                                            },
+                                            children: "↳ Venta Gravada Neta"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/CortePDF.tsx",
+                                            lineNumber: 221,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                            style: {
+                                                padding: "4px 0 2px 0",
+                                                textAlign: "right",
+                                                fontFamily: "monospace"
+                                            },
+                                            children: [
+                                                "$",
+                                                netSales.toFixed(2)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/CortePDF.tsx",
+                                            lineNumber: 222,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/CortePDF.tsx",
+                                    lineNumber: 220,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
+                                    style: {
+                                        color: "#666666",
+                                        fontSize: "10px",
+                                        borderBottom: borderLight
+                                    },
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                            style: {
+                                                padding: "2px 0 6px 10px"
+                                            },
+                                            children: "↳ IVA Débito Fiscal (13%)"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/CortePDF.tsx",
+                                            lineNumber: 227,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                            style: {
+                                                padding: "2px 0 6px 0",
+                                                textAlign: "right",
+                                                fontFamily: "monospace"
+                                            },
+                                            children: [
+                                                "$",
+                                                iva.toFixed(2)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/CortePDF.tsx",
+                                            lineNumber: 228,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/CortePDF.tsx",
+                                    lineNumber: 226,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
+                                    children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                        colSpan: 2,
+                                        style: {
+                                            height: "14px"
+                                        }
+                                    }, void 0, false, {
+                                        fileName: "[project]/src/components/CortePDF.tsx",
+                                        lineNumber: 235,
+                                        columnNumber: 15
+                                    }, this)
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/CortePDF.tsx",
+                                    lineNumber: 234,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
+                                    style: {
+                                        borderBottom: borderLight
+                                    },
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                            style: {
+                                                padding: "6px 0"
+                                            },
+                                            children: "(+) Fondo Inicial de Apertura"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/CortePDF.tsx",
+                                            lineNumber: 240,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                            style: {
+                                                padding: "6px 0",
+                                                textAlign: "right",
+                                                fontFamily: "monospace"
+                                            },
+                                            children: [
+                                                "$",
+                                                data.initialFund.toLocaleString("en-US", {
+                                                    minimumFractionDigits: 2
+                                                })
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/CortePDF.tsx",
+                                            lineNumber: 241,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/CortePDF.tsx",
+                                    lineNumber: 239,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
+                                    style: {
+                                        borderBottom: borderLight
+                                    },
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                            style: {
+                                                padding: "6px 0"
+                                            },
+                                            children: "(-) Gastos Operativos Menores"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/CortePDF.tsx",
+                                            lineNumber: 246,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                            style: {
+                                                padding: "6px 0",
+                                                textAlign: "right",
+                                                fontFamily: "monospace"
+                                            },
+                                            children: [
+                                                "-$",
+                                                data.expenses.toLocaleString("en-US", {
+                                                    minimumFractionDigits: 2
+                                                })
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/CortePDF.tsx",
+                                            lineNumber: 247,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/CortePDF.tsx",
+                                    lineNumber: 245,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
+                                    style: {
+                                        borderBottom: borderThin
+                                    },
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                            style: {
+                                                padding: "6px 0"
+                                            },
+                                            children: "(=) Efectivo Teórico Esperado"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/CortePDF.tsx",
+                                            lineNumber: 252,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                            style: {
+                                                padding: "6px 0",
+                                                textAlign: "right",
+                                                fontFamily: "monospace"
+                                            },
+                                            children: [
+                                                "$",
+                                                expectedCash.toLocaleString("en-US", {
+                                                    minimumFractionDigits: 2
+                                                })
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/CortePDF.tsx",
+                                            lineNumber: 253,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/CortePDF.tsx",
+                                    lineNumber: 251,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
+                                    style: {
+                                        borderBottom: borderThick,
+                                        fontWeight: "bold"
+                                    },
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                            style: {
+                                                padding: "8px 0"
+                                            },
+                                            children: "Efectivo Físico Contado (Arqueo)"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/CortePDF.tsx",
+                                            lineNumber: 258,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                            style: {
+                                                padding: "8px 0",
+                                                textAlign: "right",
+                                                fontFamily: "monospace"
+                                            },
+                                            children: [
+                                                "$",
+                                                data.countedCash.toLocaleString("en-US", {
+                                                    minimumFractionDigits: 2
+                                                })
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/CortePDF.tsx",
+                                            lineNumber: 259,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/CortePDF.tsx",
+                                    lineNumber: 257,
+                                    columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
+                                    style: {
+                                        fontWeight: "bold"
+                                    },
+                                    children: [
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                            style: {
+                                                padding: "10px 0 0 0",
+                                                fontSize: "12px",
+                                                textTransform: "uppercase"
+                                            },
+                                            children: "Diferencia Final de Caja"
+                                        }, void 0, false, {
+                                            fileName: "[project]/src/components/CortePDF.tsx",
+                                            lineNumber: 266,
+                                            columnNumber: 15
+                                        }, this),
+                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
+                                            style: {
+                                                padding: "10px 0 0 0",
+                                                textAlign: "right",
+                                                fontFamily: "monospace",
+                                                fontSize: "13px"
+                                            },
+                                            children: [
+                                                data.difference > 0 && "+",
+                                                "$",
+                                                data.difference.toFixed(2)
+                                            ]
+                                        }, void 0, true, {
+                                            fileName: "[project]/src/components/CortePDF.tsx",
+                                            lineNumber: 269,
+                                            columnNumber: 15
+                                        }, this)
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/CortePDF.tsx",
+                                    lineNumber: 265,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/CortePDF.tsx",
-                            lineNumber: 317,
+                            lineNumber: 195,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/CortePDF.tsx",
-                    lineNumber: 310,
+                    lineNumber: 181,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                    className: "grid grid-cols-2 gap-16 pt-12 text-center text-[10px]",
+                    style: {
+                        borderTop: borderThin,
+                        borderBottom: borderThin,
+                        padding: "10px 0",
+                        marginBottom: "40px",
+                        fontSize: "10px"
+                    },
+                    children: [
+                        data.cashierNote && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            style: {
+                                marginBottom: "4px"
+                            },
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                    children: "Nota Cajero:"
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/CortePDF.tsx",
+                                    lineNumber: 296,
+                                    columnNumber: 15
+                                }, this),
+                                " ",
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("em", {
+                                    children: [
+                                        "“",
+                                        data.cashierNote,
+                                        "”"
+                                    ]
+                                }, void 0, true, {
+                                    fileName: "[project]/src/components/CortePDF.tsx",
+                                    lineNumber: 296,
+                                    columnNumber: 45
+                                }, this)
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/src/components/CortePDF.tsx",
+                            lineNumber: 295,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            children: [
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
+                                    children: "Dictamen de Auditoría:"
+                                }, void 0, false, {
+                                    fileName: "[project]/src/components/CortePDF.tsx",
+                                    lineNumber: 300,
+                                    columnNumber: 13
+                                }, this),
+                                " [",
+                                data.resolutionType,
+                                "]",
+                                data.adminNote ? ` — ${data.adminNote}` : " — Conforme"
+                            ]
+                        }, void 0, true, {
+                            fileName: "[project]/src/components/CortePDF.tsx",
+                            lineNumber: 299,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/src/components/CortePDF.tsx",
+                    lineNumber: 285,
+                    columnNumber: 9
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    style: {
+                        display: "grid",
+                        gridTemplateColumns: "1fr 1fr",
+                        gap: "80px",
+                        textAlign: "center",
+                        fontSize: "10px",
+                        paddingTop: "20px"
+                    },
                     children: [
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     style: {
-                                        borderColor: "#94a3b8",
-                                        color: "#1e293b"
+                                        borderTop: borderThin,
+                                        paddingTop: "6px",
+                                        fontWeight: "bold",
+                                        textTransform: "uppercase"
                                     },
-                                    className: "border-t pt-2 font-bold",
                                     children: data.cashier
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 340,
+                                    lineNumber: 317,
                                     columnNumber: 13
                                 }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     style: {
-                                        color: "#64748b"
+                                        color: "#555555",
+                                        marginTop: "2px"
                                     },
-                                    children: "Firma del Cajero en Turno"
+                                    children: "Firma del Cajero"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 346,
+                                    lineNumber: 320,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/CortePDF.tsx",
-                            lineNumber: 339,
+                            lineNumber: 316,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     style: {
-                                        borderColor: "#94a3b8",
-                                        color: "#1e293b"
+                                        borderTop: borderThin,
+                                        paddingTop: "6px",
+                                        fontWeight: "bold",
+                                        textTransform: "uppercase"
                                     },
-                                    className: "border-t pt-2 font-bold",
                                     children: data.adminName
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 349,
+                                    lineNumber: 323,
                                     columnNumber: 13
                                 }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     style: {
-                                        color: "#64748b"
+                                        color: "#555555",
+                                        marginTop: "2px"
                                     },
-                                    children: "Firma del Administrador / Auditor"
+                                    children: "Firma Supervisor / Auditor"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 355,
+                                    lineNumber: 326,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/CortePDF.tsx",
-                            lineNumber: 348,
+                            lineNumber: 322,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/CortePDF.tsx",
-                    lineNumber: 338,
+                    lineNumber: 306,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/CortePDF.tsx",
-            lineNumber: 70,
+            lineNumber: 79,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/components/CortePDF.tsx",
-        lineNumber: 69,
+        lineNumber: 78,
         columnNumber: 5
     }, this);
 }
@@ -5630,40 +6416,20 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$trash$2d$2$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Trash2$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/trash-2.mjs [app-client] (ecmascript) <export default as Trash2>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$pen$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Edit2$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/pen.mjs [app-client] (ecmascript) <export default as Edit2>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$alert$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__AlertCircle$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/circle-alert.mjs [app-client] (ecmascript) <export default as AlertCircle>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$loader$2d$circle$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Loader2$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/loader-circle.mjs [app-client] (ecmascript) <export default as Loader2>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$inventoryService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/app/services/inventoryService.ts [app-client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature();
 "use client";
 ;
 ;
-const INITIAL_BRANCHES = [
-    {
-        id: "branch-sa",
-        name: "Santa Ana",
-        code: "SA",
-        phone: "2440-1234",
-        address: "Av. Independencia Sur #12, Santa Ana",
-        isActive: true
-    },
-    {
-        id: "branch-ah",
-        name: "Ahuachapán",
-        code: "AH",
-        phone: "2413-5678",
-        address: "Calle Menéndez Norte #4, Ahuachapán",
-        isActive: true
-    },
-    {
-        id: "branch-so",
-        name: "Sonsonate",
-        code: "SO",
-        phone: "2451-9012",
-        address: "Paseo 15 de Septiembre #8, Sonsonate",
-        isActive: true
-    }
-];
-function BranchManagementModal({ isOpen, onClose }) {
+;
+function BranchManagementModal({ isOpen, onClose, onSuccess }) {
     _s();
-    const [branches, setBranches] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(INITIAL_BRANCHES);
+    const [branches, setBranches] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [isLoading, setIsLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [isProcessing, setIsProcessing] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [errorMessage, setErrorMessage] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [showForm, setShowForm] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [editingBranchId, setEditingBranchId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [formData, setFormData] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({
@@ -5672,6 +6438,49 @@ function BranchManagementModal({ isOpen, onClose }) {
         phone: "",
         address: ""
     });
+    const loadBranches = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
+        "BranchManagementModal.useCallback[loadBranches]": async ()=>{
+            try {
+                setIsLoading(true);
+                setErrorMessage(null);
+                const data = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$inventoryService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fetchBranchesFromDB"])();
+                setBranches(data);
+            } catch (err) {
+                const msg = err instanceof Error ? err.message : "Error al cargar sucursales";
+                setErrorMessage(msg);
+            } finally{
+                setIsLoading(false);
+            }
+        }
+    }["BranchManagementModal.useCallback[loadBranches]"], []);
+    // Carga asíncrona segura sin cascading renders
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "BranchManagementModal.useEffect": ()=>{
+            if (!isOpen) return;
+            let isMounted = true;
+            const executeLoad = {
+                "BranchManagementModal.useEffect.executeLoad": async ()=>{
+                    if (isMounted) {
+                        await loadBranches();
+                    }
+                }
+            }["BranchManagementModal.useEffect.executeLoad"];
+            executeLoad();
+            return ({
+                "BranchManagementModal.useEffect": ()=>{
+                    isMounted = false;
+                }
+            })["BranchManagementModal.useEffect"];
+        }
+    }["BranchManagementModal.useEffect"], [
+        isOpen,
+        loadBranches
+    ]);
+    const handleCloseModal = ()=>{
+        setShowForm(false);
+        setErrorMessage(null);
+        onClose();
+    };
     if (!isOpen) return null;
     const handleOpenCreate = ()=>{
         setEditingBranchId(null);
@@ -5681,6 +6490,7 @@ function BranchManagementModal({ isOpen, onClose }) {
             phone: "",
             address: ""
         });
+        setErrorMessage(null);
         setShowForm(true);
     };
     const handleOpenEdit = (branch)=>{
@@ -5688,48 +6498,64 @@ function BranchManagementModal({ isOpen, onClose }) {
         setFormData({
             name: branch.name,
             code: branch.code,
-            phone: branch.phone,
-            address: branch.address
+            phone: branch.phone === "Sin teléfono" ? "" : branch.phone,
+            address: branch.address === "Sin dirección registrada" ? "" : branch.address
         });
+        setErrorMessage(null);
         setShowForm(true);
     };
-    const handleSave = (e)=>{
+    const handleSave = async (e)=>{
         e.preventDefault();
         if (!formData.name.trim() || !formData.code.trim()) {
             alert("El nombre y el código de la sucursal son obligatorios.");
             return;
         }
-        if (editingBranchId) {
-            setBranches((prev)=>prev.map((b)=>b.id === editingBranchId ? {
-                        ...b,
-                        ...formData,
-                        code: formData.code.toUpperCase()
-                    } : b));
-        } else {
-            const newBranch = {
-                id: `branch-${Date.now()}`,
-                name: formData.name,
-                code: formData.code.toUpperCase(),
-                phone: formData.phone || "Sin teléfono",
-                address: formData.address || "Sin dirección registrada",
-                isActive: true
-            };
-            setBranches((prev)=>[
-                    ...prev,
-                    newBranch
-                ]);
+        try {
+            setIsProcessing(true);
+            setErrorMessage(null);
+            if (editingBranchId) {
+                await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$inventoryService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["updateBranchInDB"])(editingBranchId, formData);
+            } else {
+                await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$inventoryService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["createBranchInDB"])(formData);
+            }
+            await loadBranches();
+            setShowForm(false);
+            onSuccess?.();
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : "Error al guardar la sucursal";
+            setErrorMessage(msg);
+        } finally{
+            setIsProcessing(false);
         }
-        setShowForm(false);
     };
-    const handleToggleActive = (id)=>{
-        setBranches((prev)=>prev.map((b)=>b.id === id ? {
-                    ...b,
-                    isActive: !b.isActive
-                } : b));
+    const handleToggleActive = async (branch)=>{
+        try {
+            setIsProcessing(true);
+            await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$inventoryService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toggleBranchStatusInDB"])(branch.id, branch.isActive);
+            setBranches((prev)=>prev.map((b)=>b.id === branch.id ? {
+                        ...b,
+                        isActive: !b.isActive
+                    } : b));
+            onSuccess?.();
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : "Error al alternar estado";
+            alert(msg);
+        } finally{
+            setIsProcessing(false);
+        }
     };
-    const handleDelete = (id, name)=>{
-        if (confirm(`¿Estás seguro de eliminar la sucursal "${name}"?`)) {
+    const handleDelete = async (id, name)=>{
+        if (!confirm(`¿Estás seguro de eliminar la sucursal "${name}"?`)) return;
+        try {
+            setIsProcessing(true);
+            await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$inventoryService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["deleteBranchFromDB"])(id);
             setBranches((prev)=>prev.filter((b)=>b.id !== id));
+            onSuccess?.();
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : "Error al eliminar la sucursal";
+            alert(msg);
+        } finally{
+            setIsProcessing(false);
         }
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5749,12 +6575,12 @@ function BranchManagementModal({ isOpen, onClose }) {
                                         className: "w-4 h-4"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                        lineNumber: 137,
+                                        lineNumber: 174,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                    lineNumber: 136,
+                                    lineNumber: 173,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5764,7 +6590,7 @@ function BranchManagementModal({ isOpen, onClose }) {
                                             children: "Gestión de Sucursales"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                            lineNumber: 140,
+                                            lineNumber: 177,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -5772,45 +6598,91 @@ function BranchManagementModal({ isOpen, onClose }) {
                                             children: "Administración de sedes y puntos de venta de Mario's Dent"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                            lineNumber: 143,
+                                            lineNumber: 180,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                    lineNumber: 139,
+                                    lineNumber: 176,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                            lineNumber: 135,
+                            lineNumber: 172,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                            onClick: onClose,
+                            onClick: handleCloseModal,
                             className: "p-1.5 text-rose-500 hover:text-white hover:bg-rose-500 rounded-lg transition-colors cursor-pointer",
                             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$x$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__X$3e$__["X"], {
                                 className: "w-4 h-4"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                lineNumber: 153,
+                                lineNumber: 190,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                            lineNumber: 149,
+                            lineNumber: 186,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                    lineNumber: 134,
+                    lineNumber: 171,
                     columnNumber: 9
+                }, this),
+                errorMessage && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "mx-6 mt-4 p-3 rounded-xl bg-rose-50 border border-rose-200 flex items-center gap-2 text-rose-700 text-xs",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$alert$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__AlertCircle$3e$__["AlertCircle"], {
+                            className: "w-4 h-4 shrink-0"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/GestionSucursalesModal.tsx",
+                            lineNumber: 197,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                            children: errorMessage
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/GestionSucursalesModal.tsx",
+                            lineNumber: 198,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/src/components/GestionSucursalesModal.tsx",
+                    lineNumber: 196,
+                    columnNumber: 11
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "p-6 space-y-4 max-h-[70vh] overflow-y-auto",
-                    children: !showForm ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
+                    children: isLoading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "py-12 flex flex-col items-center justify-center gap-2 text-slate-400",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$loader$2d$circle$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Loader2$3e$__["Loader2"], {
+                                className: "w-6 h-6 animate-spin text-sky-600"
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/GestionSucursalesModal.tsx",
+                                lineNumber: 206,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                className: "text-xs",
+                                children: "Cargando sucursales desde la base de datos..."
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/GestionSucursalesModal.tsx",
+                                lineNumber: 207,
+                                columnNumber: 15
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/components/GestionSucursalesModal.tsx",
+                        lineNumber: 205,
+                        columnNumber: 13
+                    }, this) : !showForm ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "flex items-center justify-between",
@@ -5823,38 +6695,39 @@ function BranchManagementModal({ isOpen, onClose }) {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                        lineNumber: 162,
+                                        lineNumber: 212,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                         type: "button",
                                         onClick: handleOpenCreate,
-                                        className: "flex items-center gap-1.5 bg-[#0284C7] hover:bg-sky-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-xs transition-colors cursor-pointer",
+                                        disabled: isProcessing,
+                                        className: "flex items-center gap-1.5 bg-[#0284C7] hover:bg-sky-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-xs transition-colors cursor-pointer disabled:opacity-50",
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$plus$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Plus$3e$__["Plus"], {
                                                 className: "w-3.5 h-3.5"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                lineNumber: 170,
+                                                lineNumber: 221,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Nueva Sucursal"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                lineNumber: 171,
+                                                lineNumber: 222,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                        lineNumber: 165,
+                                        lineNumber: 215,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                lineNumber: 161,
+                                lineNumber: 211,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5873,7 +6746,7 @@ function BranchManagementModal({ isOpen, onClose }) {
                                                                 children: branch.name
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                                lineNumber: 187,
+                                                                lineNumber: 238,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -5881,7 +6754,7 @@ function BranchManagementModal({ isOpen, onClose }) {
                                                                 children: branch.code
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                                lineNumber: 190,
+                                                                lineNumber: 241,
                                                                 columnNumber: 25
                                                             }, this),
                                                             branch.isActive ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -5891,14 +6764,14 @@ function BranchManagementModal({ isOpen, onClose }) {
                                                                         className: "w-3 h-3"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                                        lineNumber: 195,
+                                                                        lineNumber: 246,
                                                                         columnNumber: 29
                                                                     }, this),
                                                                     " Activa"
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                                lineNumber: 194,
+                                                                lineNumber: 245,
                                                                 columnNumber: 27
                                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 className: "inline-flex items-center gap-1 text-[10px] text-slate-400 font-bold",
@@ -5907,20 +6780,20 @@ function BranchManagementModal({ isOpen, onClose }) {
                                                                         className: "w-3 h-3"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                                        lineNumber: 199,
+                                                                        lineNumber: 250,
                                                                         columnNumber: 29
                                                                     }, this),
                                                                     " Inactiva"
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                                lineNumber: 198,
+                                                                lineNumber: 249,
                                                                 columnNumber: 27
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                        lineNumber: 186,
+                                                        lineNumber: 237,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5933,14 +6806,14 @@ function BranchManagementModal({ isOpen, onClose }) {
                                                                         className: "w-3 h-3 text-slate-400"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                                        lineNumber: 206,
+                                                                        lineNumber: 257,
                                                                         columnNumber: 27
                                                                     }, this),
                                                                     branch.phone
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                                lineNumber: 205,
+                                                                lineNumber: 256,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -5950,95 +6823,98 @@ function BranchManagementModal({ isOpen, onClose }) {
                                                                         className: "w-3 h-3 text-slate-400 shrink-0"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                                        lineNumber: 210,
+                                                                        lineNumber: 261,
                                                                         columnNumber: 27
                                                                     }, this),
                                                                     branch.address
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                                lineNumber: 209,
+                                                                lineNumber: 260,
                                                                 columnNumber: 25
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                        lineNumber: 204,
+                                                        lineNumber: 255,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                lineNumber: 185,
+                                                lineNumber: 236,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 className: "flex items-center gap-1",
                                                 children: [
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                        onClick: ()=>handleToggleActive(branch.id),
-                                                        className: `text-[10px] font-semibold px-2 py-1 rounded-lg border transition-colors cursor-pointer ${branch.isActive ? "border-amber-200 text-amber-700 hover:bg-amber-50" : "border-emerald-200 text-emerald-700 hover:bg-emerald-50"}`,
+                                                        disabled: isProcessing,
+                                                        onClick: ()=>handleToggleActive(branch),
+                                                        className: `text-[10px] font-semibold px-2 py-1 rounded-lg border transition-colors cursor-pointer disabled:opacity-50 ${branch.isActive ? "border-amber-200 text-amber-700 hover:bg-amber-50" : "border-emerald-200 text-emerald-700 hover:bg-emerald-50"}`,
                                                         children: branch.isActive ? "Desactivar" : "Activar"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                        lineNumber: 217,
+                                                        lineNumber: 268,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                        disabled: isProcessing,
                                                         onClick: ()=>handleOpenEdit(branch),
-                                                        className: "p-1.5 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-lg transition-colors cursor-pointer",
+                                                        className: "p-1.5 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-lg transition-colors cursor-pointer disabled:opacity-50",
                                                         title: "Editar",
                                                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$pen$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Edit2$3e$__["Edit2"], {
                                                             className: "w-3.5 h-3.5"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                            lineNumber: 232,
+                                                            lineNumber: 285,
                                                             columnNumber: 25
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                        lineNumber: 227,
+                                                        lineNumber: 279,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                        disabled: isProcessing,
                                                         onClick: ()=>handleDelete(branch.id, branch.name),
-                                                        className: "p-1.5 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-lg transition-colors cursor-pointer",
+                                                        className: "p-1.5 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-lg transition-colors cursor-pointer disabled:opacity-50",
                                                         title: "Eliminar",
                                                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$trash$2d$2$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Trash2$3e$__["Trash2"], {
                                                             className: "w-3.5 h-3.5"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                            lineNumber: 239,
+                                                            lineNumber: 293,
                                                             columnNumber: 25
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                        lineNumber: 234,
+                                                        lineNumber: 287,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                lineNumber: 216,
+                                                lineNumber: 267,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, branch.id, true, {
                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                        lineNumber: 177,
+                                        lineNumber: 228,
                                         columnNumber: 19
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                lineNumber: 175,
+                                lineNumber: 226,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                        lineNumber: 160,
+                        lineNumber: 210,
                         columnNumber: 13
-                    }, this) : /* Formulario de Alta / Edición */ /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
+                    }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
                         onSubmit: handleSave,
                         className: "space-y-4",
                         children: [
@@ -6049,11 +6925,11 @@ function BranchManagementModal({ isOpen, onClose }) {
                                         className: "col-span-2 space-y-1",
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                className: "text-[11px] font-bold text-slate-600 uppercase",
+                                                className: "text-[11px] font-bold text-sky-700 uppercase",
                                                 children: "Nombre de la Sucursal"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                lineNumber: 251,
+                                                lineNumber: 304,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -6068,13 +6944,13 @@ function BranchManagementModal({ isOpen, onClose }) {
                                                 className: "w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-sky-400"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                lineNumber: 254,
+                                                lineNumber: 307,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                        lineNumber: 250,
+                                        lineNumber: 303,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6085,7 +6961,7 @@ function BranchManagementModal({ isOpen, onClose }) {
                                                 children: "Código (Prefijo)"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                lineNumber: 266,
+                                                lineNumber: 319,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -6101,30 +6977,30 @@ function BranchManagementModal({ isOpen, onClose }) {
                                                 className: "w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-sky-400 font-mono uppercase"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                lineNumber: 269,
+                                                lineNumber: 322,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                        lineNumber: 265,
+                                        lineNumber: 318,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                lineNumber: 249,
+                                lineNumber: 302,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "space-y-1",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                        className: "text-[11px] font-bold text-slate-600 uppercase",
+                                        className: "text-[11px] font-bold text-sky-700 uppercase",
                                         children: "Teléfono de Contacto"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                        lineNumber: 284,
+                                        lineNumber: 337,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -6138,24 +7014,24 @@ function BranchManagementModal({ isOpen, onClose }) {
                                         className: "w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-sky-400"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                        lineNumber: 287,
+                                        lineNumber: 340,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                lineNumber: 283,
+                                lineNumber: 336,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "space-y-1",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                        className: "text-[11px] font-bold text-slate-600 uppercase",
-                                        children: "Dirección Física"
+                                        className: "text-[11px] font-bold text-sky-700 uppercase",
+                                        children: "Dirección"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                        lineNumber: 299,
+                                        lineNumber: 352,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -6169,13 +7045,13 @@ function BranchManagementModal({ isOpen, onClose }) {
                                         className: "w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-sky-400"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                        lineNumber: 302,
+                                        lineNumber: 355,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                lineNumber: 298,
+                                lineNumber: 351,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -6183,53 +7059,70 @@ function BranchManagementModal({ isOpen, onClose }) {
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                         type: "button",
+                                        disabled: isProcessing,
                                         onClick: ()=>setShowForm(false),
                                         className: "px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-semibold rounded-xl transition-colors cursor-pointer",
                                         children: "Cancelar"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                        lineNumber: 314,
+                                        lineNumber: 367,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                         type: "submit",
-                                        className: "px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors cursor-pointer",
-                                        children: editingBranchId ? "Guardar Cambios" : "Crear Sucursal"
-                                    }, void 0, false, {
+                                        disabled: isProcessing,
+                                        className: "px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-50",
+                                        children: [
+                                            isProcessing && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$loader$2d$circle$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Loader2$3e$__["Loader2"], {
+                                                className: "w-3.5 h-3.5 animate-spin"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/GestionSucursalesModal.tsx",
+                                                lineNumber: 380,
+                                                columnNumber: 36
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                children: editingBranchId ? "Guardar Cambios" : "Crear Sucursal"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/GestionSucursalesModal.tsx",
+                                                lineNumber: 381,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                        lineNumber: 321,
+                                        lineNumber: 375,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                lineNumber: 313,
+                                lineNumber: 366,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                        lineNumber: 248,
+                        lineNumber: 301,
                         columnNumber: 13
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                    lineNumber: 158,
+                    lineNumber: 203,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-            lineNumber: 132,
+            lineNumber: 169,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-        lineNumber: 131,
+        lineNumber: 168,
         columnNumber: 5
     }, this);
 }
-_s(BranchManagementModal, "bkgd9kgVzzlb57qwPV72RsOLvJ0=");
+_s(BranchManagementModal, "hyIM3aXiHdqQlXOvv2FdBA2ItFY=");
 _c = BranchManagementModal;
 var _c;
 __turbopack_context__.k.register(_c, "BranchManagementModal");
@@ -8137,4 +9030,4 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 }),
 ]);
 
-//# sourceMappingURL=src_1o4ijoo._.js.map
+//# sourceMappingURL=src_0jwaqdo._.js.map

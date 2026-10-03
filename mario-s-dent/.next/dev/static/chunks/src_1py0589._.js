@@ -1097,7 +1097,7 @@ function DashboardPage() {
                                                         className: "flex items-start gap-2 flex-wrap sm:flex-nowrap",
                                                         children: [
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                                className: "text-xs font-bold text-slate-800 leading-snug break-words",
+                                                                className: "text-xs font-bold text-sky-700 leading-snug break-words",
                                                                 children: item.name
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/page.tsx",
@@ -2404,6 +2404,8 @@ async function getAdminShiftAudit(branchName, dateStr) {
         } else {
             expenses = Number((expensesRes.data || []).reduce((acc, curr)=>acc + (Number(curr.amount) || 0), 0));
         }
+        const cashierProfile = shift.profiles;
+        const realCashierName = cashierProfile?.full_name || cashierProfile?.username || "Sin cajero asignado";
         return {
             shiftId: shift.id,
             status: shift.status || "closed",
@@ -2418,7 +2420,7 @@ async function getAdminShiftAudit(branchName, dateStr) {
             expenses: expenses,
             reportedCountedCash: Number(shift.counted_cash) || 0,
             operatorNotes: shift.notes || shift.cashier_notes || "",
-            operatorName: shift.cashier_name || "Maria G."
+            operatorName: realCashierName
         };
     } catch (error) {
         console.error("Error en getAdminShiftAudit:", error);
@@ -2754,16 +2756,19 @@ async function processSaleInDB(payload) {
     if (!items || items.length === 0) {
         throw new Error("El carrito no tiene productos.");
     }
+    // 1. Asegurar el ID del cajero en sesión activa
     let effectiveCashierId = cashierId || null;
     if (!effectiveCashierId) {
         const { data: authData } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].auth.getUser();
         effectiveCashierId = authData.user?.id || null;
     }
+    // 2. Obtener la sucursal actual (con código y dirección)
     const cleanBranch = (branchName || "").trim();
-    const { data: branch, error: branchErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id, name").ilike("name", cleanBranch).maybeSingle();
+    const { data: branch, error: branchErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id, name").ilike("name", `%${cleanBranch}%`).maybeSingle();
     if (branchErr || !branch) {
         throw new Error(`No se encontró la sucursal: "${cleanBranch}"`);
     }
+    // 3. Obtener el turno abierto de la sucursal
     const { data: activeShift, error: shiftErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").select("id, cashier_id").eq("branch_id", branch.id).eq("status", "open").order("opened_at", {
         ascending: false
     }).limit(1).maybeSingle();
@@ -2771,8 +2776,24 @@ async function processSaleInDB(payload) {
         throw new Error("No hay un turno de caja abierto en esta sucursal para asociar la venta.");
     }
     const finalCashierId = effectiveCashierId || activeShift.cashier_id;
+    // 4. GENERAR CORRELATIVO SECUENCIAL GLOBAL (+1)
+    // Prefijo de la sucursal (ej: "SA", "AH", "SO")
     const branchPrefix = branch.name.substring(0, 2).toUpperCase();
-    const ticketNumber = `T-${branchPrefix}-${Math.floor(1000 + Math.random() * 9000)}`;
+    // Buscar el último ticket emitido históricamente en esta sucursal
+    const { data: lastSale } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sales").select("ticket_number").eq("branch_id", branch.id).order("created_at", {
+        ascending: false
+    }).limit(1).maybeSingle();
+    let nextCorrelative = 1;
+    if (lastSale?.ticket_number) {
+        const matches = lastSale.ticket_number.match(/\d+$/);
+        if (matches) {
+            nextCorrelative = parseInt(matches[0], 10) + 1;
+        }
+    }
+    // Formato: T-SO-00000001
+    const formattedSequence = String(nextCorrelative).padStart(8, "0");
+    const ticketNumber = `T-${branchPrefix}-${formattedSequence}`;
+    // 5. Inserción en la tabla 'sales'
     const { data: saleData, error: saleErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sales").insert([
         {
             ticket_number: ticketNumber,
@@ -2792,6 +2813,7 @@ async function processSaleInDB(payload) {
         throw new Error(`Error al guardar en tabla 'sales': ${saleErr?.message}`);
     }
     const saleId = saleData.id;
+    // 6. Renglones en 'sale_items', descuento de existencias y Kardex
     for (const item of items){
         await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sale_items").insert([
             {
@@ -2829,8 +2851,8 @@ async function processSaleInDB(payload) {
     };
 }
 async function fetchTicketsByBranchAndDate(branchName, dateStr) {
-    const startOfDay = `${dateStr}T00:00:00.000Z`;
-    const endOfDay = `${dateStr}T23:59:59.999Z`;
+    const startOfDay = `${dateStr}T00:00:00-06:00`;
+    const endOfDay = `${dateStr}T23:59:59.999-06:00`;
     const { data, error } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sales").select(`
       id,
       ticket_number,
@@ -2841,7 +2863,7 @@ async function fetchTicketsByBranchAndDate(branchName, dateStr) {
       cash_received,
       change_given,
       created_at,
-      branches!inner(name),
+      branches!inner(name, address),
       profiles(full_name),
       sale_items(
         id,
@@ -2856,8 +2878,7 @@ async function fetchTicketsByBranchAndDate(branchName, dateStr) {
         console.error("Error al consultar ventas para auditoría:", error);
         return [];
     }
-    const queryRows = data ?? [];
-    return queryRows.map((sale)=>{
+    return (data || []).map((sale)=>{
         const d = new Date(sale.created_at);
         const branchRecord = Array.isArray(sale.branches) ? sale.branches[0] : sale.branches;
         const profileRecord = Array.isArray(sale.profiles) ? sale.profiles[0] : sale.profiles;
@@ -3149,14 +3170,15 @@ async function fetchBranchesPerformance(dateStr) {
     });
 }
 async function fetchBranchesFromDB() {
-    const { data, error } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id, name, code, phone, address, is_active").order("name", {
+    const { data, error } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id, name, phone, address, is_active").order("name", {
         ascending: true
     });
     if (error) {
         console.error("Error al obtener sucursales:", error.message);
         throw new Error(error.message);
     }
-    return (data || []).map((b)=>({
+    const rows = data ?? [];
+    return rows.map((b)=>({
             id: b.id,
             name: b.name,
             code: b.code || b.name.substring(0, 2).toUpperCase(),
@@ -3224,7 +3246,6 @@ async function toggleBranchStatusInDB(id, currentStatus) {
     if (error) throw new Error(error.message);
 }
 async function deleteBranchFromDB(id) {
-    // 1. Validar si tiene ventas asociadas
     const { count: salesCount } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sales").select("*", {
         count: "exact",
         head: true
@@ -3232,7 +3253,6 @@ async function deleteBranchFromDB(id) {
     if (salesCount && salesCount > 0) {
         throw new Error("No se puede eliminar la sucursal porque tiene tickets y ventas vinculadas en el historial contable. En su lugar, desactívala.");
     }
-    // 2. Limpiar inventario y turnos vacíos antes de borrar la sucursal
     await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").delete().eq("branch_id", id);
     await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").delete().eq("branch_id", id);
     const { error } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").delete().eq("id", id);
@@ -3260,40 +3280,20 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$re
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$trash$2d$2$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Trash2$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/trash-2.mjs [app-client] (ecmascript) <export default as Trash2>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$pen$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Edit2$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/pen.mjs [app-client] (ecmascript) <export default as Edit2>");
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$alert$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__AlertCircle$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/circle-alert.mjs [app-client] (ecmascript) <export default as AlertCircle>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$loader$2d$circle$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Loader2$3e$__ = __turbopack_context__.i("[project]/node_modules/lucide-react/dist/esm/icons/loader-circle.mjs [app-client] (ecmascript) <export default as Loader2>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$inventoryService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/src/app/services/inventoryService.ts [app-client] (ecmascript)");
 ;
 var _s = __turbopack_context__.k.signature();
 "use client";
 ;
 ;
-const INITIAL_BRANCHES = [
-    {
-        id: "branch-sa",
-        name: "Santa Ana",
-        code: "SA",
-        phone: "2440-1234",
-        address: "Av. Independencia Sur #12, Santa Ana",
-        isActive: true
-    },
-    {
-        id: "branch-ah",
-        name: "Ahuachapán",
-        code: "AH",
-        phone: "2413-5678",
-        address: "Calle Menéndez Norte #4, Ahuachapán",
-        isActive: true
-    },
-    {
-        id: "branch-so",
-        name: "Sonsonate",
-        code: "SO",
-        phone: "2451-9012",
-        address: "Paseo 15 de Septiembre #8, Sonsonate",
-        isActive: true
-    }
-];
-function BranchManagementModal({ isOpen, onClose }) {
+;
+function BranchManagementModal({ isOpen, onClose, onSuccess }) {
     _s();
-    const [branches, setBranches] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(INITIAL_BRANCHES);
+    const [branches, setBranches] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
+    const [isLoading, setIsLoading] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [isProcessing, setIsProcessing] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
+    const [errorMessage, setErrorMessage] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [showForm, setShowForm] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     const [editingBranchId, setEditingBranchId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     const [formData, setFormData] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({
@@ -3302,6 +3302,49 @@ function BranchManagementModal({ isOpen, onClose }) {
         phone: "",
         address: ""
     });
+    const loadBranches = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
+        "BranchManagementModal.useCallback[loadBranches]": async ()=>{
+            try {
+                setIsLoading(true);
+                setErrorMessage(null);
+                const data = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$inventoryService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["fetchBranchesFromDB"])();
+                setBranches(data);
+            } catch (err) {
+                const msg = err instanceof Error ? err.message : "Error al cargar sucursales";
+                setErrorMessage(msg);
+            } finally{
+                setIsLoading(false);
+            }
+        }
+    }["BranchManagementModal.useCallback[loadBranches]"], []);
+    // Carga asíncrona segura sin cascading renders
+    (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
+        "BranchManagementModal.useEffect": ()=>{
+            if (!isOpen) return;
+            let isMounted = true;
+            const executeLoad = {
+                "BranchManagementModal.useEffect.executeLoad": async ()=>{
+                    if (isMounted) {
+                        await loadBranches();
+                    }
+                }
+            }["BranchManagementModal.useEffect.executeLoad"];
+            executeLoad();
+            return ({
+                "BranchManagementModal.useEffect": ()=>{
+                    isMounted = false;
+                }
+            })["BranchManagementModal.useEffect"];
+        }
+    }["BranchManagementModal.useEffect"], [
+        isOpen,
+        loadBranches
+    ]);
+    const handleCloseModal = ()=>{
+        setShowForm(false);
+        setErrorMessage(null);
+        onClose();
+    };
     if (!isOpen) return null;
     const handleOpenCreate = ()=>{
         setEditingBranchId(null);
@@ -3311,6 +3354,7 @@ function BranchManagementModal({ isOpen, onClose }) {
             phone: "",
             address: ""
         });
+        setErrorMessage(null);
         setShowForm(true);
     };
     const handleOpenEdit = (branch)=>{
@@ -3318,48 +3362,64 @@ function BranchManagementModal({ isOpen, onClose }) {
         setFormData({
             name: branch.name,
             code: branch.code,
-            phone: branch.phone,
-            address: branch.address
+            phone: branch.phone === "Sin teléfono" ? "" : branch.phone,
+            address: branch.address === "Sin dirección registrada" ? "" : branch.address
         });
+        setErrorMessage(null);
         setShowForm(true);
     };
-    const handleSave = (e)=>{
+    const handleSave = async (e)=>{
         e.preventDefault();
         if (!formData.name.trim() || !formData.code.trim()) {
             alert("El nombre y el código de la sucursal son obligatorios.");
             return;
         }
-        if (editingBranchId) {
-            setBranches((prev)=>prev.map((b)=>b.id === editingBranchId ? {
-                        ...b,
-                        ...formData,
-                        code: formData.code.toUpperCase()
-                    } : b));
-        } else {
-            const newBranch = {
-                id: `branch-${Date.now()}`,
-                name: formData.name,
-                code: formData.code.toUpperCase(),
-                phone: formData.phone || "Sin teléfono",
-                address: formData.address || "Sin dirección registrada",
-                isActive: true
-            };
-            setBranches((prev)=>[
-                    ...prev,
-                    newBranch
-                ]);
+        try {
+            setIsProcessing(true);
+            setErrorMessage(null);
+            if (editingBranchId) {
+                await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$inventoryService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["updateBranchInDB"])(editingBranchId, formData);
+            } else {
+                await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$inventoryService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["createBranchInDB"])(formData);
+            }
+            await loadBranches();
+            setShowForm(false);
+            onSuccess?.();
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : "Error al guardar la sucursal";
+            setErrorMessage(msg);
+        } finally{
+            setIsProcessing(false);
         }
-        setShowForm(false);
     };
-    const handleToggleActive = (id)=>{
-        setBranches((prev)=>prev.map((b)=>b.id === id ? {
-                    ...b,
-                    isActive: !b.isActive
-                } : b));
+    const handleToggleActive = async (branch)=>{
+        try {
+            setIsProcessing(true);
+            await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$inventoryService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["toggleBranchStatusInDB"])(branch.id, branch.isActive);
+            setBranches((prev)=>prev.map((b)=>b.id === branch.id ? {
+                        ...b,
+                        isActive: !b.isActive
+                    } : b));
+            onSuccess?.();
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : "Error al alternar estado";
+            alert(msg);
+        } finally{
+            setIsProcessing(false);
+        }
     };
-    const handleDelete = (id, name)=>{
-        if (confirm(`¿Estás seguro de eliminar la sucursal "${name}"?`)) {
+    const handleDelete = async (id, name)=>{
+        if (!confirm(`¿Estás seguro de eliminar la sucursal "${name}"?`)) return;
+        try {
+            setIsProcessing(true);
+            await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$inventoryService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["deleteBranchFromDB"])(id);
             setBranches((prev)=>prev.filter((b)=>b.id !== id));
+            onSuccess?.();
+        } catch (err) {
+            const msg = err instanceof Error ? err.message : "Error al eliminar la sucursal";
+            alert(msg);
+        } finally{
+            setIsProcessing(false);
         }
     };
     return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3379,12 +3439,12 @@ function BranchManagementModal({ isOpen, onClose }) {
                                         className: "w-4 h-4"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                        lineNumber: 137,
+                                        lineNumber: 174,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                    lineNumber: 136,
+                                    lineNumber: 173,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3394,7 +3454,7 @@ function BranchManagementModal({ isOpen, onClose }) {
                                             children: "Gestión de Sucursales"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                            lineNumber: 140,
+                                            lineNumber: 177,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -3402,45 +3462,91 @@ function BranchManagementModal({ isOpen, onClose }) {
                                             children: "Administración de sedes y puntos de venta de Mario's Dent"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                            lineNumber: 143,
+                                            lineNumber: 180,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                    lineNumber: 139,
+                                    lineNumber: 176,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                            lineNumber: 135,
+                            lineNumber: 172,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                            onClick: onClose,
+                            onClick: handleCloseModal,
                             className: "p-1.5 text-rose-500 hover:text-white hover:bg-rose-500 rounded-lg transition-colors cursor-pointer",
                             children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$x$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__X$3e$__["X"], {
                                 className: "w-4 h-4"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                lineNumber: 153,
+                                lineNumber: 190,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                            lineNumber: 149,
+                            lineNumber: 186,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                    lineNumber: 134,
+                    lineNumber: 171,
                     columnNumber: 9
+                }, this),
+                errorMessage && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "mx-6 mt-4 p-3 rounded-xl bg-rose-50 border border-rose-200 flex items-center gap-2 text-rose-700 text-xs",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$circle$2d$alert$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__AlertCircle$3e$__["AlertCircle"], {
+                            className: "w-4 h-4 shrink-0"
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/GestionSucursalesModal.tsx",
+                            lineNumber: 197,
+                            columnNumber: 13
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                            children: errorMessage
+                        }, void 0, false, {
+                            fileName: "[project]/src/components/GestionSucursalesModal.tsx",
+                            lineNumber: 198,
+                            columnNumber: 13
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/src/components/GestionSucursalesModal.tsx",
+                    lineNumber: 196,
+                    columnNumber: 11
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                     className: "p-6 space-y-4 max-h-[70vh] overflow-y-auto",
-                    children: !showForm ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
+                    children: isLoading ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                        className: "py-12 flex flex-col items-center justify-center gap-2 text-slate-400",
+                        children: [
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$loader$2d$circle$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Loader2$3e$__["Loader2"], {
+                                className: "w-6 h-6 animate-spin text-sky-600"
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/GestionSucursalesModal.tsx",
+                                lineNumber: 206,
+                                columnNumber: 15
+                            }, this),
+                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                className: "text-xs",
+                                children: "Cargando sucursales desde la base de datos..."
+                            }, void 0, false, {
+                                fileName: "[project]/src/components/GestionSucursalesModal.tsx",
+                                lineNumber: 207,
+                                columnNumber: 15
+                            }, this)
+                        ]
+                    }, void 0, true, {
+                        fileName: "[project]/src/components/GestionSucursalesModal.tsx",
+                        lineNumber: 205,
+                        columnNumber: 13
+                    }, this) : !showForm ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
                         children: [
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "flex items-center justify-between",
@@ -3453,38 +3559,39 @@ function BranchManagementModal({ isOpen, onClose }) {
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                        lineNumber: 162,
+                                        lineNumber: 212,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                         type: "button",
                                         onClick: handleOpenCreate,
-                                        className: "flex items-center gap-1.5 bg-[#0284C7] hover:bg-sky-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-xs transition-colors cursor-pointer",
+                                        disabled: isProcessing,
+                                        className: "flex items-center gap-1.5 bg-[#0284C7] hover:bg-sky-700 text-white text-xs font-bold px-3 py-1.5 rounded-xl shadow-xs transition-colors cursor-pointer disabled:opacity-50",
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$plus$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Plus$3e$__["Plus"], {
                                                 className: "w-3.5 h-3.5"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                lineNumber: 170,
+                                                lineNumber: 221,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                 children: "Nueva Sucursal"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                lineNumber: 171,
+                                                lineNumber: 222,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                        lineNumber: 165,
+                                        lineNumber: 215,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                lineNumber: 161,
+                                lineNumber: 211,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3503,7 +3610,7 @@ function BranchManagementModal({ isOpen, onClose }) {
                                                                 children: branch.name
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                                lineNumber: 187,
+                                                                lineNumber: 238,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3511,7 +3618,7 @@ function BranchManagementModal({ isOpen, onClose }) {
                                                                 children: branch.code
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                                lineNumber: 190,
+                                                                lineNumber: 241,
                                                                 columnNumber: 25
                                                             }, this),
                                                             branch.isActive ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3521,14 +3628,14 @@ function BranchManagementModal({ isOpen, onClose }) {
                                                                         className: "w-3 h-3"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                                        lineNumber: 195,
+                                                                        lineNumber: 246,
                                                                         columnNumber: 29
                                                                     }, this),
                                                                     " Activa"
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                                lineNumber: 194,
+                                                                lineNumber: 245,
                                                                 columnNumber: 27
                                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 className: "inline-flex items-center gap-1 text-[10px] text-slate-400 font-bold",
@@ -3537,20 +3644,20 @@ function BranchManagementModal({ isOpen, onClose }) {
                                                                         className: "w-3 h-3"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                                        lineNumber: 199,
+                                                                        lineNumber: 250,
                                                                         columnNumber: 29
                                                                     }, this),
                                                                     " Inactiva"
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                                lineNumber: 198,
+                                                                lineNumber: 249,
                                                                 columnNumber: 27
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                        lineNumber: 186,
+                                                        lineNumber: 237,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3563,14 +3670,14 @@ function BranchManagementModal({ isOpen, onClose }) {
                                                                         className: "w-3 h-3 text-slate-400"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                                        lineNumber: 206,
+                                                                        lineNumber: 257,
                                                                         columnNumber: 27
                                                                     }, this),
                                                                     branch.phone
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                                lineNumber: 205,
+                                                                lineNumber: 256,
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3580,95 +3687,98 @@ function BranchManagementModal({ isOpen, onClose }) {
                                                                         className: "w-3 h-3 text-slate-400 shrink-0"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                                        lineNumber: 210,
+                                                                        lineNumber: 261,
                                                                         columnNumber: 27
                                                                     }, this),
                                                                     branch.address
                                                                 ]
                                                             }, void 0, true, {
                                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                                lineNumber: 209,
+                                                                lineNumber: 260,
                                                                 columnNumber: 25
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                        lineNumber: 204,
+                                                        lineNumber: 255,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                lineNumber: 185,
+                                                lineNumber: 236,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                 className: "flex items-center gap-1",
                                                 children: [
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                        onClick: ()=>handleToggleActive(branch.id),
-                                                        className: `text-[10px] font-semibold px-2 py-1 rounded-lg border transition-colors cursor-pointer ${branch.isActive ? "border-amber-200 text-amber-700 hover:bg-amber-50" : "border-emerald-200 text-emerald-700 hover:bg-emerald-50"}`,
+                                                        disabled: isProcessing,
+                                                        onClick: ()=>handleToggleActive(branch),
+                                                        className: `text-[10px] font-semibold px-2 py-1 rounded-lg border transition-colors cursor-pointer disabled:opacity-50 ${branch.isActive ? "border-amber-200 text-amber-700 hover:bg-amber-50" : "border-emerald-200 text-emerald-700 hover:bg-emerald-50"}`,
                                                         children: branch.isActive ? "Desactivar" : "Activar"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                        lineNumber: 217,
+                                                        lineNumber: 268,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                        disabled: isProcessing,
                                                         onClick: ()=>handleOpenEdit(branch),
-                                                        className: "p-1.5 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-lg transition-colors cursor-pointer",
+                                                        className: "p-1.5 hover:bg-slate-100 text-slate-500 hover:text-slate-800 rounded-lg transition-colors cursor-pointer disabled:opacity-50",
                                                         title: "Editar",
                                                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$pen$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Edit2$3e$__["Edit2"], {
                                                             className: "w-3.5 h-3.5"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                            lineNumber: 232,
+                                                            lineNumber: 285,
                                                             columnNumber: 25
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                        lineNumber: 227,
+                                                        lineNumber: 279,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                        disabled: isProcessing,
                                                         onClick: ()=>handleDelete(branch.id, branch.name),
-                                                        className: "p-1.5 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-lg transition-colors cursor-pointer",
+                                                        className: "p-1.5 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-lg transition-colors cursor-pointer disabled:opacity-50",
                                                         title: "Eliminar",
                                                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$trash$2d$2$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Trash2$3e$__["Trash2"], {
                                                             className: "w-3.5 h-3.5"
                                                         }, void 0, false, {
                                                             fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                            lineNumber: 239,
+                                                            lineNumber: 293,
                                                             columnNumber: 25
                                                         }, this)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                        lineNumber: 234,
+                                                        lineNumber: 287,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                lineNumber: 216,
+                                                lineNumber: 267,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, branch.id, true, {
                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                        lineNumber: 177,
+                                        lineNumber: 228,
                                         columnNumber: 19
                                     }, this))
                             }, void 0, false, {
                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                lineNumber: 175,
+                                lineNumber: 226,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                        lineNumber: 160,
+                        lineNumber: 210,
                         columnNumber: 13
-                    }, this) : /* Formulario de Alta / Edición */ /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
+                    }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("form", {
                         onSubmit: handleSave,
                         className: "space-y-4",
                         children: [
@@ -3679,11 +3789,11 @@ function BranchManagementModal({ isOpen, onClose }) {
                                         className: "col-span-2 space-y-1",
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                                className: "text-[11px] font-bold text-slate-600 uppercase",
+                                                className: "text-[11px] font-bold text-sky-700 uppercase",
                                                 children: "Nombre de la Sucursal"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                lineNumber: 251,
+                                                lineNumber: 304,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -3698,13 +3808,13 @@ function BranchManagementModal({ isOpen, onClose }) {
                                                 className: "w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-sky-400"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                lineNumber: 254,
+                                                lineNumber: 307,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                        lineNumber: 250,
+                                        lineNumber: 303,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3715,7 +3825,7 @@ function BranchManagementModal({ isOpen, onClose }) {
                                                 children: "Código (Prefijo)"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                lineNumber: 266,
+                                                lineNumber: 319,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -3731,30 +3841,30 @@ function BranchManagementModal({ isOpen, onClose }) {
                                                 className: "w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-sky-400 font-mono uppercase"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                                lineNumber: 269,
+                                                lineNumber: 322,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                        lineNumber: 265,
+                                        lineNumber: 318,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                lineNumber: 249,
+                                lineNumber: 302,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "space-y-1",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                        className: "text-[11px] font-bold text-slate-600 uppercase",
+                                        className: "text-[11px] font-bold text-sky-700 uppercase",
                                         children: "Teléfono de Contacto"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                        lineNumber: 284,
+                                        lineNumber: 337,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -3768,24 +3878,24 @@ function BranchManagementModal({ isOpen, onClose }) {
                                         className: "w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-sky-400"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                        lineNumber: 287,
+                                        lineNumber: 340,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                lineNumber: 283,
+                                lineNumber: 336,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                 className: "space-y-1",
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
-                                        className: "text-[11px] font-bold text-slate-600 uppercase",
-                                        children: "Dirección Física"
+                                        className: "text-[11px] font-bold text-sky-700 uppercase",
+                                        children: "Dirección"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                        lineNumber: 299,
+                                        lineNumber: 352,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("input", {
@@ -3799,13 +3909,13 @@ function BranchManagementModal({ isOpen, onClose }) {
                                         className: "w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-sky-400"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                        lineNumber: 302,
+                                        lineNumber: 355,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                lineNumber: 298,
+                                lineNumber: 351,
                                 columnNumber: 15
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3813,53 +3923,70 @@ function BranchManagementModal({ isOpen, onClose }) {
                                 children: [
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                         type: "button",
+                                        disabled: isProcessing,
                                         onClick: ()=>setShowForm(false),
                                         className: "px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-semibold rounded-xl transition-colors cursor-pointer",
                                         children: "Cancelar"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                        lineNumber: 314,
+                                        lineNumber: 367,
                                         columnNumber: 17
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                         type: "submit",
-                                        className: "px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors cursor-pointer",
-                                        children: editingBranchId ? "Guardar Cambios" : "Crear Sucursal"
-                                    }, void 0, false, {
+                                        disabled: isProcessing,
+                                        className: "px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-50",
+                                        children: [
+                                            isProcessing && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$loader$2d$circle$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__Loader2$3e$__["Loader2"], {
+                                                className: "w-3.5 h-3.5 animate-spin"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/GestionSucursalesModal.tsx",
+                                                lineNumber: 380,
+                                                columnNumber: 36
+                                            }, this),
+                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                children: editingBranchId ? "Guardar Cambios" : "Crear Sucursal"
+                                            }, void 0, false, {
+                                                fileName: "[project]/src/components/GestionSucursalesModal.tsx",
+                                                lineNumber: 381,
+                                                columnNumber: 19
+                                            }, this)
+                                        ]
+                                    }, void 0, true, {
                                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                        lineNumber: 321,
+                                        lineNumber: 375,
                                         columnNumber: 17
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                                lineNumber: 313,
+                                lineNumber: 366,
                                 columnNumber: 15
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                        lineNumber: 248,
+                        lineNumber: 301,
                         columnNumber: 13
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-                    lineNumber: 158,
+                    lineNumber: 203,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-            lineNumber: 132,
+            lineNumber: 169,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/components/GestionSucursalesModal.tsx",
-        lineNumber: 131,
+        lineNumber: 168,
         columnNumber: 5
     }, this);
 }
-_s(BranchManagementModal, "bkgd9kgVzzlb57qwPV72RsOLvJ0=");
+_s(BranchManagementModal, "hyIM3aXiHdqQlXOvv2FdBA2ItFY=");
 _c = BranchManagementModal;
 var _c;
 __turbopack_context__.k.register(_c, "BranchManagementModal");
@@ -5429,4 +5556,4 @@ if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelper
 }),
 ]);
 
-//# sourceMappingURL=src_17ttqxg._.js.map
+//# sourceMappingURL=src_1py0589._.js.map
