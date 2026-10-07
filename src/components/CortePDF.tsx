@@ -13,6 +13,7 @@ export interface CorteZData {
   cardSales: number;
   transferSales: number;
   totalSales: number;
+  totalExpected: number;
   expenses: number;
   expectedCash?: number;
   countedCash: number;

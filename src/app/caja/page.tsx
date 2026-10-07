@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useCallback, useEffect, useRef } from "react";
+import React, { useState, useMemo, useCallback, useEffect, useRef, Suspense } from "react";
 import Navbar from "@/components/Navbar";
 import {
   openCashShiftInDB,
@@ -66,7 +66,7 @@ const BRANCH_LIST: { name: BranchName; state: string }[] = [
   { name: "Sonsonate", state: "Sucursal Occidente" },
 ];
 
-export default function CajaPage() {
+function CajaContent() {
   const {
     isShiftOpen,
     cashierName,
@@ -363,7 +363,7 @@ export default function CajaPage() {
         const audit = await getAdminShiftAudit(selectedBranch, selectedDate);
         if (isMounted) {
           if (!audit.shiftId) {
-            // Si no existe turno en la fecha consultada (ej. fechas de septiembre)
+            // Si no existe turno en la fecha consultada (ej. fechas pasadas vacías)
             setCurrentAuditedShiftId(null);
             setSalesMetrics({
               shiftId: null,
@@ -1461,6 +1461,7 @@ export default function CajaPage() {
           cardSales: totals.cardSales,
           transferSales: totals.transferSales,
           totalSales: totals.totalSales,
+          totalExpected: totals.totalExpected,
           expenses: totals.expenses,
           expectedCash: totals.expectedCash,
           countedCash: isAdmin ? salesMetrics.reportedCountedCash : countedCash,
@@ -1473,5 +1474,22 @@ export default function CajaPage() {
         }}
       />
     </div>
+  );
+}
+
+export default function CajaPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center">
+          <div className="flex items-center gap-2 text-sky-600 font-bold text-sm">
+            <span className="w-4 h-4 border-2 border-sky-600 border-t-transparent rounded-full animate-spin" />
+            Cargando control de caja...
+          </div>
+        </div>
+      }
+    >
+      <CajaContent />
+    </Suspense>
   );
 }
