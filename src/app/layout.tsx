@@ -20,9 +20,15 @@ const mono = JetBrains_Mono({
   display: "swap",
 });
 
+// ✅ Metadata con el tipo correcto y rutas limpias hacia public/
 export const metadata: Metadata = {
-  title: "Deposito dental - Marios Dent",
+  title: "Mario's Dent - Depósito Dental",
   description: "Punto de venta e inventario dental",
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: "/mariosdent.jpg",
+    apple: "/mariosdent.jpg",
+  },
 };
 
 export default function RootLayout({
