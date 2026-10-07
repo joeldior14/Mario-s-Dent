@@ -2198,7 +2198,6 @@ async function recordExpenseInDB(payload) {
         {
             shift_id: activeShift.id,
             amount: Number(amount),
-            type: "egress",
             description: fullDescription,
             created_at: new Date().toISOString()
         }
@@ -2209,20 +2208,16 @@ async function recordExpenseInDB(payload) {
     return data;
 }
 async function fetchCurrentShiftExpenses(branchName) {
-    // 1. Obtener la sucursal
     const { data: branch } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id").ilike("name", branchName).single();
     if (!branch) return [];
-    // 2. Obtener el turno abierto
     const { data: activeShift } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").select("id").eq("branch_id", branch.id).eq("status", "open").order("opened_at", {
         ascending: false
     }).limit(1).maybeSingle();
     if (!activeShift) return [];
-    // 3. Obtener los egresos de 'cash_movements'
     const { data: movements, error } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_movements").select("id, amount, description, created_at").eq("shift_id", activeShift.id).order("created_at", {
         ascending: false
     });
     if (error || !movements) return [];
-    // 4. Mapear a la estructura que consume el estado de la UI
     return movements.map((m)=>{
         const parts = (m.description || "").split(" - ");
         return {
@@ -2244,18 +2239,14 @@ async function getShiftSalesBreakdown(branchName) {
         transfer: 0,
         total: 0
     };
-    // 1. Localizar sucursal
     const { data: branch } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id").ilike("name", branchName).single();
     if (!branch) return initial;
-    // 2. Localizar turno abierto
     const { data: activeShift } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").select("id").eq("branch_id", branch.id).eq("status", "open").order("opened_at", {
         ascending: false
     }).limit(1).maybeSingle();
     if (!activeShift) return initial;
-    // 3. Obtener ventas del turno
     const { data: sales } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sales").select("payment_method, total").eq("shift_id", activeShift.id);
     if (!sales || sales.length === 0) return initial;
-    // 4. Sumar por cada método de pago
     return sales.reduce((acc, sale)=>{
         const amount = Number(sale.total) || 0;
         if (sale.payment_method === "cash") acc.cash += amount;
@@ -2267,20 +2258,16 @@ async function getShiftSalesBreakdown(branchName) {
 }
 async function closeCashShiftInDB(payload) {
     const { branchName, countedCash, expectedCash, totalSales, totalExpenses, difference, notes } = payload;
-    // 1. Obtener la sucursal activa
     const { data: branch, error: branchErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id").ilike("name", branchName).single();
     if (branchErr || !branch) {
         throw new Error(`No se encontró la sucursal: ${branchName}`);
     }
-    // 2. Buscar el turno abierto actual
     const { data: activeShift, error: shiftErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").select("id, initial_cash").eq("branch_id", branch.id).eq("status", "open").order("opened_at", {
         ascending: false
     }).limit(1).maybeSingle();
     if (shiftErr || !activeShift) {
         throw new Error("No existe ningún turno activo para cerrar en esta sucursal.");
     }
-    // 3. CÁLCULO SEGURO DE DIFERENCIA:
-    // Si en el payload difference llegó en 0 o undefined, se calcula explícitamente:
     const finalCounted = Number(countedCash) || 0;
     const finalExpected = Number(expectedCash) || 0;
     const calculatedDiff = Number((finalCounted - finalExpected).toFixed(2));
@@ -2289,14 +2276,10 @@ async function closeCashShiftInDB(payload) {
     const autoAuditStatus = isExact ? "reviewed" : "pending_review";
     const autoResolution = isExact ? "CUADRE_EXACTO" : null;
     const autoAuditNotes = isExact ? "Arqueo conforme: cuadre de caja exacto al 100%." : null;
-    // 4. Asentar el cierre con la diferencia real en Supabase
     const { error: updateErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").update({
         status: "closed",
         closed_at: new Date().toISOString(),
         counted_cash: Number(finalCounted.toFixed(2)),
-        expected_cash: Number(finalExpected.toFixed(2)),
-        total_sales: Number((totalSales || 0).toFixed(2)),
-        total_expenses: Number((totalExpenses || 0).toFixed(2)),
         difference: finalDifference,
         cashier_notes: notes?.trim() || null,
         audit_status: autoAuditStatus,
@@ -2312,15 +2295,12 @@ async function closeCashShiftInDB(payload) {
     };
 }
 async function getNextOrderNumber(branchName) {
-    // 1. Obtener sucursal
     const { data: branch } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id").ilike("name", branchName).single();
     if (!branch) return 1;
-    // 2. Obtener turno abierto
     const { data: activeShift } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").select("id").eq("branch_id", branch.id).eq("status", "open").order("opened_at", {
         ascending: false
     }).limit(1).maybeSingle();
     if (!activeShift) return 1;
-    // 3. Contar ventas realizadas en este turno
     const { count, error } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sales").select("*", {
         count: "exact",
         head: true
@@ -2340,7 +2320,6 @@ async function getPendingDiscrepancyAlert() {
         ascending: false
     }).limit(1).maybeSingle();
     if (error || !data) return null;
-    // Extraer el nombre de la sucursal de la relación
     const branchData = Array.isArray(data.branches) ? data.branches[0] : data.branches;
     return {
         shiftId: data.id,
@@ -2350,11 +2329,11 @@ async function getPendingDiscrepancyAlert() {
     };
 }
 async function getAdminShiftAudit(branchName, dateStr) {
-    const defaultData = {
+    const defaultCleanData = {
         shiftId: null,
         status: "none",
-        auditStatus: "pending_review",
-        auditResolution: "MERMA_ACEPTADA",
+        auditStatus: "none",
+        auditResolution: "",
         auditNotes: "",
         initialFund: 0,
         cashSales: 0,
@@ -2364,24 +2343,29 @@ async function getAdminShiftAudit(branchName, dateStr) {
         expenses: 0,
         reportedCountedCash: 0,
         operatorNotes: "",
-        operatorName: "Sin operador"
+        operatorName: "Sin turno registrado"
     };
     try {
-        // 1. Localizar ID de la sucursal
         const { data: branch, error: branchErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branches").select("id").ilike("name", branchName).single();
-        if (branchErr || !branch) return defaultData;
-        // 2. Rango de 24 horas del día seleccionado (hora salvadoreña UTC-6)
+        if (branchErr || !branch) return defaultCleanData;
+        // Rango del día en hora de El Salvador (UTC-6)
         const startOfDay = `${dateStr}T00:00:00-06:00`;
         const endOfDay = `${dateStr}T23:59:59.999-06:00`;
-        // 3. Buscar turno registrado en esa jornada
-        const { data: shift, error: shiftErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").select("*").eq("branch_id", branch.id).gte("opened_at", startOfDay).lte("opened_at", endOfDay).order("opened_at", {
+        // Consulta con join a la tabla profiles para obtener el nombre del cajero
+        const { data: shift, error: shiftErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_shifts").select(`
+        *,
+        profiles:cashier_id (
+          full_name,
+          username
+        )
+      `).eq("branch_id", branch.id).gte("opened_at", startOfDay).lte("opened_at", endOfDay).order("opened_at", {
             ascending: false
         }).limit(1).maybeSingle();
-        if (shiftErr || !shift) return defaultData;
-        // 4. Consultar ventas y egresos vinculados al turno
+        if (shiftErr || !shift) return defaultCleanData;
+        // Consultar ventas y egresos
         const [salesRes, expensesRes] = await Promise.all([
             __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("sales").select("payment_method, total").eq("shift_id", shift.id),
-            __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_movements").select("amount").eq("shift_id", shift.id).eq("type", "egress")
+            __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("cash_movements").select("amount").eq("shift_id", shift.id)
         ]);
         let cash = 0;
         let card = 0;
@@ -2410,21 +2394,21 @@ async function getAdminShiftAudit(branchName, dateStr) {
             shiftId: shift.id,
             status: shift.status || "closed",
             auditStatus: shift.audit_status || "pending_review",
-            auditResolution: shift.audit_resolution || "MERMA_ACEPTADA",
+            auditResolution: shift.audit_resolution || "",
             auditNotes: shift.audit_notes || "",
             initialFund: Number(shift.initial_cash) || 0,
             cashSales: cash,
             cardSales: card,
             transferSales: transfer,
             totalSales,
-            expenses: expenses,
+            expenses,
             reportedCountedCash: Number(shift.counted_cash) || 0,
             operatorNotes: shift.notes || shift.cashier_notes || "",
             operatorName: realCashierName
         };
     } catch (error) {
         console.error("Error en getAdminShiftAudit:", error);
-        return defaultData;
+        return defaultCleanData;
     }
 }
 async function resolveShiftAuditInDB(payload) {

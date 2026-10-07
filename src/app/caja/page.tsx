@@ -139,7 +139,7 @@ export default function CajaPage() {
     onConfirm: () => {},
   });
 
-  // Sucursales y Fecha inicializadas con URL o fallback
+  // Sucursales y Fecha inicializadas con URL o fallback dinámico
   const [selectedBranch, setSelectedBranch] = useState<BranchName>(() => {
     if (paramBranch) return paramBranch as BranchName;
     return (user?.branch as BranchName) || "Santa Ana";
@@ -198,7 +198,6 @@ export default function CajaPage() {
         if (!isMounted) return;
 
         if (openShiftData) {
-          // Sucursal con turno abierto: sincronizar montos y cajero
           const shiftUserRecord = Array.isArray(openShiftData.profiles)
             ? openShiftData.profiles[0]
             : openShiftData.profiles;
@@ -209,7 +208,6 @@ export default function CajaPage() {
             openShiftData.id
           );
         } else {
-          // NO tiene turno abierto en ESTA sede: forzar cerrado en memoria
           closeShift();
           setCountedCash(0.0);
         }
@@ -291,8 +289,8 @@ export default function CajaPage() {
   // Métricas del turno para auditoría
   const [salesMetrics, setSalesMetrics] = useState({
     shiftId: null as string | null,
-    auditStatus: "pending_review" as "pending_review" | "reviewed",
-    auditResolution: "MERMA_ACEPTADA",
+    auditStatus: "none" as "pending_review" | "reviewed" | "none",
+    auditResolution: "",
     auditNotes: "",
     initialFund: 0.0,
     cash: 0.0,
@@ -364,11 +362,34 @@ export default function CajaPage() {
       try {
         const audit = await getAdminShiftAudit(selectedBranch, selectedDate);
         if (isMounted) {
+          if (!audit.shiftId) {
+            // Si no existe turno en la fecha consultada (ej. fechas de septiembre)
+            setCurrentAuditedShiftId(null);
+            setSalesMetrics({
+              shiftId: null,
+              auditStatus: "none",
+              auditResolution: "",
+              auditNotes: "",
+              initialFund: 0.0,
+              cash: 0.0,
+              card: 0.0,
+              transfer: 0.0,
+              totalSales: 0.0,
+              expenses: 0.0,
+              reportedCountedCash: 0.0,
+              operatorNotes: "",
+              operatorName: "Sin turno registrado",
+            });
+            setAdminNotes("");
+            setResolutionType("MERMA_ACEPTADA");
+            return;
+          }
+
           setCurrentAuditedShiftId(audit.shiftId);
           setSalesMetrics({
             shiftId: audit.shiftId,
-            auditStatus: (audit.auditStatus as "pending_review" | "reviewed") || "pending_review",
-            auditResolution: audit.auditResolution || "MERMA_ACEPTADA",
+            auditStatus: (audit.auditStatus as "pending_review" | "reviewed" | "none") || "pending_review",
+            auditResolution: audit.auditResolution || "",
             auditNotes: audit.auditNotes || "",
             initialFund: audit.initialFund,
             cash: audit.cashSales,
@@ -393,6 +414,21 @@ export default function CajaPage() {
         console.error("Error al cargar auditoría unificada:", error);
         if (isMounted) {
           setCurrentAuditedShiftId(null);
+          setSalesMetrics({
+            shiftId: null,
+            auditStatus: "none",
+            auditResolution: "",
+            auditNotes: "",
+            initialFund: 0.0,
+            cash: 0.0,
+            card: 0.0,
+            transfer: 0.0,
+            totalSales: 0.0,
+            expenses: 0.0,
+            reportedCountedCash: 0.0,
+            operatorNotes: "",
+            operatorName: "Sin turno registrado",
+          });
           setAdminNotes("");
           setResolutionType("MERMA_ACEPTADA");
         }
@@ -456,6 +492,18 @@ export default function CajaPage() {
       openShift(amount, activeOperatorName);
       setCountedCash(amount);
       setIsModalOpen(false);
+
+      // Desacoplamiento para montar ConfirmarModal tras el cierre de OpenShiftModal
+      setTimeout(() => {
+        setDialogConfig({
+          isOpen: true,
+          type: "success",
+          title: "Turno en curso",
+          description: `Inicio de turno exitoso con un fondo de $${amount.toFixed(2)}.`,
+          confirmText: "Aceptar",
+          onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
+        });
+      }, 100);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Error al iniciar turno en base de datos";
       setDialogConfig({
@@ -509,79 +557,79 @@ export default function CajaPage() {
   };
 
   // Cerrar turno (Corte Z)
-const handleCloseShift = () => {
-  const currentCounted = Number(countedCash) || 0;
-  const currentExpected = Number(totals.expectedCash) || 0;
-  const realDiff = Number((currentCounted - currentExpected).toFixed(2));
+  const handleCloseShift = () => {
+    const currentCounted = Number(countedCash) || 0;
+    const currentExpected = Number(totals.expectedCash) || 0;
+    const realDiff = Number((currentCounted - currentExpected).toFixed(2));
 
-  if (realDiff !== 0 && !cashierNotes.trim()) {
+    if (realDiff !== 0 && !cashierNotes.trim()) {
+      setDialogConfig({
+        isOpen: true,
+        type: "warning",
+        title: "Justificación Requerida",
+        description:
+          "Existe un descuadre en el arqueo de efectivo. Es obligatorio ingresar una justificación antes de realizar el Corte Z.",
+        confirmText: "Entendido",
+        onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
+      });
+      return;
+    }
+
     setDialogConfig({
       isOpen: true,
       type: "warning",
-      title: "Justificación Requerida",
+      title: "Confirmar Cierre de Turno",
       description:
-        "Existe un descuadre en el arqueo de efectivo. Es obligatorio ingresar una justificación antes de realizar el Corte Z.",
-      confirmText: "Entendido",
-      onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
+        "¿Confirmas el cierre de jornada (Corte Z)? Esta acción asentará el balance final en el sistema y cerrará la caja.",
+      confirmText: "Sí, Cerrar Turno",
+      cancelText: "Cancelar",
+      onConfirm: async () => {
+        try {
+          setIsProcessing(true);
+
+          await closeCashShiftInDB({
+            branchName: effectiveBranch,
+            countedCash: currentCounted,
+            expectedCash: currentExpected,
+            totalSales: totals.totalSales,
+            totalExpenses: totals.expenses,
+            difference: realDiff,
+            notes: cashierNotes,
+          });
+
+          closeShift();
+          setCashierNotes("");
+          setCountedCash(0.0);
+          setExpensesList([]);
+          setSalesBreakdown({ cash: 0, card: 0, transfer: 0, total: 0 });
+
+          setDialogConfig({
+            isOpen: true,
+            type: "success",
+            title: "Turno Cerrado con Éxito",
+            description:
+              "El balance final ha sido asentado correctamente en la base de datos (Corte Z registrado).",
+            confirmText: "Aceptar",
+            onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
+          });
+        } catch (err: unknown) {
+          const msg =
+            err instanceof Error ? err.message : "Error al registrar el cierre de turno";
+          setDialogConfig({
+            isOpen: true,
+            type: "warning",
+            title: "Error de Cierre",
+            description: msg,
+            confirmText: "Aceptar",
+            onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
+          });
+        } finally {
+          setIsProcessing(false);
+        }
+      },
+      onCancel: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
     });
-    return;
-  }
-
-  setDialogConfig({
-    isOpen: true,
-    type: "warning",
-    title: "Confirmar Cierre de Turno",
-    description:
-      "¿Confirmas el cierre de jornada (Corte Z)? Esta acción asentará el balance final en el sistema y cerrará la caja.",
-    confirmText: "Sí, Cerrar Turno",
-    cancelText: "Cancelar",
-    onConfirm: async () => {
-      try {
-        setIsProcessing(true);
-
-        await closeCashShiftInDB({
-          branchName: effectiveBranch,
-          countedCash: currentCounted,
-          expectedCash: currentExpected,
-          totalSales: totals.totalSales,
-          totalExpenses: totals.expenses,
-          difference: realDiff,
-          notes: cashierNotes,
-        });
-
-        closeShift();
-        setCashierNotes("");
-        setCountedCash(0.0);
-        setExpensesList([]);
-        setSalesBreakdown({ cash: 0, card: 0, transfer: 0, total: 0 });
-
-        setDialogConfig({
-          isOpen: true,
-          type: "success",
-          title: "Turno Cerrado con Éxito",
-          description:
-            "El balance final ha sido asentado correctamente en la base de datos (Corte Z registrado).",
-          confirmText: "Aceptar",
-          onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
-        });
-      } catch (err: unknown) {
-        const msg =
-          err instanceof Error ? err.message : "Error al registrar el cierre de turno";
-        setDialogConfig({
-          isOpen: true,
-          type: "warning",
-          title: "Error de Cierre",
-          description: msg,
-          confirmText: "Aceptar",
-          onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
-        });
-      } finally {
-        setIsProcessing(false);
-      }
-    },
-    onCancel: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
-  });
-};
+  };
 
   // Auditoría dictaminada por Admin
   const handleResolveDiscrepancy = useCallback(() => {
@@ -1101,7 +1149,8 @@ const handleCloseShift = () => {
                 </p>
               </div>
 
-              {isAdmin && !totals.isBalanced && (
+              {/* Si no existe turno registrado en la fecha seleccionada, no mostramos badges de descuadre ni dictamen */}
+              {isAdmin && currentAuditedShiftId && !totals.isBalanced && (
                 <span
                   className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-extrabold ${
                     isAudited
@@ -1179,7 +1228,7 @@ const handleCloseShift = () => {
             {/* Cuadro de Diferencia */}
             <div
               className={`p-4 rounded-xl border flex items-center justify-between transition-colors ${
-                totals.isBalanced
+                totals.isBalanced || (isAdmin && !currentAuditedShiftId)
                   ? "bg-emerald-50/70 border-emerald-300 text-emerald-900"
                   : isAudited
                   ? "bg-sky-50/70 border-sky-300 text-sky-900"
@@ -1189,7 +1238,7 @@ const handleCloseShift = () => {
               }`}
             >
               <div className="flex items-center gap-3">
-                {totals.isBalanced ? (
+                {totals.isBalanced || (isAdmin && !currentAuditedShiftId) ? (
                   <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
                 ) : isAudited ? (
                   <ShieldCheck className="w-5 h-5 text-sky-600 shrink-0" />
@@ -1198,7 +1247,9 @@ const handleCloseShift = () => {
                 )}
                 <div>
                   <p className="text-xs font-bold leading-tight">
-                    {totals.isBalanced
+                    {!currentAuditedShiftId && isAdmin
+                      ? "Sin Jornada Registrada"
+                      : totals.isBalanced
                       ? "Cuadre Exacto"
                       : isAudited
                       ? "Descuadre Auditado y Resuelto"
@@ -1207,10 +1258,12 @@ const handleCloseShift = () => {
                       : "Diferencia: Faltante de Efectivo"}
                   </p>
                   <p className="text-[11px] opacity-80 mt-0.5">
-                    {totals.isBalanced
+                    {!currentAuditedShiftId && isAdmin
+                      ? "No existen registros de turnos de caja para la fecha seleccionada."
+                      : totals.isBalanced
                       ? "El conteo físico coincide al 100% con el efectivo esperado."
                       : isAudited
-                      ? `Discrepancia conciliada bajo el dictamen [${resolutionType}].`
+                      ? `Discrepancia conciliada bajo el dictamen [${salesMetrics.auditResolution || resolutionType}].`
                       : totals.isSurplus
                       ? "Hay más dinero físico en gaveta del registrado en sistema."
                       : "El efectivo físico es menor al balance contable exigido."}
@@ -1218,7 +1271,9 @@ const handleCloseShift = () => {
                 </div>
               </div>
               <span className="text-lg font-black tabular-nums tracking-tight">
-                {totals.isBalanced
+                {!currentAuditedShiftId && isAdmin
+                  ? "$0.00"
+                  : totals.isBalanced
                   ? "$0.00"
                   : totals.isSurplus
                   ? `+$${totals.difference.toFixed(2)}`
@@ -1227,7 +1282,7 @@ const handleCloseShift = () => {
             </div>
 
             {/* Justificación obligatoria */}
-            {(totals.isShortage || (isAdmin && !totals.isBalanced)) && (
+            {((totals.isShortage && !isAdmin) || (isAdmin && currentAuditedShiftId && !totals.isBalanced)) && (
               <div className="space-y-1.5 animate-in fade-in duration-200">
                 <label className="block text-[11px] font-bold text-slate-700 uppercase tracking-tight">
                   Justificación / Motivo del Descuadre
@@ -1268,17 +1323,18 @@ const handleCloseShift = () => {
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
+                      disabled={!currentAuditedShiftId}
                       onClick={() =>
                         downloadCorteZPDF(`Corte-Z-${selectedBranch}-${selectedDate}.pdf`)
                       }
-                      className="flex items-center gap-1.5 px-3 py-2 border border-emerald-200 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl transition-colors cursor-pointer shadow-2xs"
+                      className="flex items-center gap-1.5 px-3 py-2 border border-emerald-200 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl transition-colors cursor-pointer shadow-2xs disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       <FileText className="w-3.5 h-3.5 text-emerald-600" />
                       <span>Descargar Corte Z</span>
                     </button>
                   </div>
 
-                  {!totals.isBalanced && (
+                  {currentAuditedShiftId && !totals.isBalanced && (
                     <>
                       {!isAudited ? (
                         <button
@@ -1298,7 +1354,7 @@ const handleCloseShift = () => {
                   )}
                 </div>
 
-                {!totals.isBalanced && !isAudited && (
+                {currentAuditedShiftId && !totals.isBalanced && !isAudited && (
                   <div className="p-3.5 bg-purple-100/50 border border-purple-200 rounded-xl space-y-2.5">
                     <div className="flex items-center justify-between">
                       <span className="text-[11px] font-bold text-purple-900 uppercase tracking-tight">
@@ -1404,7 +1460,9 @@ const handleCloseShift = () => {
           cashSales: totals.cashSales,
           cardSales: totals.cardSales,
           transferSales: totals.transferSales,
+          totalSales: totals.totalSales,
           expenses: totals.expenses,
+          expectedCash: totals.expectedCash,
           countedCash: isAdmin ? salesMetrics.reportedCountedCash : countedCash,
           difference: totals.difference,
           cashierNote: isAdmin

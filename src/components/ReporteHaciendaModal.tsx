@@ -21,6 +21,7 @@ interface BranchStock {
 export interface InventoryItemRaw {
   id: string;
   sku: string;
+  barcode?: string | null;
   name: string;
   brand: string;
   description?: string;
@@ -66,6 +67,7 @@ export default function HaciendaReportModal({
       return {
         sku: p.sku,
         name: p.name,
+        barcode: p.barcode || null,
         brand: p.brand,
         description: p.description || p.description || "Unidad",
         units,

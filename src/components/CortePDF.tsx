@@ -12,7 +12,9 @@ export interface CorteZData {
   cashSales: number;
   cardSales: number;
   transferSales: number;
+  totalSales: number;
   expenses: number;
+  expectedCash?: number;
   countedCash: number;
   difference: number;
   cashierNote: string;
@@ -64,10 +66,15 @@ export default function CorteZPDFTemplate({ data }: { data: CorteZData }) {
 
   if (!isMounted) return null;
 
-  const expectedCash = data.initialFund + data.cashSales - data.expenses;
-  const totalSales = data.cashSales + data.cardSales + data.transferSales;
+  const sumMethods = data.cashSales + data.cardSales + data.transferSales;
+  const totalSales = (data.totalSales !== undefined && data.totalSales > 0) 
+    ? data.totalSales 
+    : sumMethods;
+
+  const otherSales = Math.max(0, totalSales - sumMethods);
   const iva = totalSales * 0.13;
   const netSales = totalSales - iva;
+  const expectedCash = data.expectedCash ?? (data.initialFund + data.cashSales - data.expenses);
 
   // Estilos base estrictamente en Blanco y Negro
   const borderThin = "1px solid #000000";
@@ -211,6 +218,15 @@ export default function CorteZPDFTemplate({ data }: { data: CorteZData }) {
                 ${data.transferSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
               </td>
             </tr>
+            {/* Fila condicional por si hubo ventas sin método asignado */}
+          {otherSales > 0 && (
+            <tr style={{ borderBottom: borderLight }}>
+              <td style={{ padding: "6px 0" }}>Otras Ventas Registradas</td>
+              <td style={{ padding: "6px 0", textAlign: "right", fontFamily: "monospace" }}>
+                ${otherSales.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+              </td>
+            </tr>
+          )}
             <tr style={{ borderBottom: borderThin, fontWeight: "bold" }}>
               <td style={{ padding: "8px 0" }}>TOTAL VENTAS BRUTAS</td>
               <td style={{ padding: "8px 0", textAlign: "right", fontFamily: "monospace" }}>
@@ -245,7 +261,7 @@ export default function CorteZPDFTemplate({ data }: { data: CorteZData }) {
             <tr style={{ borderBottom: borderLight }}>
               <td style={{ padding: "6px 0" }}>(-) Gastos Operativos Menores</td>
               <td style={{ padding: "6px 0", textAlign: "right", fontFamily: "monospace" }}>
-                -${data.expenses.toLocaleString("en-US", { minimumFractionDigits: 2 })}
+                {data.expenses > 0 ? `-$${data.expenses.toFixed(2)}` : "0.00"}
               </td>
             </tr>
             <tr style={{ borderBottom: borderThin }}>

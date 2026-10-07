@@ -52,13 +52,14 @@ export function exportInventoryToCSV(
 
   const rows = items.map((item, index) => {
     const totalValuedCost = item.units * item.cost;
+    const barcodeVal = item.barcode ? `"${String(item.barcode).trim()}"` : '""';
     return [
       index + 1,
       `"${item.sku}"`,
-      `"${item.barcode ?? ""}"`,
+      barcodeVal,
       `"${item.name.replace(/"/g, '""')}"`,
       `"${item.brand.replace(/"/g, '""')}"`,
-      `"${item.description.replace(/"/g, '""')}"`,
+      `"${(item.description || "").replace(/"/g, '""')}"`,
       item.units,
       item.cost.toFixed(2),
       item.price.toFixed(2),

@@ -158,7 +158,6 @@
     --color-slate-800: #1d293d;
     --color-slate-900: #0f172b;
     --color-slate-950: #020618;
-    --color-gray-700: #364153;
     --color-black: #000;
     --color-white: #fff;
     --spacing: .25rem;
@@ -296,7 +295,6 @@
       --color-slate-800: lab(16.132% -.318021 -14.6672);
       --color-slate-900: lab(7.78673% 1.82346 -15.0537);
       --color-slate-950: lab(1.76974% 1.32743 -9.28855);
-      --color-gray-700: lab(27.1134% -.956401 -12.3224);
     }
   }
 }
@@ -2589,12 +2587,8 @@
     font-size: 11px;
   }
 
-  .text-\[12px\] {
-    font-size: 12px;
-  }
-
-  .text-\[13px\] {
-    font-size: 13px;
+  .text-\[14px\] {
+    font-size: 14px;
   }
 
   .text-\[15px\] {
@@ -2742,10 +2736,6 @@
 
   .text-emerald-900 {
     color: var(--color-emerald-900);
-  }
-
-  .text-gray-700 {
-    color: var(--color-gray-700);
   }
 
   .text-green-700 {

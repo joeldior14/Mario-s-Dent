@@ -8440,6 +8440,7 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                     return {
                         sku: p.sku,
                         name: p.name,
+                        barcode: p.barcode || null,
                         brand: p.brand,
                         description: p.description || p.description || "Unidad",
                         units,
@@ -8497,12 +8498,12 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                         className: "w-5 h-5"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                        lineNumber: 120,
+                                        lineNumber: 122,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                    lineNumber: 119,
+                                    lineNumber: 121,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8513,7 +8514,7 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                             children: "Informe Fiscal de Inventario (Hacienda)"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 123,
+                                            lineNumber: 125,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -8521,19 +8522,19 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                             children: "Declaración Anual de Existencias y Valuación al Costo"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 129,
+                                            lineNumber: 131,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                    lineNumber: 122,
+                                    lineNumber: 124,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                            lineNumber: 118,
+                            lineNumber: 120,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -8545,18 +8546,18 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                 className: "w-4 h-4"
                             }, void 0, false, {
                                 fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                lineNumber: 140,
+                                lineNumber: 142,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                            lineNumber: 134,
+                            lineNumber: 136,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                    lineNumber: 117,
+                    lineNumber: 119,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8575,20 +8576,20 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                                     className: "w-3.5 h-3.5 text-sky-600 shrink-0"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                                    lineNumber: 153,
+                                                    lineNumber: 155,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                     children: "Ejercicio Fiscal (Corte 31/Dic)"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                                    lineNumber: 154,
+                                                    lineNumber: 156,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 149,
+                                            lineNumber: 151,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -8606,18 +8607,18 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                                     ]
                                                 }, year, true, {
                                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                                    lineNumber: 163,
+                                                    lineNumber: 165,
                                                     columnNumber: 19
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 156,
+                                            lineNumber: 158,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                    lineNumber: 148,
+                                    lineNumber: 150,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8630,20 +8631,20 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                                     className: "w-3.5 h-3.5 text-sky-600 shrink-0"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                                    lineNumber: 175,
+                                                    lineNumber: 177,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                     children: "Alcance / Establecimiento"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                                    lineNumber: 176,
+                                                    lineNumber: 178,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 171,
+                                            lineNumber: 173,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("select", {
@@ -8656,24 +8657,24 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                                     children: opt.label
                                                 }, opt.value, false, {
                                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                                    lineNumber: 185,
+                                                    lineNumber: 187,
                                                     columnNumber: 19
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 178,
+                                            lineNumber: 180,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                    lineNumber: 170,
+                                    lineNumber: 172,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                            lineNumber: 147,
+                            lineNumber: 149,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8687,7 +8688,7 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                             children: "Artículos"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 196,
+                                            lineNumber: 198,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -8698,13 +8699,13 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 199,
+                                            lineNumber: 201,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                    lineNumber: 195,
+                                    lineNumber: 197,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8715,7 +8716,7 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                             children: "Unidades Físicas"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 205,
+                                            lineNumber: 207,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -8726,13 +8727,13 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 208,
+                                            lineNumber: 210,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                    lineNumber: 204,
+                                    lineNumber: 206,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8743,7 +8744,7 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                             children: "Valuación al Costo"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 214,
+                                            lineNumber: 216,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -8757,19 +8758,19 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 217,
+                                            lineNumber: 219,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                    lineNumber: 213,
+                                    lineNumber: 215,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                            lineNumber: 194,
+                            lineNumber: 196,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8780,7 +8781,7 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                     children: "Columnas auditables generadas:"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                    lineNumber: 228,
+                                    lineNumber: 230,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("ul", {
@@ -8790,74 +8791,74 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                             children: "• Código de Barra / SKU"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 232,
+                                            lineNumber: 234,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                                             children: "• Nombre y Descripción"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 233,
+                                            lineNumber: 235,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                                             children: "• Marca / Fabricante"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 234,
+                                            lineNumber: 236,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                                             children: "• Presentación (Unidad de Medida)"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 235,
+                                            lineNumber: 237,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                                             children: "• Stock Físico al corte"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 236,
+                                            lineNumber: 238,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                                             children: "• Costo Unitario de Compra"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 237,
+                                            lineNumber: 239,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                                             children: "• Precio de Venta al Público"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 238,
+                                            lineNumber: 240,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("li", {
                                             children: "• Total Valuado al Costo ($)"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 239,
+                                            lineNumber: 241,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                    lineNumber: 231,
+                                    lineNumber: 233,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                            lineNumber: 227,
+                            lineNumber: 229,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                    lineNumber: 145,
+                    lineNumber: 147,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8870,20 +8871,20 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                     className: "w-4 h-4 text-sky-600 shrink-0"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                    lineNumber: 247,
+                                    lineNumber: 249,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                     children: "Formato listo para anexos fiscales."
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                    lineNumber: 248,
+                                    lineNumber: 250,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                            lineNumber: 246,
+                            lineNumber: 248,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -8896,7 +8897,7 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                     children: "Cerrar"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                    lineNumber: 252,
+                                    lineNumber: 254,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -8908,43 +8909,43 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                             className: "w-4 h-4"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 265,
+                                            lineNumber: 267,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                             children: "Exportar Excel / CSV"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                            lineNumber: 266,
+                                            lineNumber: 268,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                                    lineNumber: 260,
+                                    lineNumber: 262,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                            lineNumber: 251,
+                            lineNumber: 253,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-                    lineNumber: 245,
+                    lineNumber: 247,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-            lineNumber: 115,
+            lineNumber: 117,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/components/ReporteHaciendaModal.tsx",
-        lineNumber: 108,
+        lineNumber: 110,
         columnNumber: 5
     }, this);
 }
@@ -9582,13 +9583,14 @@ function exportInventoryToCSV(items, fiscalYear = "2026", branchName = "Toda la 
     ];
     const rows = items.map((item, index)=>{
         const totalValuedCost = item.units * item.cost;
+        const barcodeVal = item.barcode ? `"${String(item.barcode).trim()}"` : '""';
         return [
             index + 1,
             `"${item.sku}"`,
-            `"${item.barcode ?? ""}"`,
+            barcodeVal,
             `"${item.name.replace(/"/g, '""')}"`,
             `"${item.brand.replace(/"/g, '""')}"`,
-            `"${item.description.replace(/"/g, '""')}"`,
+            `"${(item.description || "").replace(/"/g, '""')}"`,
             item.units,
             item.cost.toFixed(2),
             item.price.toFixed(2),
