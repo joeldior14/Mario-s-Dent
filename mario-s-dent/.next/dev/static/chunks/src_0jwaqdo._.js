@@ -68,7 +68,7 @@ const BRANCH_LIST = [
         state: "Sucursal Occidente"
     }
 ];
-function CajaPage() {
+function CajaContent() {
     _s();
     const { isShiftOpen, cashierName, initialCash, openShift, closeShift, auditStatus, resolveAudit } = (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$context$2f$ShiftContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useShift"])();
     const searchParams = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useSearchParams"])();
@@ -79,7 +79,7 @@ function CajaPage() {
     const [currentAuditedShiftId, setCurrentAuditedShiftId] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(null);
     // Fecha en zona horaria local de El Salvador
     const currentDateDisplay = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
-        "CajaPage.useMemo[currentDateDisplay]": ()=>{
+        "CajaContent.useMemo[currentDateDisplay]": ()=>{
             return new Intl.DateTimeFormat("es-SV", {
                 timeZone: "America/El_Salvador",
                 day: "numeric",
@@ -87,12 +87,12 @@ function CajaPage() {
                 year: "numeric"
             }).format(new Date());
         }
-    }["CajaPage.useMemo[currentDateDisplay]"], []);
+    }["CajaContent.useMemo[currentDateDisplay]"], []);
     const activeOperatorName = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
-        "CajaPage.useMemo[activeOperatorName]": ()=>{
+        "CajaContent.useMemo[activeOperatorName]": ()=>{
             return user?.name || cashierName || "Operador";
         }
-    }["CajaPage.useMemo[activeOperatorName]"], [
+    }["CajaContent.useMemo[activeOperatorName]"], [
         user?.name,
         cashierName
     ]);
@@ -120,19 +120,19 @@ function CajaPage() {
         title: "",
         description: "",
         onConfirm: {
-            "CajaPage.useState": ()=>{}
-        }["CajaPage.useState"]
+            "CajaContent.useState": ()=>{}
+        }["CajaContent.useState"]
     });
     // Sucursales y Fecha inicializadas con URL o fallback dinámico
     const [selectedBranch, setSelectedBranch] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({
-        "CajaPage.useState": ()=>{
+        "CajaContent.useState": ()=>{
             if (paramBranch) return paramBranch;
             return user?.branch || "Santa Ana";
         }
-    }["CajaPage.useState"]);
+    }["CajaContent.useState"]);
     const effectiveBranch = !isAdmin && user?.branch ? user.branch : selectedBranch;
     const [selectedDate, setSelectedDate] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({
-        "CajaPage.useState": ()=>{
+        "CajaContent.useState": ()=>{
             if (paramDate) return paramDate;
             return new Intl.DateTimeFormat("en-CA", {
                 timeZone: "America/El_Salvador",
@@ -141,7 +141,7 @@ function CajaPage() {
                 day: "2-digit"
             }).format(new Date());
         }
-    }["CajaPage.useState"]);
+    }["CajaContent.useState"]);
     const [cashierNotes, setCashierNotes] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])("");
     const [countedCash, setCountedCash] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(0.0);
     const [expensesList, setExpensesList] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])([]);
@@ -149,7 +149,7 @@ function CajaPage() {
     // SINCRONIZACIÓN ESTRICTA DEL TURNO POR SUCURSAL DEL CAJERO
     // =========================================================================
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
-        "CajaPage.useEffect": ()=>{
+        "CajaContent.useEffect": ()=>{
             if (isAdmin) return;
             let isMounted = true;
             async function syncCashierShift() {
@@ -179,12 +179,12 @@ function CajaPage() {
             }
             syncCashierShift();
             return ({
-                "CajaPage.useEffect": ()=>{
+                "CajaContent.useEffect": ()=>{
                     isMounted = false;
                 }
-            })["CajaPage.useEffect"];
+            })["CajaContent.useEffect"];
         }
-    }["CajaPage.useEffect"], [
+    }["CajaContent.useEffect"], [
         isAdmin,
         user?.branch,
         user?.name,
@@ -193,7 +193,7 @@ function CajaPage() {
     ]);
     // Cierre de menús al hacer click fuera
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
-        "CajaPage.useEffect": ()=>{
+        "CajaContent.useEffect": ()=>{
             function handleClickOutside(e) {
                 if (branchRef.current && !branchRef.current.contains(e.target)) {
                     setIsBranchOpen(false);
@@ -204,17 +204,17 @@ function CajaPage() {
             }
             document.addEventListener("mousedown", handleClickOutside);
             return ({
-                "CajaPage.useEffect": ()=>document.removeEventListener("mousedown", handleClickOutside)
-            })["CajaPage.useEffect"];
+                "CajaContent.useEffect": ()=>document.removeEventListener("mousedown", handleClickOutside)
+            })["CajaContent.useEffect"];
         }
-    }["CajaPage.useEffect"], []);
+    }["CajaContent.useEffect"], []);
     // Lógica del Calendario
     const [viewMonth, setViewMonth] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])({
-        "CajaPage.useState": ()=>{
+        "CajaContent.useState": ()=>{
             const d = new Date(selectedDate ? `${selectedDate}T12:00:00` : new Date());
             return isNaN(d.getTime()) ? new Date() : d;
         }
-    }["CajaPage.useState"]);
+    }["CajaContent.useState"]);
     const monthNames = [
         "Enero",
         "Febrero",
@@ -239,7 +239,7 @@ function CajaPage() {
         "SÁ"
     ];
     const calendarDays = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
-        "CajaPage.useMemo[calendarDays]": ()=>{
+        "CajaContent.useMemo[calendarDays]": ()=>{
             const year = viewMonth.getFullYear();
             const month = viewMonth.getMonth();
             const firstDayIndex = new Date(year, month, 1).getDay();
@@ -278,7 +278,7 @@ function CajaPage() {
             }
             return days;
         }
-    }["CajaPage.useMemo[calendarDays]"], [
+    }["CajaContent.useMemo[calendarDays]"], [
         viewMonth
     ]);
     // Dictamen contable (Admin)
@@ -303,7 +303,7 @@ function CajaPage() {
     const isAudited = isAdmin ? salesMetrics.auditStatus === "reviewed" : auditStatus === "reviewed";
     // Carga de ventas en vivo para el turno
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
-        "CajaPage.useEffect": ()=>{
+        "CajaContent.useEffect": ()=>{
             if (isAdmin) return;
             let isMounted = true;
             async function loadSales() {
@@ -321,19 +321,19 @@ function CajaPage() {
             }
             loadSales();
             return ({
-                "CajaPage.useEffect": ()=>{
+                "CajaContent.useEffect": ()=>{
                     isMounted = false;
                 }
-            })["CajaPage.useEffect"];
+            })["CajaContent.useEffect"];
         }
-    }["CajaPage.useEffect"], [
+    }["CajaContent.useEffect"], [
         isAdmin,
         effectiveBranch,
         isShiftOpen
     ]);
     // Carga de gastos del turno
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
-        "CajaPage.useEffect": ()=>{
+        "CajaContent.useEffect": ()=>{
             if (isAdmin) return;
             let isMounted = true;
             async function loadExpenses() {
@@ -350,19 +350,19 @@ function CajaPage() {
             }
             loadExpenses();
             return ({
-                "CajaPage.useEffect": ()=>{
+                "CajaContent.useEffect": ()=>{
                     isMounted = false;
                 }
-            })["CajaPage.useEffect"];
+            })["CajaContent.useEffect"];
         }
-    }["CajaPage.useEffect"], [
+    }["CajaContent.useEffect"], [
         isAdmin,
         effectiveBranch,
         isShiftOpen
     ]);
     // Carga unificada de auditoría (Admin)
     (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useEffect"])({
-        "CajaPage.useEffect": ()=>{
+        "CajaContent.useEffect": ()=>{
             if (!isAdmin) return;
             let isMounted = true;
             async function loadAdminAudit() {
@@ -370,7 +370,7 @@ function CajaPage() {
                     const audit = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$cashService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["getAdminShiftAudit"])(selectedBranch, selectedDate);
                     if (isMounted) {
                         if (!audit.shiftId) {
-                            // Si no existe turno en la fecha consultada (ej. fechas de septiembre)
+                            // Si no existe turno en la fecha consultada (ej. fechas pasadas vacías)
                             setCurrentAuditedShiftId(null);
                             setSalesMetrics({
                                 shiftId: null,
@@ -441,22 +441,22 @@ function CajaPage() {
             }
             loadAdminAudit();
             return ({
-                "CajaPage.useEffect": ()=>{
+                "CajaContent.useEffect": ()=>{
                     isMounted = false;
                 }
-            })["CajaPage.useEffect"];
+            })["CajaContent.useEffect"];
         }
-    }["CajaPage.useEffect"], [
+    }["CajaContent.useEffect"], [
         isAdmin,
         selectedBranch,
         selectedDate
     ]);
     // Cálculos contables unificados
     const totals = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useMemo"])({
-        "CajaPage.useMemo[totals]": ()=>{
+        "CajaContent.useMemo[totals]": ()=>{
             const liveExpenses = expensesList.reduce({
-                "CajaPage.useMemo[totals].liveExpenses": (acc, curr)=>acc + (Number(curr.amount) || 0)
-            }["CajaPage.useMemo[totals].liveExpenses"], 0);
+                "CajaContent.useMemo[totals].liveExpenses": (acc, curr)=>acc + (Number(curr.amount) || 0)
+            }["CajaContent.useMemo[totals].liveExpenses"], 0);
             const totalExpenses = isAdmin ? salesMetrics.expenses : liveExpenses;
             const fund = isAdmin ? salesMetrics.initialFund : isShiftOpen ? Number(initialCash) || 0.0 : 0.0;
             const cash = isAdmin ? salesMetrics.cash : salesBreakdown.cash;
@@ -483,7 +483,7 @@ function CajaPage() {
                 isBalanced: diff === 0
             };
         }
-    }["CajaPage.useMemo[totals]"], [
+    }["CajaContent.useMemo[totals]"], [
         expensesList,
         isAdmin,
         isShiftOpen,
@@ -662,7 +662,7 @@ function CajaPage() {
     };
     // Auditoría dictaminada por Admin
     const handleResolveDiscrepancy = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useCallback"])({
-        "CajaPage.useCallback[handleResolveDiscrepancy]": ()=>{
+        "CajaContent.useCallback[handleResolveDiscrepancy]": ()=>{
             if (!adminNotes.trim()) {
                 setDialogConfig({
                     isOpen: true,
@@ -671,13 +671,13 @@ function CajaPage() {
                     description: "Por favor ingrese una breve justificación técnica antes de dictaminar la auditoría.",
                     confirmText: "Entendido",
                     onConfirm: {
-                        "CajaPage.useCallback[handleResolveDiscrepancy]": ()=>setDialogConfig({
-                                "CajaPage.useCallback[handleResolveDiscrepancy]": (prev)=>({
+                        "CajaContent.useCallback[handleResolveDiscrepancy]": ()=>setDialogConfig({
+                                "CajaContent.useCallback[handleResolveDiscrepancy]": (prev)=>({
                                         ...prev,
                                         isOpen: false
                                     })
-                            }["CajaPage.useCallback[handleResolveDiscrepancy]"])
-                    }["CajaPage.useCallback[handleResolveDiscrepancy]"]
+                            }["CajaContent.useCallback[handleResolveDiscrepancy]"])
+                    }["CajaContent.useCallback[handleResolveDiscrepancy]"]
                 });
                 return;
             }
@@ -689,13 +689,13 @@ function CajaPage() {
                     description: "No se encontró un turno registrado en la fecha seleccionada para resolver.",
                     confirmText: "Aceptar",
                     onConfirm: {
-                        "CajaPage.useCallback[handleResolveDiscrepancy]": ()=>setDialogConfig({
-                                "CajaPage.useCallback[handleResolveDiscrepancy]": (prev)=>({
+                        "CajaContent.useCallback[handleResolveDiscrepancy]": ()=>setDialogConfig({
+                                "CajaContent.useCallback[handleResolveDiscrepancy]": (prev)=>({
                                         ...prev,
                                         isOpen: false
                                     })
-                            }["CajaPage.useCallback[handleResolveDiscrepancy]"])
-                    }["CajaPage.useCallback[handleResolveDiscrepancy]"]
+                            }["CajaContent.useCallback[handleResolveDiscrepancy]"])
+                    }["CajaContent.useCallback[handleResolveDiscrepancy]"]
                 });
                 return;
             }
@@ -707,7 +707,7 @@ function CajaPage() {
                 confirmText: "Aprobar y Resolver",
                 cancelText: "Cancelar",
                 onConfirm: {
-                    "CajaPage.useCallback[handleResolveDiscrepancy]": async ()=>{
+                    "CajaContent.useCallback[handleResolveDiscrepancy]": async ()=>{
                         try {
                             setIsProcessing(true);
                             await (0, __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$services$2f$cashService$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["resolveShiftAuditInDB"])({
@@ -716,13 +716,13 @@ function CajaPage() {
                                 notes: adminNotes
                             });
                             setSalesMetrics({
-                                "CajaPage.useCallback[handleResolveDiscrepancy]": (prev)=>({
+                                "CajaContent.useCallback[handleResolveDiscrepancy]": (prev)=>({
                                         ...prev,
                                         auditStatus: "reviewed",
                                         auditResolution: resolutionType,
                                         auditNotes: adminNotes
                                     })
-                            }["CajaPage.useCallback[handleResolveDiscrepancy]"]);
+                            }["CajaContent.useCallback[handleResolveDiscrepancy]"]);
                             resolveAudit(adminNotes, resolutionType);
                             setDialogConfig({
                                 isOpen: true,
@@ -731,13 +731,13 @@ function CajaPage() {
                                 description: "La discrepancia contable fue archivada y resuelta con éxito en la base de datos.",
                                 confirmText: "Aceptar",
                                 onConfirm: {
-                                    "CajaPage.useCallback[handleResolveDiscrepancy]": ()=>setDialogConfig({
-                                            "CajaPage.useCallback[handleResolveDiscrepancy]": (prev)=>({
+                                    "CajaContent.useCallback[handleResolveDiscrepancy]": ()=>setDialogConfig({
+                                            "CajaContent.useCallback[handleResolveDiscrepancy]": (prev)=>({
                                                     ...prev,
                                                     isOpen: false
                                                 })
-                                        }["CajaPage.useCallback[handleResolveDiscrepancy]"])
-                                }["CajaPage.useCallback[handleResolveDiscrepancy]"]
+                                        }["CajaContent.useCallback[handleResolveDiscrepancy]"])
+                                }["CajaContent.useCallback[handleResolveDiscrepancy]"]
                             });
                         } catch (err) {
                             const msg = err instanceof Error ? err.message : "Error al procesar la auditoría";
@@ -748,30 +748,30 @@ function CajaPage() {
                                 description: msg,
                                 confirmText: "Aceptar",
                                 onConfirm: {
-                                    "CajaPage.useCallback[handleResolveDiscrepancy]": ()=>setDialogConfig({
-                                            "CajaPage.useCallback[handleResolveDiscrepancy]": (prev)=>({
+                                    "CajaContent.useCallback[handleResolveDiscrepancy]": ()=>setDialogConfig({
+                                            "CajaContent.useCallback[handleResolveDiscrepancy]": (prev)=>({
                                                     ...prev,
                                                     isOpen: false
                                                 })
-                                        }["CajaPage.useCallback[handleResolveDiscrepancy]"])
-                                }["CajaPage.useCallback[handleResolveDiscrepancy]"]
+                                        }["CajaContent.useCallback[handleResolveDiscrepancy]"])
+                                }["CajaContent.useCallback[handleResolveDiscrepancy]"]
                             });
                         } finally{
                             setIsProcessing(false);
                         }
                     }
-                }["CajaPage.useCallback[handleResolveDiscrepancy]"],
+                }["CajaContent.useCallback[handleResolveDiscrepancy]"],
                 onCancel: {
-                    "CajaPage.useCallback[handleResolveDiscrepancy]": ()=>setDialogConfig({
-                            "CajaPage.useCallback[handleResolveDiscrepancy]": (prev)=>({
+                    "CajaContent.useCallback[handleResolveDiscrepancy]": ()=>setDialogConfig({
+                            "CajaContent.useCallback[handleResolveDiscrepancy]": (prev)=>({
                                     ...prev,
                                     isOpen: false
                                 })
-                        }["CajaPage.useCallback[handleResolveDiscrepancy]"])
-                }["CajaPage.useCallback[handleResolveDiscrepancy]"]
+                        }["CajaContent.useCallback[handleResolveDiscrepancy]"])
+                }["CajaContent.useCallback[handleResolveDiscrepancy]"]
             });
         }
-    }["CajaPage.useCallback[handleResolveDiscrepancy]"], [
+    }["CajaContent.useCallback[handleResolveDiscrepancy]"], [
         adminNotes,
         resolutionType,
         currentAuditedShiftId,
@@ -2496,6 +2496,7 @@ function CajaPage() {
                     cardSales: totals.cardSales,
                     transferSales: totals.transferSales,
                     totalSales: totals.totalSales,
+                    totalExpected: totals.totalExpected,
                     expenses: totals.expenses,
                     expectedCash: totals.expectedCash,
                     countedCash: isAdmin ? salesMetrics.reportedCountedCash : countedCash,
@@ -2516,16 +2517,55 @@ function CajaPage() {
         columnNumber: 5
     }, this);
 }
-_s(CajaPage, "6vkO+CPZZGl/mr+2vhIlENv2uJU=", false, function() {
+_s(CajaContent, "6vkO+CPZZGl/mr+2vhIlENv2uJU=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$context$2f$ShiftContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useShift"],
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useSearchParams"],
         __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$app$2f$context$2f$AuthContext$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useAuth"]
     ];
 });
-_c = CajaPage;
-var _c;
-__turbopack_context__.k.register(_c, "CajaPage");
+_c = CajaContent;
+function CajaPage() {
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Suspense"], {
+        fallback: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "min-h-screen bg-[#F8FAFC] flex items-center justify-center",
+            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                className: "flex items-center gap-2 text-sky-600 font-bold text-sm",
+                children: [
+                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                        className: "w-4 h-4 border-2 border-sky-600 border-t-transparent rounded-full animate-spin"
+                    }, void 0, false, {
+                        fileName: "[project]/src/app/caja/page.tsx",
+                        lineNumber: 1486,
+                        columnNumber: 13
+                    }, this),
+                    "Cargando control de caja..."
+                ]
+            }, void 0, true, {
+                fileName: "[project]/src/app/caja/page.tsx",
+                lineNumber: 1485,
+                columnNumber: 11
+            }, this)
+        }, void 0, false, {
+            fileName: "[project]/src/app/caja/page.tsx",
+            lineNumber: 1484,
+            columnNumber: 9
+        }, this),
+        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(CajaContent, {}, void 0, false, {
+            fileName: "[project]/src/app/caja/page.tsx",
+            lineNumber: 1492,
+            columnNumber: 7
+        }, this)
+    }, void 0, false, {
+        fileName: "[project]/src/app/caja/page.tsx",
+        lineNumber: 1482,
+        columnNumber: 5
+    }, this);
+}
+_c1 = CajaPage;
+var _c, _c1;
+__turbopack_context__.k.register(_c, "CajaContent");
+__turbopack_context__.k.register(_c1, "CajaPage");
 if (typeof globalThis.$RefreshHelpers$ === 'object' && globalThis.$RefreshHelpers !== null) {
     __turbopack_context__.k.registerExports(__turbopack_context__.m, globalThis.$RefreshHelpers$);
 }
@@ -5048,7 +5088,7 @@ function CorteZPDFTemplate({ data }) {
                                     children: "MARIO'S DENT"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 111,
+                                    lineNumber: 112,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -5063,7 +5103,7 @@ function CorteZPDFTemplate({ data }) {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 122,
+                                    lineNumber: 123,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -5075,13 +5115,13 @@ function CorteZPDFTemplate({ data }) {
                                     children: "PBX: (503) 2440-1234 • Santa Ana, El Salvador"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 125,
+                                    lineNumber: 126,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/CortePDF.tsx",
-                            lineNumber: 110,
+                            lineNumber: 111,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5099,7 +5139,7 @@ function CorteZPDFTemplate({ data }) {
                                     children: "Corte Z — Balance Diario"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 130,
+                                    lineNumber: 131,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5114,7 +5154,7 @@ function CorteZPDFTemplate({ data }) {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 140,
+                                    lineNumber: 141,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5128,19 +5168,19 @@ function CorteZPDFTemplate({ data }) {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 143,
+                                    lineNumber: 144,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/CortePDF.tsx",
-                            lineNumber: 129,
+                            lineNumber: 130,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/CortePDF.tsx",
-                    lineNumber: 100,
+                    lineNumber: 101,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5166,20 +5206,20 @@ function CorteZPDFTemplate({ data }) {
                                     children: "Fecha"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 162,
+                                    lineNumber: 163,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
                                     children: data.date
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 165,
+                                    lineNumber: 166,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/CortePDF.tsx",
-                            lineNumber: 161,
+                            lineNumber: 162,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5194,20 +5234,20 @@ function CorteZPDFTemplate({ data }) {
                                     children: "Jornada"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 168,
+                                    lineNumber: 169,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
                                     children: "Completa"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 171,
+                                    lineNumber: 172,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/CortePDF.tsx",
-                            lineNumber: 167,
+                            lineNumber: 168,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5222,20 +5262,20 @@ function CorteZPDFTemplate({ data }) {
                                     children: "Cajero Responsable"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 174,
+                                    lineNumber: 175,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
                                     children: data.cashier
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 177,
+                                    lineNumber: 178,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/CortePDF.tsx",
-                            lineNumber: 173,
+                            lineNumber: 174,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5250,26 +5290,26 @@ function CorteZPDFTemplate({ data }) {
                                     children: "Auditor / Supervisor"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 180,
+                                    lineNumber: 181,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
                                     children: data.adminName
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 183,
+                                    lineNumber: 184,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/CortePDF.tsx",
-                            lineNumber: 179,
+                            lineNumber: 180,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/CortePDF.tsx",
-                    lineNumber: 150,
+                    lineNumber: 151,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("table", {
@@ -5296,7 +5336,7 @@ function CorteZPDFTemplate({ data }) {
                                         children: "Descripción Contable"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/CortePDF.tsx",
-                                        lineNumber: 198,
+                                        lineNumber: 199,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("th", {
@@ -5307,18 +5347,18 @@ function CorteZPDFTemplate({ data }) {
                                         children: "Monto USD"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/CortePDF.tsx",
-                                        lineNumber: 199,
+                                        lineNumber: 200,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/components/CortePDF.tsx",
-                                lineNumber: 197,
+                                lineNumber: 198,
                                 columnNumber: 13
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/src/components/CortePDF.tsx",
-                            lineNumber: 196,
+                            lineNumber: 197,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tbody", {
@@ -5335,7 +5375,7 @@ function CorteZPDFTemplate({ data }) {
                                             children: "Ventas en Efectivo"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/CortePDF.tsx",
-                                            lineNumber: 204,
+                                            lineNumber: 205,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -5352,13 +5392,13 @@ function CorteZPDFTemplate({ data }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CortePDF.tsx",
-                                            lineNumber: 205,
+                                            lineNumber: 206,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 203,
+                                    lineNumber: 204,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -5373,7 +5413,7 @@ function CorteZPDFTemplate({ data }) {
                                             children: "Ventas con Tarjeta (POS)"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/CortePDF.tsx",
-                                            lineNumber: 210,
+                                            lineNumber: 211,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -5390,13 +5430,13 @@ function CorteZPDFTemplate({ data }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CortePDF.tsx",
-                                            lineNumber: 211,
+                                            lineNumber: 212,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 209,
+                                    lineNumber: 210,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -5411,7 +5451,7 @@ function CorteZPDFTemplate({ data }) {
                                             children: "Transferencias Bancarias"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/CortePDF.tsx",
-                                            lineNumber: 216,
+                                            lineNumber: 217,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -5428,13 +5468,13 @@ function CorteZPDFTemplate({ data }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CortePDF.tsx",
-                                            lineNumber: 217,
+                                            lineNumber: 218,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 215,
+                                    lineNumber: 216,
                                     columnNumber: 13
                                 }, this),
                                 otherSales > 0 && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -5449,7 +5489,7 @@ function CorteZPDFTemplate({ data }) {
                                             children: "Otras Ventas Registradas"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/CortePDF.tsx",
-                                            lineNumber: 224,
+                                            lineNumber: 225,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -5466,13 +5506,13 @@ function CorteZPDFTemplate({ data }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CortePDF.tsx",
-                                            lineNumber: 225,
+                                            lineNumber: 226,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 223,
+                                    lineNumber: 224,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -5488,7 +5528,7 @@ function CorteZPDFTemplate({ data }) {
                                             children: "TOTAL VENTAS BRUTAS"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/CortePDF.tsx",
-                                            lineNumber: 231,
+                                            lineNumber: 232,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -5505,13 +5545,13 @@ function CorteZPDFTemplate({ data }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CortePDF.tsx",
-                                            lineNumber: 232,
+                                            lineNumber: 233,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 230,
+                                    lineNumber: 231,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -5527,7 +5567,7 @@ function CorteZPDFTemplate({ data }) {
                                             children: "↳ Venta Gravada Neta"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/CortePDF.tsx",
-                                            lineNumber: 237,
+                                            lineNumber: 238,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -5542,13 +5582,13 @@ function CorteZPDFTemplate({ data }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CortePDF.tsx",
-                                            lineNumber: 238,
+                                            lineNumber: 239,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 236,
+                                    lineNumber: 237,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -5565,7 +5605,7 @@ function CorteZPDFTemplate({ data }) {
                                             children: "↳ IVA Débito Fiscal (13%)"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/CortePDF.tsx",
-                                            lineNumber: 243,
+                                            lineNumber: 244,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -5580,13 +5620,13 @@ function CorteZPDFTemplate({ data }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CortePDF.tsx",
-                                            lineNumber: 244,
+                                            lineNumber: 245,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 242,
+                                    lineNumber: 243,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -5597,12 +5637,12 @@ function CorteZPDFTemplate({ data }) {
                                         }
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/CortePDF.tsx",
-                                        lineNumber: 251,
+                                        lineNumber: 252,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 250,
+                                    lineNumber: 251,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -5617,7 +5657,7 @@ function CorteZPDFTemplate({ data }) {
                                             children: "(+) Fondo Inicial de Apertura"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/CortePDF.tsx",
-                                            lineNumber: 256,
+                                            lineNumber: 257,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -5634,13 +5674,13 @@ function CorteZPDFTemplate({ data }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CortePDF.tsx",
-                                            lineNumber: 257,
+                                            lineNumber: 258,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 255,
+                                    lineNumber: 256,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -5655,7 +5695,7 @@ function CorteZPDFTemplate({ data }) {
                                             children: "(-) Gastos Operativos Menores"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/CortePDF.tsx",
-                                            lineNumber: 262,
+                                            lineNumber: 263,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -5667,13 +5707,13 @@ function CorteZPDFTemplate({ data }) {
                                             children: data.expenses > 0 ? `-$${data.expenses.toFixed(2)}` : "0.00"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/CortePDF.tsx",
-                                            lineNumber: 263,
+                                            lineNumber: 264,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 261,
+                                    lineNumber: 262,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -5688,7 +5728,7 @@ function CorteZPDFTemplate({ data }) {
                                             children: "(=) Efectivo Teórico Esperado"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/CortePDF.tsx",
-                                            lineNumber: 268,
+                                            lineNumber: 269,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -5705,13 +5745,13 @@ function CorteZPDFTemplate({ data }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CortePDF.tsx",
-                                            lineNumber: 269,
+                                            lineNumber: 270,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 267,
+                                    lineNumber: 268,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -5727,7 +5767,7 @@ function CorteZPDFTemplate({ data }) {
                                             children: "Efectivo Físico Contado (Arqueo)"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/CortePDF.tsx",
-                                            lineNumber: 274,
+                                            lineNumber: 275,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -5744,13 +5784,13 @@ function CorteZPDFTemplate({ data }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CortePDF.tsx",
-                                            lineNumber: 275,
+                                            lineNumber: 276,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 273,
+                                    lineNumber: 274,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
@@ -5767,7 +5807,7 @@ function CorteZPDFTemplate({ data }) {
                                             children: "Diferencia Final de Caja"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/CortePDF.tsx",
-                                            lineNumber: 282,
+                                            lineNumber: 283,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -5784,25 +5824,25 @@ function CorteZPDFTemplate({ data }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/src/components/CortePDF.tsx",
-                                            lineNumber: 285,
+                                            lineNumber: 286,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 281,
+                                    lineNumber: 282,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/CortePDF.tsx",
-                            lineNumber: 202,
+                            lineNumber: 203,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/CortePDF.tsx",
-                    lineNumber: 188,
+                    lineNumber: 189,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5823,7 +5863,7 @@ function CorteZPDFTemplate({ data }) {
                                     children: "Nota Cajero:"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 312,
+                                    lineNumber: 313,
                                     columnNumber: 15
                                 }, this),
                                 " ",
@@ -5835,13 +5875,13 @@ function CorteZPDFTemplate({ data }) {
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 312,
+                                    lineNumber: 313,
                                     columnNumber: 45
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/CortePDF.tsx",
-                            lineNumber: 311,
+                            lineNumber: 312,
                             columnNumber: 13
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5850,7 +5890,7 @@ function CorteZPDFTemplate({ data }) {
                                     children: "Dictamen de Auditoría:"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 316,
+                                    lineNumber: 317,
                                     columnNumber: 13
                                 }, this),
                                 " [",
@@ -5860,13 +5900,13 @@ function CorteZPDFTemplate({ data }) {
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/CortePDF.tsx",
-                            lineNumber: 315,
+                            lineNumber: 316,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/CortePDF.tsx",
-                    lineNumber: 301,
+                    lineNumber: 302,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5891,7 +5931,7 @@ function CorteZPDFTemplate({ data }) {
                                     children: data.cashier
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 333,
+                                    lineNumber: 334,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5902,13 +5942,13 @@ function CorteZPDFTemplate({ data }) {
                                     children: "Firma del Cajero"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 336,
+                                    lineNumber: 337,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/CortePDF.tsx",
-                            lineNumber: 332,
+                            lineNumber: 333,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5923,7 +5963,7 @@ function CorteZPDFTemplate({ data }) {
                                     children: data.adminName
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 339,
+                                    lineNumber: 340,
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -5934,30 +5974,30 @@ function CorteZPDFTemplate({ data }) {
                                     children: "Firma Supervisor / Auditor"
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/CortePDF.tsx",
-                                    lineNumber: 342,
+                                    lineNumber: 343,
                                     columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/src/components/CortePDF.tsx",
-                            lineNumber: 338,
+                            lineNumber: 339,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/src/components/CortePDF.tsx",
-                    lineNumber: 322,
+                    lineNumber: 323,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/src/components/CortePDF.tsx",
-            lineNumber: 86,
+            lineNumber: 87,
             columnNumber: 7
         }, this)
     }, void 0, false, {
         fileName: "[project]/src/components/CortePDF.tsx",
-        lineNumber: 85,
+        lineNumber: 86,
         columnNumber: 5
     }, this);
 }

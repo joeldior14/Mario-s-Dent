@@ -26,8 +26,9 @@ export const metadata: Metadata = {
   description: "Punto de venta e inventario dental",
   manifest: "/manifest.webmanifest",
   icons: {
-    icon: "/mariosdent.jpg",
-    apple: "/mariosdent.jpg",
+    icon: "/favicon.ico",
+    shortcut: "/icon-192.png",
+    apple: "/icon-192.png",
   },
 };
 
