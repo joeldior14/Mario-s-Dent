@@ -246,7 +246,7 @@ export default function NewProductModal({
                 value={sku}
                 onChange={(e) => setSku(e.target.value)}
                 placeholder="Ej. RS-5520"
-                className="w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-sky-500 transition-all"
+                className="w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-sky-500 transition-all"
               />
             </div>
 
@@ -265,7 +265,7 @@ export default function NewProductModal({
                 value={barcode}
                 onChange={(e) => setBarcode(e.target.value)}
                 placeholder="Escanea o escribe código..."
-                className="w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-medium text-slate-800 focus:bg-white focus:outline-none focus:border-sky-500 transition-all"
+                className="w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-medium text-slate-800 focus:bg-white focus:outline-none focus:border-sky-500 transition-all"
               />
             </div>
           </div>
@@ -357,7 +357,7 @@ export default function NewProductModal({
                   value={cost}
                   onChange={(e) => setCost(e.target.value)}
                   placeholder="0.00"
-                  className="w-full h-9 pl-7 pr-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-sky-500 transition-all"
+                  className="w-full h-9 pl-7 pr-3 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-sky-500 transition-all"
                 />
               </div>
             </div>
@@ -378,7 +378,7 @@ export default function NewProductModal({
                   value={price}
                   onChange={(e) => setPrice(e.target.value)}
                   placeholder="0.00"
-                  className="w-full h-9 pl-7 pr-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-sky-500 transition-all"
+                  className="w-full h-9 pl-7 pr-3 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-sky-500 transition-all"
                 />
               </div>
             </div>

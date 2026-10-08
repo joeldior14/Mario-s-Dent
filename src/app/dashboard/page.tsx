@@ -723,7 +723,7 @@ export default function DashboardPage() {
                     Ingresos Totales Cobrados
                   </span>
                   <div className="flex items-baseline gap-3">
-                    <span className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight tabular-nums">
+                    <span className="text-3xl sm:text-4xl font-black text-sky-500 tracking-tight tabular-nums">
                       ${realMetrics.totalIncome.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                     </span>
                     <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
@@ -743,19 +743,19 @@ export default function DashboardPage() {
                   <span className="text-xs font-black text-slate-900 uppercase tracking-wider block">
                     Tickets
                   </span>
-                  <span className="text-3xl font-black text-sky-700 tabular-nums">
+                  <span className="text-3xl font-bold text-sky-700 tabular-nums">
                     {realMetrics.totalTickets}
                   </span>
                 </div>
               </div>
 
               <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs">
-                <span className="text-slate-400 text-[11px]">
+                <span className="text-slate-700 font-bold text-[11px]">
                   {selectedBranchKey === "all"
                     ? "Consolidado de 3 sucursales en operación"
                     : `Reporte específico de ${activeMetrics.name}`}
                 </span>
-                <span className="text-[11px] font-semibold text-slate-500">
+                <span className="text-[10px] font-semibold text-slate-400">
                   Corte y arqueo gestionado en Caja
                 </span>
               </div>
@@ -889,12 +889,12 @@ export default function DashboardPage() {
 
                   {/* NÚMERO CENTRAL */}
                   <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                    <span className="text-xs font-black text-slate-800 tabular-nums tabular-nums">
+                    <span className="text-xs font-black text-sky-600 tabular-nums tabular-nums">
                       {hasSales && !isLoadingMetrics
                         ? `${Math.round(animProgress * 100)}%`
                         : "0%"}
                     </span>
-                    <span className="text-[9px] text-slate-400 font-bold uppercase">
+                    <span className="text-[9px] text-slate-800 font-bold uppercase">
                       Total
                     </span>
                   </div>

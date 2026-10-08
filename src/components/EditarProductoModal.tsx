@@ -181,7 +181,7 @@ function EditProductFormContent({
             <h3 id={`${formId}-title`} className="text-sm font-bold text-slate-800 leading-tight">
               Editar Ficha de Producto
             </h3>
-            <p className="text-[11px] text-slate-500 font-mono">SKU: {product.sku}</p>
+            <p className="text-[11px] text-slate-500 tabular-nums">SKU: {product.sku}</p>
           </div>
         </div>
         <button
@@ -269,7 +269,7 @@ function EditProductFormContent({
               value={sku}
               disabled={isSubmitting}
               onChange={(e) => setSku(e.target.value)}
-              className="w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs font-mono font-medium focus:outline-none focus:border-sky-500 shadow-2xs uppercase disabled:opacity-50"
+              className="w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs tabular-nums font-medium focus:outline-none focus:border-sky-500 shadow-2xs uppercase disabled:opacity-50"
               required
             />
           </div>
@@ -288,7 +288,7 @@ function EditProductFormContent({
               disabled={isSubmitting}
               onChange={(e) => setBarcode(e.target.value)}
               placeholder="Opcional / Lector"
-              className="w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs font-mono font-medium focus:outline-none focus:border-sky-500 shadow-2xs disabled:opacity-50"
+              className="w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs tabular-nums font-medium focus:outline-none focus:border-sky-500 shadow-2xs disabled:opacity-50"
             />
           </div>
         </div>
@@ -394,7 +394,7 @@ function EditProductFormContent({
               onChange={(e) =>
                 setCost(e.target.value === "" ? "" : parseFloat(e.target.value))
               }
-              className="w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs font-mono font-medium focus:outline-none focus:border-sky-500 shadow-2xs disabled:opacity-50"
+              className="w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs tabular-nums font-medium focus:outline-none focus:border-sky-500 shadow-2xs disabled:opacity-50"
               required
             />
           </div>
@@ -416,7 +416,7 @@ function EditProductFormContent({
               onChange={(e) =>
                 setPrice(e.target.value === "" ? "" : parseFloat(e.target.value))
               }
-              className="w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-800 focus:outline-none focus:border-sky-500 shadow-2xs disabled:opacity-50"
+              className="w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs tabular-nums font-bold text-slate-800 focus:outline-none focus:border-sky-500 shadow-2xs disabled:opacity-50"
               required
             />
           </div>
@@ -442,7 +442,7 @@ function EditProductFormContent({
                     e.target.value === "" ? "" : parseInt(e.target.value, 10)
                   )
                 }
-                className="w-full h-8 px-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-800 focus:outline-none focus:border-sky-500 disabled:opacity-50"
+                className="w-full h-8 px-2 bg-white border border-slate-200 rounded-lg text-xs tabular-nums font-bold text-slate-800 focus:outline-none focus:border-sky-500 disabled:opacity-50"
               />
             </div>
 
@@ -460,7 +460,7 @@ function EditProductFormContent({
                     e.target.value === "" ? "" : parseInt(e.target.value, 10)
                   )
                 }
-                className="w-full h-8 px-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-800 focus:outline-none focus:border-sky-500 disabled:opacity-50"
+                className="w-full h-8 px-2 bg-white border border-slate-200 rounded-lg text-xs tabular-nums font-bold text-slate-800 focus:outline-none focus:border-sky-500 disabled:opacity-50"
               />
             </div>
 
@@ -478,7 +478,7 @@ function EditProductFormContent({
                     e.target.value === "" ? "" : parseInt(e.target.value, 10)
                   )
                 }
-                className="w-full h-8 px-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-800 focus:outline-none focus:border-sky-500 disabled:opacity-50"
+                className="w-full h-8 px-2 bg-white border border-slate-200 rounded-lg text-xs tabular-nums font-bold text-slate-800 focus:outline-none focus:border-sky-500 disabled:opacity-50"
               />
             </div>
           </div>

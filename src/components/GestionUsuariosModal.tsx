@@ -470,7 +470,7 @@ export default function UserManagementModal({
                     <tr key={u.id} className="hover:bg-slate-50/80 transition-colors">
                       <td className="py-2.5 px-3">
                         <p className="font-bold text-slate-800 text-xs">{u.fullName}</p>
-                        <p className="font-mono text-[10px] text-slate-400">@{u.username}</p>
+                        <p className="tabular-nums text-[10px] text-slate-400">@{u.username}</p>
                       </td>
                       <td className="py-2.5 px-3">
                         <span className="inline-flex items-center gap-1 font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded-md text-[11px]">

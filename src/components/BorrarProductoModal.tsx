@@ -63,12 +63,12 @@ export default function DeleteProductModal({
 
           <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5">
             <div className="flex items-center justify-between">
-              <span className="font-mono text-[10px] bg-slate-200/80 text-slate-700 px-1.5 py-0.5 rounded font-bold">
+              <span className="tabular-nums text-[10px] bg-slate-200/80 text-slate-700 px-1.5 py-0.5 rounded font-bold">
                 {product.sku}
               </span>
               <span className="text-[10px] text-slate-500 font-semibold">
                 Existencia total:{" "}
-                <strong className="text-slate-800 font-mono">
+                <strong className="text-slate-800 tabular-nums">
                   {totalStockInNetwork} unid.
                 </strong>
               </span>

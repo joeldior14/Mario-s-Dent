@@ -141,13 +141,13 @@ export default function StockAdjustmentModal({
           <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between">
             <div>
               <p className="font-bold text-slate-800 text-xs">{productName}</p>
-              <p className="text-[10px] text-slate-400 font-mono">SKU: {sku}</p>
+              <p className="text-[10px] text-slate-400 tabular-nums">SKU: {sku}</p>
             </div>
             <div className="text-right">
               <span className="text-[10px] text-slate-400 uppercase font-bold block">
                 Stock Actual
               </span>
-              <span className="text-sm font-bold text-slate-800 font-mono">
+              <span className="text-sm font-bold text-slate-800 tabular-nums">
                 {currentStock} unidades
               </span>
             </div>
@@ -251,7 +251,7 @@ export default function StockAdjustmentModal({
           {/* Previsualización del Stock Resultante */}
           <div className="p-3 bg-sky-50/60 border border-sky-100 rounded-xl flex items-center justify-between text-xs">
             <span className="text-slate-500">Nuevo stock resultante:</span>
-            <span className="font-bold text-sky-900 font-mono text-sm">
+            <span className="font-bold text-sky-900 tabular-nums text-sm">
               {projectedStock} unidades
             </span>
           </div>

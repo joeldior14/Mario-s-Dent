@@ -198,7 +198,7 @@ export default function HaciendaReportModal({
               <span className="block text-[10px] text-purple-700 font-bold uppercase">
                 Artículos
               </span>
-              <span className="text-sm font-bold text-slate-800 font-mono">
+              <span className="text-sm font-bold text-slate-800 tabular-nums">
                 {totalProductsCount} SKUs
               </span>
             </div>
@@ -207,7 +207,7 @@ export default function HaciendaReportModal({
               <span className="block text-[10px] text-amber-700 font-bold uppercase">
                 Unidades Físicas
               </span>
-              <span className="text-sm font-bold text-slate-800 font-mono">
+              <span className="text-sm font-bold text-slate-800 tabular-nums">
                 {totalPhysicalUnits.toLocaleString("en-US")} piezas
               </span>
             </div>
@@ -216,7 +216,7 @@ export default function HaciendaReportModal({
               <span className="block text-[10px] text-emerald-700 font-bold uppercase">
                 Valuación al Costo
               </span>
-              <span className="text-sm font-bold text-emerald-800 font-mono">
+              <span className="text-sm font-bold text-emerald-800 tabular-nums">
                 ${totalInventoryValuation.toLocaleString("en-US", {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,

@@ -37,7 +37,7 @@ export default function BranchStockModal({
         {/* Cabecera */}
         <div className="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50/50">
           <div>
-            <span className="text-[10px] font-mono text-slate-400 uppercase tracking-wider font-bold">
+            <span className="text-[10px] tabular-nums text-slate-400 uppercase tracking-wider font-bold">
               {product.sku}
             </span>
             <h3 className="text-sm font-bold text-slate-800 leading-tight">
@@ -94,7 +94,7 @@ export default function BranchStockModal({
                 {/* Badge de Stock */}
                 <div className="text-right">
                   <span
-                    className={`inline-block px-2.5 py-1 rounded-lg text-xs font-mono font-bold ${
+                    className={`inline-block px-2.5 py-1 rounded-lg text-xs tabular-nums font-bold ${
                       hasStock
                         ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                         : "bg-rose-50 text-rose-600 border border-rose-200"

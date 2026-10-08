@@ -238,7 +238,7 @@ export default function BranchManagementModal({ isOpen, onClose, onSuccess }: Pr
                         <span className="text-xs font-bold text-slate-800">
                           {branch.name}
                         </span>
-                        <span className="px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[10px] font-mono font-bold">
+                        <span className="px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[10px] tabular-nums font-bold">
                           {branch.code}
                         </span>
                         {branch.isActive ? (
@@ -328,7 +328,7 @@ export default function BranchManagementModal({ isOpen, onClose, onSuccess }: Pr
                       setFormData({ ...formData, code: e.target.value })
                     }
                     placeholder="Ej. SM, SA"
-                    className="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-sky-400 font-mono uppercase"
+                    className="w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-sky-400 tabular-nums uppercase"
                   />
                 </div>
               </div>

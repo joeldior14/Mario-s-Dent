@@ -116,7 +116,7 @@ export default function ProductHistoryModal({
                 <h3 id={`${modalId}-title`} className="text-sm font-bold text-slate-800 leading-tight">
                   Kardex y Trazabilidad de Stock
                 </h3>
-                <span className="font-mono text-[10px] bg-slate-200/80 font-bold text-slate-700 px-1.5 py-0.5 rounded">
+                <span className="tabular-nums text-[10px] bg-slate-200/80 font-bold text-slate-700 px-1.5 py-0.5 rounded">
                   {product.sku}
                 </span>
               </div>
@@ -199,7 +199,7 @@ export default function ProductHistoryModal({
               <tbody className="divide-y divide-slate-100 text-slate-600 font-medium">
                 {movements.map((row) => (
                   <tr key={row.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-2.5 px-3 font-mono text-[11px] text-slate-400 whitespace-nowrap">
+                    <td className="py-2.5 px-3 tabular-nums text-[11px] text-slate-400 whitespace-nowrap">
                       {row.date}
                     </td>
                     <td className="py-2.5 px-3">
@@ -228,15 +228,15 @@ export default function ProductHistoryModal({
                       <p className="font-bold text-slate-800 text-[11px]">{row.branch}</p>
                       <p className="text-[10px] text-slate-400">{row.user}</p>
                     </td>
-                    <td className="py-2.5 px-3 text-right font-mono font-bold">
+                    <td className="py-2.5 px-3 text-right tabular-nums font-bold">
                       <span className={row.quantity < 0 ? "text-rose-600" : "text-emerald-600"}>
                         {row.quantity > 0 ? `+${row.quantity}` : row.quantity}
                       </span>
                     </td>
-                    <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-800">
+                    <td className="py-2.5 px-3 text-right tabular-nums font-bold text-slate-800">
                       {row.stockAfter}
                     </td>
-                    <td className="py-2.5 px-3 text-[11px] text-slate-500 font-mono">
+                    <td className="py-2.5 px-3 text-[11px] text-slate-500 tabular-nums">
                       {row.reference}
                     </td>
                   </tr>

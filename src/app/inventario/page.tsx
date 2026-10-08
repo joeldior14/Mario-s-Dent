@@ -807,7 +807,7 @@ export default function InventoryPage() {
                       return (
                         <tr
                           key={item.id}
-                          className="hover:bg-sky-50/25 transition-colors group"
+                          className="hover:bg-sky-50/25 transition-colors"
                         >
                           {/* 1. SKU & Barcode */}
                           <td className="py-3.5 px-5 whitespace-nowrap">
@@ -823,17 +823,50 @@ export default function InventoryPage() {
                             </div>
                           </td>
 
-                          {/* 2. Producto & Marca */}
-                          <td className="py-3.5 px-4">
-                            <div className="max-w-[200px]">
-                              <p className="font-bold text-sky-800 text-xs leading-snug group-hover:text-sky-500 transition-colors">
-                                {item.name}
-                              </p>
-                              <span className="text-[10px] font-semibold text-slate-600 mt-0.5 block">
-                                {item.brand || "Genérico"}
-                              </span>
-                            </div>
-                          </td>
+{/* 2. Producto & Marca sin provocar scroll en el último ítem */}
+<td className="py-3.5 px-4 align-middle">
+  <div className="flex flex-col items-start max-w-[200px]">
+    
+    {/* Contenedor group exclusivo para el nombre */}
+    <span className="relative inline-block w-fit group">
+      
+      {/* Texto del nombre */}
+      <span className="font-bold text-sky-800 text-xs leading-snug hover:text-sky-500 transition-colors cursor-pointer select-none">
+        {item.name}
+      </span>
+
+      {/* Ventana flotante: con 'bottom-0' la caja sube hacia arriba y nunca sobrepasa la base de la tabla */}
+      <div className="absolute left-full bottom-0 ml-3 z-50 pointer-events-none hidden group-hover:flex flex-col items-center animate-in fade-in zoom-in-95 duration-150">
+        <div className="w-32 bg-white p-2 rounded-2xl shadow-2xl border border-slate-200/90 backdrop-blur-xs flex flex-col items-center gap-1.5">
+          
+          {/* Recuadro de la imagen */}
+          <div className="w-full h-24 bg-slate-50 rounded-xl overflow-hidden flex items-center justify-center border border-slate-100">
+            {item.image ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img
+                src={item.image}
+                alt={item.name}
+                className="w-full h-full object-contain p-1"
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center text-slate-300">
+                <span className="text-xl">🦷</span>
+                <span className="text-[9px] text-slate-400 font-medium mt-0.5">Sin imagen</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+    </span>
+
+    {/* Marca fuera del grupo */}
+    <span className="text-[10px] font-semibold text-slate-500 mt-0.5 block select-none">
+      {item.brand || "Genérico"}
+    </span>
+
+  </div>
+</td>
 
                           {/* 3. Descripción */}
                           <td className="py-3.5 px-4 text-slate-600 text-[11px] leading-relaxed line-clamp-2">

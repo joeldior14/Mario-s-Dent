@@ -213,7 +213,7 @@ export default function TransferStockModal({
                         }`}
                       >
                         <div>
-                          <span className="font-mono font-semibold text-[11px] text-slate-500 mr-1.5">
+                          <span className="tabular-nums font-semibold text-[11px] text-slate-500 mr-1.5">
                             [{p.sku}]
                           </span>
                           <span>{p.name}</span>
@@ -253,7 +253,7 @@ export default function TransferStockModal({
                   </option>
                 ))}
               </select>
-              <p className="text-xs text-slate-500 mt-1 font-mono">
+              <p className="text-xs text-slate-500 mt-1 tabular-nums">
                 Disp:{" "}
                 <strong className={selectedProductId ? "text-amber-700" : "text-slate-400"}>
                   {selectedProductId ? availableInSource : "—"}

@@ -1235,7 +1235,7 @@ function DashboardPage() {
                                                                 className: "flex items-baseline gap-3",
                                                                 children: [
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                        className: "text-3xl sm:text-4xl font-black text-slate-900 tracking-tight tabular-nums",
+                                                                        className: "text-3xl sm:text-4xl font-black text-sky-500 tracking-tight tabular-nums",
                                                                         children: [
                                                                             "$",
                                                                             realMetrics.totalIncome.toLocaleString("en-US", {
@@ -1312,7 +1312,7 @@ function DashboardPage() {
                                                                 columnNumber: 19
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "text-3xl font-black text-sky-700 tabular-nums",
+                                                                className: "text-3xl font-bold text-sky-700 tabular-nums",
                                                                 children: realMetrics.totalTickets
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/dashboard/page.tsx",
@@ -1335,7 +1335,7 @@ function DashboardPage() {
                                                 className: "mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs",
                                                 children: [
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        className: "text-slate-400 text-[11px]",
+                                                        className: "text-slate-700 font-bold text-[11px]",
                                                         children: selectedBranchKey === "all" ? "Consolidado de 3 sucursales en operación" : `Reporte específico de ${activeMetrics.name}`
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/page.tsx",
@@ -1343,7 +1343,7 @@ function DashboardPage() {
                                                         columnNumber: 17
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        className: "text-[11px] font-semibold text-slate-500",
+                                                        className: "text-[10px] font-semibold text-slate-400",
                                                         children: "Corte y arqueo gestionado en Caja"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/dashboard/page.tsx",
@@ -1606,7 +1606,7 @@ function DashboardPage() {
                                                                 className: "absolute inset-0 flex flex-col items-center justify-center text-center",
                                                                 children: [
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                        className: "text-xs font-black text-slate-800 tabular-nums tabular-nums",
+                                                                        className: "text-xs font-black text-sky-600 tabular-nums tabular-nums",
                                                                         children: hasSales && !isLoadingMetrics ? `${Math.round(animProgress * 100)}%` : "0%"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/dashboard/page.tsx",
@@ -1614,7 +1614,7 @@ function DashboardPage() {
                                                                         columnNumber: 21
                                                                     }, this),
                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                        className: "text-[9px] text-slate-400 font-bold uppercase",
+                                                                        className: "text-[9px] text-slate-800 font-bold uppercase",
                                                                         children: "Total"
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/dashboard/page.tsx",
@@ -3598,7 +3598,7 @@ function BranchManagementModal({ isOpen, onClose, onSuccess }) {
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[10px] font-mono font-bold",
+                                                                className: "px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[10px] tabular-nums font-bold",
                                                                 children: branch.code
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
@@ -3822,7 +3822,7 @@ function BranchManagementModal({ isOpen, onClose, onSuccess }) {
                                                         code: e.target.value
                                                     }),
                                                 placeholder: "Ej. SM, SA",
-                                                className: "w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-sky-400 font-mono uppercase"
+                                                className: "w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-sky-400 tabular-nums uppercase"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
                                                 lineNumber: 322,
@@ -4686,7 +4686,7 @@ function UserManagementModal({ isOpen, onClose }) {
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                                    className: "font-mono text-[10px] text-slate-400",
+                                                                    className: "tabular-nums text-[10px] text-slate-400",
                                                                     children: [
                                                                         "@",
                                                                         u.username

@@ -1329,7 +1329,7 @@ function InventoryPage() {
                                                         const currentStock = getStockDisplay(item);
                                                         const otherStock = getOtherBranchesStock(item);
                                                         return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("tr", {
-                                                            className: "hover:bg-sky-50/25 transition-colors group",
+                                                            className: "hover:bg-sky-50/25 transition-colors",
                                                             children: [
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
                                                                     className: "py-3.5 px-5 whitespace-nowrap",
@@ -1364,43 +1364,106 @@ function InventoryPage() {
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                                    className: "py-3.5 px-4",
+                                                                    className: "py-3.5 px-4 align-middle",
                                                                     children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                                        className: "max-w-[200px]",
+                                                                        className: "flex flex-col items-start max-w-[200px]",
                                                                         children: [
-                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                                                className: "font-bold text-sky-800 text-xs leading-snug group-hover:text-sky-500 transition-colors",
-                                                                                children: item.name
-                                                                            }, void 0, false, {
+                                                                            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                className: "relative inline-block w-fit group",
+                                                                                children: [
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                        className: "font-bold text-sky-800 text-xs leading-snug hover:text-sky-500 transition-colors cursor-pointer select-none",
+                                                                                        children: item.name
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/src/app/inventario/page.tsx",
+                                                                                        lineNumber: 834,
+                                                                                        columnNumber: 7
+                                                                                    }, this),
+                                                                                    /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                        className: "absolute left-full bottom-0 ml-3 z-50 pointer-events-none hidden group-hover:flex flex-col items-center animate-in fade-in zoom-in-95 duration-150",
+                                                                                        children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                            className: "w-32 bg-white p-2 rounded-2xl shadow-2xl border border-slate-200/90 backdrop-blur-xs flex flex-col items-center gap-1.5",
+                                                                                            children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                className: "w-full h-24 bg-slate-50 rounded-xl overflow-hidden flex items-center justify-center border border-slate-100",
+                                                                                                children: item.image ? /* eslint-disable-next-line @next/next/no-img-element */ /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("img", {
+                                                                                                    src: item.image,
+                                                                                                    alt: item.name,
+                                                                                                    className: "w-full h-full object-contain p-1"
+                                                                                                }, void 0, false, {
+                                                                                                    fileName: "[project]/src/app/inventario/page.tsx",
+                                                                                                    lineNumber: 846,
+                                                                                                    columnNumber: 15
+                                                                                                }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                                                                    className: "flex flex-col items-center justify-center text-slate-300",
+                                                                                                    children: [
+                                                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                            className: "text-xl",
+                                                                                                            children: "🦷"
+                                                                                                        }, void 0, false, {
+                                                                                                            fileName: "[project]/src/app/inventario/page.tsx",
+                                                                                                            lineNumber: 853,
+                                                                                                            columnNumber: 17
+                                                                                                        }, this),
+                                                                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                                                                            className: "text-[9px] text-slate-400 font-medium mt-0.5",
+                                                                                                            children: "Sin imagen"
+                                                                                                        }, void 0, false, {
+                                                                                                            fileName: "[project]/src/app/inventario/page.tsx",
+                                                                                                            lineNumber: 854,
+                                                                                                            columnNumber: 17
+                                                                                                        }, this)
+                                                                                                    ]
+                                                                                                }, void 0, true, {
+                                                                                                    fileName: "[project]/src/app/inventario/page.tsx",
+                                                                                                    lineNumber: 852,
+                                                                                                    columnNumber: 15
+                                                                                                }, this)
+                                                                                            }, void 0, false, {
+                                                                                                fileName: "[project]/src/app/inventario/page.tsx",
+                                                                                                lineNumber: 843,
+                                                                                                columnNumber: 11
+                                                                                            }, this)
+                                                                                        }, void 0, false, {
+                                                                                            fileName: "[project]/src/app/inventario/page.tsx",
+                                                                                            lineNumber: 840,
+                                                                                            columnNumber: 9
+                                                                                        }, this)
+                                                                                    }, void 0, false, {
+                                                                                        fileName: "[project]/src/app/inventario/page.tsx",
+                                                                                        lineNumber: 839,
+                                                                                        columnNumber: 7
+                                                                                    }, this)
+                                                                                ]
+                                                                            }, void 0, true, {
                                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                                lineNumber: 829,
-                                                                                columnNumber: 31
+                                                                                lineNumber: 831,
+                                                                                columnNumber: 5
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                                className: "text-[10px] font-semibold text-slate-600 mt-0.5 block",
+                                                                                className: "text-[10px] font-semibold text-slate-500 mt-0.5 block select-none",
                                                                                 children: item.brand || "Genérico"
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                                lineNumber: 832,
-                                                                                columnNumber: 31
+                                                                                lineNumber: 864,
+                                                                                columnNumber: 5
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/app/inventario/page.tsx",
                                                                         lineNumber: 828,
-                                                                        columnNumber: 29
+                                                                        columnNumber: 3
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/inventario/page.tsx",
                                                                     lineNumber: 827,
-                                                                    columnNumber: 27
+                                                                    columnNumber: 1
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
                                                                     className: "py-3.5 px-4 text-slate-600 text-[11px] leading-relaxed line-clamp-2",
                                                                     children: item.description || "—"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                                    lineNumber: 839,
+                                                                    lineNumber: 872,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -1410,12 +1473,12 @@ function InventoryPage() {
                                                                         children: item.category
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                                        lineNumber: 845,
+                                                                        lineNumber: 878,
                                                                         columnNumber: 29
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                                    lineNumber: 844,
+                                                                    lineNumber: 877,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 isAdmin && selectedBranch === "ALL" ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -1425,7 +1488,7 @@ function InventoryPage() {
                                                                             children: item.branches.find((b)=>b.branchId === "santa-ana")?.stock ?? 0
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                                            lineNumber: 853,
+                                                                            lineNumber: 886,
                                                                             columnNumber: 31
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -1433,7 +1496,7 @@ function InventoryPage() {
                                                                             children: item.branches.find((b)=>b.branchId === "ahuachapan")?.stock ?? 0
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                                            lineNumber: 856,
+                                                                            lineNumber: 889,
                                                                             columnNumber: 31
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -1441,7 +1504,7 @@ function InventoryPage() {
                                                                             children: item.branches.find((b)=>b.branchId === "sonsonate")?.stock ?? 0
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                                            lineNumber: 859,
+                                                                            lineNumber: 892,
                                                                             columnNumber: 31
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -1451,18 +1514,18 @@ function InventoryPage() {
                                                                                 children: currentStock
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                                lineNumber: 863,
+                                                                                lineNumber: 896,
                                                                                 columnNumber: 33
                                                                             }, this)
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                                            lineNumber: 862,
+                                                                            lineNumber: 895,
                                                                             columnNumber: 31
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                                    lineNumber: 852,
+                                                                    lineNumber: 885,
                                                                     columnNumber: 29
                                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
                                                                     children: [
@@ -1473,12 +1536,12 @@ function InventoryPage() {
                                                                                 children: currentStock === 0 ? "Agotado" : currentStock
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                                lineNumber: 872,
+                                                                                lineNumber: 905,
                                                                                 columnNumber: 33
                                                                             }, this)
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                                            lineNumber: 871,
+                                                                            lineNumber: 904,
                                                                             columnNumber: 31
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -1492,31 +1555,31 @@ function InventoryPage() {
                                                                                         className: `w-3.5 h-3.5 ${otherStock > 0 ? "text-sky-600" : "text-slate-400"}`
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                                                        lineNumber: 896,
+                                                                                        lineNumber: 929,
                                                                                         columnNumber: 35
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                                         children: otherStock > 0 ? `${otherStock} en red` : "Sin stock"
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                                                        lineNumber: 901,
+                                                                                        lineNumber: 934,
                                                                                         columnNumber: 35
                                                                                     }, this)
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                                lineNumber: 887,
+                                                                                lineNumber: 920,
                                                                                 columnNumber: 33
                                                                             }, this)
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                                                            lineNumber: 886,
+                                                                            lineNumber: 919,
                                                                             columnNumber: 31
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                                    lineNumber: 869,
+                                                                    lineNumber: 902,
                                                                     columnNumber: 29
                                                                 }, this),
                                                                 isAdmin && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -1527,7 +1590,7 @@ function InventoryPage() {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                                    lineNumber: 909,
+                                                                    lineNumber: 942,
                                                                     columnNumber: 29
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -1540,12 +1603,12 @@ function InventoryPage() {
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                                        lineNumber: 916,
+                                                                        lineNumber: 949,
                                                                         columnNumber: 29
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                                    lineNumber: 915,
+                                                                    lineNumber: 948,
                                                                     columnNumber: 27
                                                                 }, this),
                                                                 isAdmin && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
@@ -1562,12 +1625,12 @@ function InventoryPage() {
                                                                                     className: "w-3 h-3 text-sky-600"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                                                    lineNumber: 932,
+                                                                                    lineNumber: 965,
                                                                                     columnNumber: 37
                                                                                 }, this)
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                                lineNumber: 926,
+                                                                                lineNumber: 959,
                                                                                 columnNumber: 35
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1579,12 +1642,12 @@ function InventoryPage() {
                                                                                     className: "w-3.5 h-3.5"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                                                    lineNumber: 942,
+                                                                                    lineNumber: 975,
                                                                                     columnNumber: 35
                                                                                 }, this)
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                                lineNumber: 936,
+                                                                                lineNumber: 969,
                                                                                 columnNumber: 33
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1596,12 +1659,12 @@ function InventoryPage() {
                                                                                     className: "w-3.5 h-3.5"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                                                    lineNumber: 951,
+                                                                                    lineNumber: 984,
                                                                                     columnNumber: 35
                                                                                 }, this)
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                                lineNumber: 945,
+                                                                                lineNumber: 978,
                                                                                 columnNumber: 33
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1613,23 +1676,23 @@ function InventoryPage() {
                                                                                     className: "w-3.5 h-3.5"
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                                                    lineNumber: 960,
+                                                                                    lineNumber: 993,
                                                                                     columnNumber: 35
                                                                                 }, this)
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                                lineNumber: 954,
+                                                                                lineNumber: 987,
                                                                                 columnNumber: 33
                                                                             }, this)
                                                                         ]
                                                                     }, void 0, true, {
                                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                                        lineNumber: 924,
+                                                                        lineNumber: 957,
                                                                         columnNumber: 31
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                                    lineNumber: 923,
+                                                                    lineNumber: 956,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             ]
@@ -1668,7 +1731,7 @@ function InventoryPage() {
                                                         children: (safePage - 1) * itemsPerPage + 1
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 979,
+                                                        lineNumber: 1012,
                                                         columnNumber: 21
                                                     }, this),
                                                     " ",
@@ -1679,7 +1742,7 @@ function InventoryPage() {
                                                         children: Math.min(safePage * itemsPerPage, filteredItems.length)
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 983,
+                                                        lineNumber: 1016,
                                                         columnNumber: 21
                                                     }, this),
                                                     " ",
@@ -1689,14 +1752,14 @@ function InventoryPage() {
                                                         children: filteredItems.length
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 986,
+                                                        lineNumber: 1019,
                                                         columnNumber: 24
                                                     }, this),
                                                     " registros"
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 977,
+                                                lineNumber: 1010,
                                                 columnNumber: 19
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1712,20 +1775,20 @@ function InventoryPage() {
                                                                 className: "w-3.5 h-3.5"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                lineNumber: 997,
+                                                                lineNumber: 1030,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                 children: "Anterior"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                lineNumber: 998,
+                                                                lineNumber: 1031,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 991,
+                                                        lineNumber: 1024,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1741,7 +1804,7 @@ function InventoryPage() {
                                                                     children: pageNum
                                                                 }, pageNum, false, {
                                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                                    lineNumber: 1010,
+                                                                    lineNumber: 1043,
                                                                     columnNumber: 29
                                                                 }, this);
                                                             }
@@ -1751,7 +1814,7 @@ function InventoryPage() {
                                                                     children: "..."
                                                                 }, pageNum, false, {
                                                                     fileName: "[project]/src/app/inventario/page.tsx",
-                                                                    lineNumber: 1029,
+                                                                    lineNumber: 1062,
                                                                     columnNumber: 29
                                                                 }, this);
                                                             }
@@ -1759,7 +1822,7 @@ function InventoryPage() {
                                                         })
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 1002,
+                                                        lineNumber: 1035,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1772,32 +1835,32 @@ function InventoryPage() {
                                                                 children: "Siguiente"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                lineNumber: 1045,
+                                                                lineNumber: 1078,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$chevron$2d$right$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__ChevronRight$3e$__["ChevronRight"], {
                                                                 className: "w-3.5 h-3.5"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                                lineNumber: 1046,
+                                                                lineNumber: 1079,
                                                                 columnNumber: 23
                                                             }, this)
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                                        lineNumber: 1039,
+                                                        lineNumber: 1072,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                                lineNumber: 989,
+                                                lineNumber: 1022,
                                                 columnNumber: 19
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                        lineNumber: 976,
+                                        lineNumber: 1009,
                                         columnNumber: 17
                                     }, this)
                                 ]
@@ -1815,12 +1878,12 @@ function InventoryPage() {
                                             className: "w-6 h-6"
                                         }, void 0, false, {
                                             fileName: "[project]/src/app/inventario/page.tsx",
-                                            lineNumber: 1057,
+                                            lineNumber: 1090,
                                             columnNumber: 17
                                         }, this)
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                        lineNumber: 1056,
+                                        lineNumber: 1089,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1828,7 +1891,7 @@ function InventoryPage() {
                                         children: "No hay productos que coincidan"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                        lineNumber: 1059,
+                                        lineNumber: 1092,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -1836,13 +1899,13 @@ function InventoryPage() {
                                         children: search || category !== "All" ? "Verifica los términos de búsqueda o selecciona otra categoría." : "El catálogo está vacío. Utiliza el botón \"Nuevo Producto\" para agregar insumos."
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/inventario/page.tsx",
-                                        lineNumber: 1062,
+                                        lineNumber: 1095,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 1055,
+                                lineNumber: 1088,
                                 columnNumber: 13
                             }, this)
                         ]
@@ -1858,7 +1921,7 @@ function InventoryPage() {
                         product: selectedProduct
                     }, void 0, false, {
                         fileName: "[project]/src/app/inventario/page.tsx",
-                        lineNumber: 1074,
+                        lineNumber: 1107,
                         columnNumber: 9
                     }, this),
                     adjustingProduct && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$AjusteStockModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1871,7 +1934,7 @@ function InventoryPage() {
                         onConfirm: handleConfirmAdjustment
                     }, void 0, false, {
                         fileName: "[project]/src/app/inventario/page.tsx",
-                        lineNumber: 1082,
+                        lineNumber: 1115,
                         columnNumber: 11
                     }, this),
                     isAdmin && /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -1882,7 +1945,7 @@ function InventoryPage() {
                                 onSave: handleSaveNewProduct
                             }, void 0, false, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 1095,
+                                lineNumber: 1128,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$TransferStockModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1892,7 +1955,7 @@ function InventoryPage() {
                                 onConfirmTransfer: handleConfirmTransfer
                             }, void 0, false, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 1101,
+                                lineNumber: 1134,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$HistorialProductoModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1902,7 +1965,7 @@ function InventoryPage() {
                                 currentBranch: selectedBranch
                             }, void 0, false, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 1108,
+                                lineNumber: 1141,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$EditarProductoModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1912,7 +1975,7 @@ function InventoryPage() {
                                 onSave: handleUpdateProduct
                             }, void 0, false, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 1115,
+                                lineNumber: 1148,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$BorrarProductoModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1922,7 +1985,7 @@ function InventoryPage() {
                                 product: deletingProduct
                             }, void 0, false, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 1122,
+                                lineNumber: 1155,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$src$2f$components$2f$ReporteHaciendaModal$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
@@ -1931,13 +1994,13 @@ function InventoryPage() {
                                 products: items
                             }, void 0, false, {
                                 fileName: "[project]/src/app/inventario/page.tsx",
-                                lineNumber: 1129,
+                                lineNumber: 1162,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/src/app/inventario/page.tsx",
-                        lineNumber: 1094,
+                        lineNumber: 1127,
                         columnNumber: 11
                     }, this)
                 ]
@@ -2971,7 +3034,7 @@ function StockAdjustmentModal({ isOpen, onClose, productName, sku, branchName, c
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                        className: "text-[10px] text-slate-400 font-mono",
+                                        className: "text-[10px] text-slate-400 tabular-nums",
                                         children: [
                                             "SKU: ",
                                             sku
@@ -2999,7 +3062,7 @@ function StockAdjustmentModal({ isOpen, onClose, productName, sku, branchName, c
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                        className: "text-sm font-bold text-slate-800 font-mono",
+                                        className: "text-sm font-bold text-slate-800 tabular-nums",
                                         children: [
                                             currentStock,
                                             " unidades"
@@ -3214,7 +3277,7 @@ function StockAdjustmentModal({ isOpen, onClose, productName, sku, branchName, c
                                     columnNumber: 13
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                    className: "font-bold text-sky-900 font-mono text-sm",
+                                    className: "font-bold text-sky-900 tabular-nums text-sm",
                                     children: [
                                         projectedStock,
                                         " unidades"
@@ -3417,7 +3480,7 @@ function DeleteProductModal({ isOpen, onClose, onConfirm, product }) {
                                     className: "flex items-center justify-between",
                                     children: [
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "font-mono text-[10px] bg-slate-200/80 text-slate-700 px-1.5 py-0.5 rounded font-bold",
+                                            className: "tabular-nums text-[10px] bg-slate-200/80 text-slate-700 px-1.5 py-0.5 rounded font-bold",
                                             children: product.sku
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/BorrarProductoModal.tsx",
@@ -3430,7 +3493,7 @@ function DeleteProductModal({ isOpen, onClose, onConfirm, product }) {
                                                 "Existencia total:",
                                                 " ",
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("strong", {
-                                                    className: "text-slate-800 font-mono",
+                                                    className: "text-slate-800 tabular-nums",
                                                     children: [
                                                         totalStockInNetwork,
                                                         " unid."
@@ -3598,7 +3661,7 @@ function BranchStockModal({ isOpen, onClose, currentBranch, product }) {
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                    className: "text-[10px] font-mono text-slate-400 uppercase tracking-wider font-bold",
+                                    className: "text-[10px] tabular-nums text-slate-400 uppercase tracking-wider font-bold",
                                     children: product.sku
                                 }, void 0, false, {
                                     fileName: "[project]/src/components/BranchStockModal.tsx",
@@ -3747,7 +3810,7 @@ function BranchStockModal({ isOpen, onClose, currentBranch, product }) {
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                         className: "text-right",
                                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: `inline-block px-2.5 py-1 rounded-lg text-xs font-mono font-bold ${hasStock ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-rose-50 text-rose-600 border border-rose-200"}`,
+                                            className: `inline-block px-2.5 py-1 rounded-lg text-xs tabular-nums font-bold ${hasStock ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-rose-50 text-rose-600 border border-rose-200"}`,
                                             children: hasStock ? `${b.stock} disp.` : "Agotado"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/BranchStockModal.tsx",
@@ -3983,7 +4046,7 @@ function EditProductFormContent({ product, onClose, onSave }) {
                                         columnNumber: 13
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                        className: "text-[11px] text-slate-500 font-mono",
+                                        className: "text-[11px] text-slate-500 tabular-nums",
                                         children: [
                                             "SKU: ",
                                             product.sku
@@ -4180,7 +4243,7 @@ function EditProductFormContent({ product, onClose, onSave }) {
                                         value: sku,
                                         disabled: isSubmitting,
                                         onChange: (e)=>setSku(e.target.value),
-                                        className: "w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs font-mono font-medium focus:outline-none focus:border-sky-500 shadow-2xs uppercase disabled:opacity-50",
+                                        className: "w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs tabular-nums font-medium focus:outline-none focus:border-sky-500 shadow-2xs uppercase disabled:opacity-50",
                                         required: true
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/EditarProductoModal.tsx",
@@ -4211,7 +4274,7 @@ function EditProductFormContent({ product, onClose, onSave }) {
                                         disabled: isSubmitting,
                                         onChange: (e)=>setBarcode(e.target.value),
                                         placeholder: "Opcional / Lector",
-                                        className: "w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs font-mono font-medium focus:outline-none focus:border-sky-500 shadow-2xs disabled:opacity-50"
+                                        className: "w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs tabular-nums font-medium focus:outline-none focus:border-sky-500 shadow-2xs disabled:opacity-50"
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/EditarProductoModal.tsx",
                                         lineNumber: 284,
@@ -4395,7 +4458,7 @@ function EditProductFormContent({ product, onClose, onSave }) {
                                         value: cost,
                                         disabled: isSubmitting,
                                         onChange: (e)=>setCost(e.target.value === "" ? "" : parseFloat(e.target.value)),
-                                        className: "w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs font-mono font-medium focus:outline-none focus:border-sky-500 shadow-2xs disabled:opacity-50",
+                                        className: "w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs tabular-nums font-medium focus:outline-none focus:border-sky-500 shadow-2xs disabled:opacity-50",
                                         required: true
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/EditarProductoModal.tsx",
@@ -4427,7 +4490,7 @@ function EditProductFormContent({ product, onClose, onSave }) {
                                         value: price,
                                         disabled: isSubmitting,
                                         onChange: (e)=>setPrice(e.target.value === "" ? "" : parseFloat(e.target.value)),
-                                        className: "w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-800 focus:outline-none focus:border-sky-500 shadow-2xs disabled:opacity-50",
+                                        className: "w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs tabular-nums font-bold text-slate-800 focus:outline-none focus:border-sky-500 shadow-2xs disabled:opacity-50",
                                         required: true
                                     }, void 0, false, {
                                         fileName: "[project]/src/components/EditarProductoModal.tsx",
@@ -4476,7 +4539,7 @@ function EditProductFormContent({ product, onClose, onSave }) {
                                                 value: stockSantaAna,
                                                 disabled: isSubmitting,
                                                 onChange: (e)=>setStockSantaAna(e.target.value === "" ? "" : parseInt(e.target.value, 10)),
-                                                className: "w-full h-8 px-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-800 focus:outline-none focus:border-sky-500 disabled:opacity-50"
+                                                className: "w-full h-8 px-2 bg-white border border-slate-200 rounded-lg text-xs tabular-nums font-bold text-slate-800 focus:outline-none focus:border-sky-500 disabled:opacity-50"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/EditarProductoModal.tsx",
                                                 lineNumber: 435,
@@ -4505,7 +4568,7 @@ function EditProductFormContent({ product, onClose, onSave }) {
                                                 value: stockAhuachapan,
                                                 disabled: isSubmitting,
                                                 onChange: (e)=>setStockAhuachapan(e.target.value === "" ? "" : parseInt(e.target.value, 10)),
-                                                className: "w-full h-8 px-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-800 focus:outline-none focus:border-sky-500 disabled:opacity-50"
+                                                className: "w-full h-8 px-2 bg-white border border-slate-200 rounded-lg text-xs tabular-nums font-bold text-slate-800 focus:outline-none focus:border-sky-500 disabled:opacity-50"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/EditarProductoModal.tsx",
                                                 lineNumber: 453,
@@ -4534,7 +4597,7 @@ function EditProductFormContent({ product, onClose, onSave }) {
                                                 value: stockSonsonate,
                                                 disabled: isSubmitting,
                                                 onChange: (e)=>setStockSonsonate(e.target.value === "" ? "" : parseInt(e.target.value, 10)),
-                                                className: "w-full h-8 px-2 bg-white border border-slate-200 rounded-lg text-xs font-mono font-bold text-slate-800 focus:outline-none focus:border-sky-500 disabled:opacity-50"
+                                                className: "w-full h-8 px-2 bg-white border border-slate-200 rounded-lg text-xs tabular-nums font-bold text-slate-800 focus:outline-none focus:border-sky-500 disabled:opacity-50"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/EditarProductoModal.tsx",
                                                 lineNumber: 471,
@@ -5010,7 +5073,7 @@ function BranchManagementModal({ isOpen, onClose, onSuccess }) {
                                                                 columnNumber: 25
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                className: "px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[10px] font-mono font-bold",
+                                                                className: "px-1.5 py-0.5 rounded-md bg-slate-100 text-slate-600 text-[10px] tabular-nums font-bold",
                                                                 children: branch.code
                                                             }, void 0, false, {
                                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
@@ -5234,7 +5297,7 @@ function BranchManagementModal({ isOpen, onClose, onSuccess }) {
                                                         code: e.target.value
                                                     }),
                                                 placeholder: "Ej. SM, SA",
-                                                className: "w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-sky-400 font-mono uppercase"
+                                                className: "w-full text-xs p-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:border-sky-400 tabular-nums uppercase"
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/GestionSucursalesModal.tsx",
                                                 lineNumber: 322,
@@ -6098,7 +6161,7 @@ function UserManagementModal({ isOpen, onClose }) {
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                                                    className: "font-mono text-[10px] text-slate-400",
+                                                                    className: "tabular-nums text-[10px] text-slate-400",
                                                                     children: [
                                                                         "@",
                                                                         u.username
@@ -6424,7 +6487,7 @@ function ProductHistoryModal({ isOpen, onClose, currentBranch = "Santa Ana", pro
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                    className: "font-mono text-[10px] bg-slate-200/80 font-bold text-slate-700 px-1.5 py-0.5 rounded",
+                                                    className: "tabular-nums text-[10px] bg-slate-200/80 font-bold text-slate-700 px-1.5 py-0.5 rounded",
                                                     children: product.sku
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/HistorialProductoModal.tsx",
@@ -6706,7 +6769,7 @@ function ProductHistoryModal({ isOpen, onClose, currentBranch = "Santa Ana", pro
                                         className: "hover:bg-slate-50/80 transition-colors",
                                         children: [
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                className: "py-2.5 px-3 font-mono text-[11px] text-slate-400 whitespace-nowrap",
+                                                className: "py-2.5 px-3 tabular-nums text-[11px] text-slate-400 whitespace-nowrap",
                                                 children: row.date
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/HistorialProductoModal.tsx",
@@ -6816,7 +6879,7 @@ function ProductHistoryModal({ isOpen, onClose, currentBranch = "Santa Ana", pro
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                className: "py-2.5 px-3 text-right font-mono font-bold",
+                                                className: "py-2.5 px-3 text-right tabular-nums font-bold",
                                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                     className: row.quantity < 0 ? "text-rose-600" : "text-emerald-600",
                                                     children: row.quantity > 0 ? `+${row.quantity}` : row.quantity
@@ -6831,7 +6894,7 @@ function ProductHistoryModal({ isOpen, onClose, currentBranch = "Santa Ana", pro
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                className: "py-2.5 px-3 text-right font-mono font-bold text-slate-800",
+                                                className: "py-2.5 px-3 text-right tabular-nums font-bold text-slate-800",
                                                 children: row.stockAfter
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/HistorialProductoModal.tsx",
@@ -6839,7 +6902,7 @@ function ProductHistoryModal({ isOpen, onClose, currentBranch = "Santa Ana", pro
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("td", {
-                                                className: "py-2.5 px-3 text-[11px] text-slate-500 font-mono",
+                                                className: "py-2.5 px-3 text-[11px] text-slate-500 tabular-nums",
                                                 children: row.reference
                                             }, void 0, false, {
                                                 fileName: "[project]/src/components/HistorialProductoModal.tsx",
@@ -7988,7 +8051,7 @@ function NewProductModal({ isOpen, onClose, onSave }) {
                                             value: sku,
                                             onChange: (e)=>setSku(e.target.value),
                                             placeholder: "Ej. RS-5520",
-                                            className: "w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-sky-500 transition-all"
+                                            className: "w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-sky-500 transition-all"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/NewProductModal.tsx",
                                             lineNumber: 242,
@@ -8032,7 +8095,7 @@ function NewProductModal({ isOpen, onClose, onSave }) {
                                             value: barcode,
                                             onChange: (e)=>setBarcode(e.target.value),
                                             placeholder: "Escanea o escribe código...",
-                                            className: "w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-medium text-slate-800 focus:bg-white focus:outline-none focus:border-sky-500 transition-all"
+                                            className: "w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-medium text-slate-800 focus:bg-white focus:outline-none focus:border-sky-500 transition-all"
                                         }, void 0, false, {
                                             fileName: "[project]/src/components/NewProductModal.tsx",
                                             lineNumber: 263,
@@ -8233,7 +8296,7 @@ function NewProductModal({ isOpen, onClose, onSave }) {
                                                     value: cost,
                                                     onChange: (e)=>setCost(e.target.value),
                                                     placeholder: "0.00",
-                                                    className: "w-full h-9 pl-7 pr-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-sky-500 transition-all"
+                                                    className: "w-full h-9 pl-7 pr-3 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-sky-500 transition-all"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/NewProductModal.tsx",
                                                     lineNumber: 352,
@@ -8280,7 +8343,7 @@ function NewProductModal({ isOpen, onClose, onSave }) {
                                                     value: price,
                                                     onChange: (e)=>setPrice(e.target.value),
                                                     placeholder: "0.00",
-                                                    className: "w-full h-9 pl-7 pr-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-sky-500 transition-all"
+                                                    className: "w-full h-9 pl-7 pr-3 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-sky-500 transition-all"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/components/NewProductModal.tsx",
                                                     lineNumber: 373,
@@ -8692,7 +8755,7 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "text-sm font-bold text-slate-800 font-mono",
+                                            className: "text-sm font-bold text-slate-800 tabular-nums",
                                             children: [
                                                 totalProductsCount,
                                                 " SKUs"
@@ -8720,7 +8783,7 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "text-sm font-bold text-slate-800 font-mono",
+                                            className: "text-sm font-bold text-slate-800 tabular-nums",
                                             children: [
                                                 totalPhysicalUnits.toLocaleString("en-US"),
                                                 " piezas"
@@ -8748,7 +8811,7 @@ function HaciendaReportModal({ isOpen, onClose, products }) {
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "text-sm font-bold text-emerald-800 font-mono",
+                                            className: "text-sm font-bold text-emerald-800 tabular-nums",
                                             children: [
                                                 "$",
                                                 totalInventoryValuation.toLocaleString("en-US", {
@@ -9263,7 +9326,7 @@ function TransferStockModal({ isOpen, onClose, products, onConfirmTransfer }) {
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                     children: [
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                            className: "font-mono font-semibold text-[11px] text-slate-500 mr-1.5",
+                                                            className: "tabular-nums font-semibold text-[11px] text-slate-500 mr-1.5",
                                                             children: [
                                                                 "[",
                                                                 p.sku,
@@ -9370,7 +9433,7 @@ function TransferStockModal({ isOpen, onClose, products, onConfirmTransfer }) {
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
-                                            className: "text-xs text-slate-500 mt-1 font-mono",
+                                            className: "text-xs text-slate-500 mt-1 tabular-nums",
                                             children: [
                                                 "Disp:",
                                                 " ",
