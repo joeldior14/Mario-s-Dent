@@ -360,6 +360,45 @@ export async function createProductInDB(payload: CreateProductPayload) {
   return newProduct;
 }
 
+// Generar el siguiente sku automaticamente
+
+export async function generateNextSKU(prefix: string = "P"): Promise<string> {
+  try {
+    // 1. Traemos todos los SKU que comiencen con el prefijo
+    const { data, error } = await supabase
+      .from("products")
+      .select("sku")
+      .ilike("sku", `${prefix}%`);
+
+    if (error || !data || data.length === 0) {
+      return `${prefix}001`; // Si no hay productos, empezamos con P001
+    }
+
+    let maxNumber = 0;
+    let detectedPadding = 3; // Por defecto rellenamos con ceros a 3 dígitos (ej. 001)
+
+    // 2. Iteramos para encontrar matemáticamente el número mayor de toda la tabla
+    data.forEach((item) => {
+      const match = item.sku.match(/(\d+)$/); // Extrae los números al final del SKU
+      if (match) {
+        const num = parseInt(match[1], 10);
+        if (num > maxNumber) {
+          maxNumber = num;
+          detectedPadding = match[1].length; // Mantiene el formato de ceros (ej. si era 603, mantiene 3 dígitos)
+        }
+      }
+    });
+
+    const nextNumber = maxNumber + 1;
+    const paddedNumber = nextNumber.toString().padStart(detectedPadding, "0");
+
+    return `${prefix}${paddedNumber}`;
+  } catch (err) {
+    console.error("Error calculando el mayor SKU:", err);
+    return `${prefix}001`;
+  }
+}
+
 // =========================================================================
 // 2. AJUSTAR EXISTENCIAS MANUALMENTE (+ / -)
 // =========================================================================
@@ -493,6 +532,7 @@ export async function updateProductInDB(payload: UpdateProductPayload) {
 // 4. ELIMINAR PRODUCTO DEL CATÁLOGO
 // =========================================================================
 export async function deleteProductFromDB(productId: string) {
+  // 1. Eliminar dependencias en branch_inventory
   const { error: invErr } = await supabase
     .from("branch_inventory")
     .delete()
@@ -503,6 +543,7 @@ export async function deleteProductFromDB(productId: string) {
     throw new Error(`Error en branch_inventory: ${invErr.message}`);
   }
 
+  // 2. Eliminar movimientos asociados en Kardex si existen
   const { error: movErr } = await supabase
     .from("stock_movements")
     .delete()
@@ -513,6 +554,7 @@ export async function deleteProductFromDB(productId: string) {
     throw new Error(`Error en stock_movements: ${movErr.message}`);
   }
 
+  // 3. Eliminar el registro maestro en products
   const { error: productErr } = await supabase
     .from("products")
     .delete()

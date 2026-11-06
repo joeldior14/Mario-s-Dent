@@ -3,6 +3,7 @@ import { Plus_Jakarta_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ShiftProvider } from "@/app/context/ShiftContext";
 import { AuthProvider } from "@/app/context/AuthContext";
+import AdminTimer from "@/components/AdminTimer"
 
 // Tipografía geométrica y nítida para la interfaz del sistema
 const jakarta = Plus_Jakarta_Sans({
@@ -41,6 +42,7 @@ export default function RootLayout({
     <html lang="es" className={`${jakarta.variable} ${mono.variable}`}>
       <body className={`${jakarta.className} antialiased bg-[#F8FAFC] text-slate-800`}>
         <AuthProvider>
+          <AdminTimer />
           <ShiftProvider>{children}</ShiftProvider>
         </AuthProvider>
       </body>

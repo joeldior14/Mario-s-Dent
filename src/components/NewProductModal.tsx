@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { X, Plus, Package, UploadCloud, Trash2 } from "lucide-react";
 import { BranchStock } from "@/app/inventario/page";
+import { generateNextSKU } from "@/app/services/inventoryService";
 
 export interface NewProductFormData {
   sku: string;
@@ -25,10 +26,11 @@ interface NewProductModalProps {
 
 const CATEGORIES = [
   "Resinas",
-  "Endo",
-  "Orto",
+  "Endodoncia",
+  "Ortodoncia",
   "Instrumentos",
   "Desechables",
+  "Insumos dentales",
 ] as const;
 
 export default function NewProductModal({
@@ -49,9 +51,19 @@ export default function NewProductModal({
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Cerrar al presionar Escape y bloquear scroll de fondo
+  // Autogenerar el SKU y resetear estados cada vez que se abre el modal
   useEffect(() => {
     if (!isOpen) return;
+
+    let isMounted = true;
+    async function fetchNextSku() {
+      const next = await generateNextSKU("P");
+      if (isMounted) {
+        setSku(next);
+      }
+    }
+
+    fetchNextSku();
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -61,6 +73,7 @@ export default function NewProductModal({
     window.addEventListener("keydown", handleKeyDown);
 
     return () => {
+      isMounted = false;
       document.body.style.overflow = "";
       window.removeEventListener("keydown", handleKeyDown);
     };
@@ -119,6 +132,8 @@ export default function NewProductModal({
       return;
     }
 
+    const finalBrand = brand.trim() ? brand.trim() : "Genérico";
+
     const initialBranches: BranchStock[] = [
       { branchId: "santa-ana", branchName: "Santa Ana", stock: 0, phone: "2440-1234" },
       { branchId: "ahuachapan", branchName: "Ahuachapán", stock: 0, phone: "2413-5678" },
@@ -129,7 +144,7 @@ export default function NewProductModal({
       sku: sku.trim().toUpperCase(),
       barcode: barcode.trim() || undefined,
       name: name.trim(),
-      brand: brand.trim() ? brand.trim() : "Genérico",
+      brand: finalBrand,
       category,
       description: description.trim(),
       cost: numCost,
@@ -245,7 +260,7 @@ export default function NewProductModal({
                 autoFocus
                 value={sku}
                 onChange={(e) => setSku(e.target.value)}
-                placeholder="Ej. RS-5520"
+                placeholder="Ej. P604"
                 className="w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs tabular-nums font-bold text-slate-800 focus:bg-white focus:outline-none focus:border-sky-500 transition-all"
               />
             </div>
@@ -291,7 +306,7 @@ export default function NewProductModal({
                 <label className="block text-[11px] font-bold text-sky-700 uppercase tracking-wider">
                   Marca
                 </label>
-                <span className="text-[10px] text-slate-400 font-medium lowercase">
+                <span className="text-[10px] text-slate-400 font-medium">
                   (opcional)
                 </span>
               </div>
@@ -299,7 +314,7 @@ export default function NewProductModal({
                 type="text"
                 value={brand}
                 onChange={(e) => setBrand(e.target.value)}
-                placeholder="Ej. 3M, Dentsply (por defecto: Genérico)"
+                placeholder="Ej. 3M (por defecto: Genérico)"
                 className="w-full h-9 px-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 focus:bg-white focus:outline-none focus:border-sky-500 transition-all"
               />
             </div>

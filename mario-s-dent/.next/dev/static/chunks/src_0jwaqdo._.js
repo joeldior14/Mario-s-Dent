@@ -578,7 +578,7 @@ function CajaContent() {
             setIsProcessing(false);
         }
     };
-    // Cerrar turno (Corte Z)
+    // Cerrar turno (Corte)
     const handleCloseShift = ()=>{
         const currentCounted = Number(countedCash) || 0;
         const currentExpected = Number(totals.expectedCash) || 0;
@@ -588,7 +588,7 @@ function CajaContent() {
                 isOpen: true,
                 type: "warning",
                 title: "Justificación Requerida",
-                description: "Existe un descuadre en el arqueo de efectivo. Es obligatorio ingresar una justificación antes de realizar el Corte Z.",
+                description: "Existe un descuadre en el arqueo de efectivo. Es obligatorio ingresar una justificación antes de realizar el Corte.",
                 confirmText: "Entendido",
                 onConfirm: ()=>setDialogConfig((prev)=>({
                             ...prev,
@@ -601,7 +601,7 @@ function CajaContent() {
             isOpen: true,
             type: "warning",
             title: "Confirmar Cierre de Turno",
-            description: "¿Confirmas el cierre de jornada (Corte Z)? Esta acción asentará el balance final en el sistema y cerrará la caja.",
+            description: "¿Confirmas el cierre de jornada (Corte)? Esta acción asentará el balance final en el sistema y cerrará la caja.",
             confirmText: "Sí, Cerrar Turno",
             cancelText: "Cancelar",
             onConfirm: async ()=>{
@@ -630,7 +630,7 @@ function CajaContent() {
                         isOpen: true,
                         type: "success",
                         title: "Turno Cerrado con Éxito",
-                        description: "El balance final ha sido asentado correctamente en la base de datos (Corte Z registrado).",
+                        description: "El balance final ha sido asentado correctamente en la base de datos (Corte registrado).",
                         confirmText: "Aceptar",
                         onConfirm: ()=>setDialogConfig((prev)=>({
                                     ...prev,
@@ -852,7 +852,7 @@ function CajaContent() {
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                                         className: "text-xs text-slate-600 font-medium mt-0.5",
-                                        children: "Cajón de efectivo, conciliación de ventas y cierre diario (Corte Z)"
+                                        children: "Cajón de efectivo, conciliación de ventas y cierre diario (Corte)"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/caja/page.tsx",
                                         lineNumber: 740,
@@ -1248,10 +1248,10 @@ function CajaContent() {
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                             type: "button",
                                             onClick: ()=>setIsTicketAuditOpen(true),
-                                            className: "px-3.5 h-10 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl shadow-2xs hover:border-sky-400 transition-colors flex items-center gap-2 cursor-pointer",
+                                            className: "group flex items-center gap-1.5 px-3.5 h-10 bg-sky-50 border border-sky-200 hover:bg-sky-700 hover:text-white text-sky-700 text-xs font-bold rounded-xl shadow-2xs hover:border-sky-400 transition-colors flex items-center gap-2 cursor-pointer",
                                             children: [
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$lucide$2d$react$2f$dist$2f$esm$2f$icons$2f$file$2d$text$2e$mjs__$5b$app$2d$client$5d$__$28$ecmascript$29$__$3c$export__default__as__FileText$3e$__["FileText"], {
-                                                    className: "w-3.5 h-3.5 text-sky-600"
+                                                    className: "w-3.5 h-3.5 text-sky-600 group-hover:text-white transition-colors"
                                                 }, void 0, false, {
                                                     fileName: "[project]/src/app/caja/page.tsx",
                                                     lineNumber: 945,
@@ -1927,7 +1927,7 @@ function CajaContent() {
                                                 children: [
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h2", {
                                                         className: "text-sm font-black text-sky-600 tracking-tight",
-                                                        children: isAdmin ? "Auditoría de Arqueo (Corte Z)" : "Arqueo de Caja (Efectivo)"
+                                                        children: isAdmin ? "Auditoría de Arqueo" : "Arqueo de Caja (Efectivo)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
                                                         lineNumber: 1142,
@@ -2228,7 +2228,7 @@ function CajaContent() {
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                                    children: "Descargar Corte Z"
+                                                                    children: "Descargar Corte"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/src/app/caja/page.tsx",
                                                                     lineNumber: 1333,
@@ -2403,7 +2403,7 @@ function CajaContent() {
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                                        children: "Cerrar Turno (Corte Z)"
+                                                        children: "Cerrar Turno (Corte)"
                                                     }, void 0, false, {
                                                         fileName: "[project]/src/app/caja/page.tsx",
                                                         lineNumber: 1402,
@@ -2900,6 +2900,8 @@ __turbopack_context__.s([
     ()=>fetchProductKardex,
     "fetchTicketsByBranchAndDate",
     ()=>fetchTicketsByBranchAndDate,
+    "generateNextSKU",
+    ()=>generateNextSKU,
     "processSaleInDB",
     ()=>processSaleInDB,
     "searchDashboardInventory",
@@ -2955,6 +2957,34 @@ async function createProductInDB(payload) {
     const { error: invError } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").insert(inventoryRows);
     if (invError) throw invError;
     return newProduct;
+}
+async function generateNextSKU(prefix = "P") {
+    try {
+        // 1. Traemos todos los SKU que comiencen con el prefijo
+        const { data, error } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("products").select("sku").ilike("sku", `${prefix}%`);
+        if (error || !data || data.length === 0) {
+            return `${prefix}001`; // Si no hay productos, empezamos con P001
+        }
+        let maxNumber = 0;
+        let detectedPadding = 3; // Por defecto rellenamos con ceros a 3 dígitos (ej. 001)
+        // 2. Iteramos para encontrar matemáticamente el número mayor de toda la tabla
+        data.forEach((item)=>{
+            const match = item.sku.match(/(\d+)$/); // Extrae los números al final del SKU
+            if (match) {
+                const num = parseInt(match[1], 10);
+                if (num > maxNumber) {
+                    maxNumber = num;
+                    detectedPadding = match[1].length; // Mantiene el formato de ceros (ej. si era 603, mantiene 3 dígitos)
+                }
+            }
+        });
+        const nextNumber = maxNumber + 1;
+        const paddedNumber = nextNumber.toString().padStart(detectedPadding, "0");
+        return `${prefix}${paddedNumber}`;
+    } catch (err) {
+        console.error("Error calculando el mayor SKU:", err);
+        return `${prefix}001`;
+    }
 }
 async function adjustProductStockInDB(payload) {
     const { productId, branchName, type, quantity, reason, userId } = payload;
@@ -3036,16 +3066,19 @@ async function updateProductInDB(payload) {
     return true;
 }
 async function deleteProductFromDB(productId) {
+    // 1. Eliminar dependencias en branch_inventory
     const { error: invErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").delete().eq("product_id", productId);
     if (invErr) {
         console.error("Error al eliminar inventario de sucursales:", invErr);
         throw new Error(`Error en branch_inventory: ${invErr.message}`);
     }
+    // 2. Eliminar movimientos asociados en Kardex si existen
     const { error: movErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("stock_movements").delete().eq("product_id", productId);
     if (movErr) {
         console.error("Error al eliminar historial de movimientos:", movErr);
         throw new Error(`Error en stock_movements: ${movErr.message}`);
     }
+    // 3. Eliminar el registro maestro en products
     const { error: productErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("products").delete().eq("id", productId);
     if (productErr) {
         console.error("Error al eliminar producto maestro:", productErr);

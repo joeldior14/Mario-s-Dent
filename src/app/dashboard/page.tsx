@@ -637,7 +637,7 @@ export default function DashboardPage() {
               }}
               placeholder={`Consultar existencias y precios en ${
                 selectedBranchKey === "all" ? "toda la red" : activeMetrics.name
-              } (ej. Articaína, Resina A2, Fórceps)...`}
+              } `}
               className="w-full pl-11 pr-12 py-3 bg-white border border-slate-200 rounded-2xl text-xs font-medium placeholder-slate-400 shadow-2xs focus:outline-none focus:border-sky-500 transition-colors"
             />
             {searchQuery && (

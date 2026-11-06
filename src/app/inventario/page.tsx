@@ -16,7 +16,8 @@ import {
   createProductInDB, 
   adjustProductStockInDB, 
   updateProductInDB, 
-  transferProductStockInDB 
+  transferProductStockInDB, 
+  deleteProductFromDB
 } from "@/app/services/inventoryService";
 import {
   Search,
@@ -94,10 +95,11 @@ export type StockSortOrder = "NONE" | "DESC" | "ASC";
 const CATEGORY_OPTIONS = [
   { value: "All", label: "Todas" },
   { value: "Resinas", label: "Resinas" },
-  { value: "Endo", label: "Endodoncia" },
-  { value: "Orto", label: "Ortodoncia" },
+  { value: "Endodoncia", label: "Endodoncia" },
+  { value: "Ortodoncia", label: "Ortodoncia" },
   { value: "Instrumentos", label: "Instrumentos" },
   { value: "Desechables", label: "Productos Desechables" },
+  { value: "Insumos dentales", label: "Insumos dentales" },
 ];
 
 const BRANCH_OPTIONS = [
@@ -382,11 +384,23 @@ export default function InventoryPage() {
     [adjustingProduct, selectedBranch, user?.id, loadInventory]
   );
 
-  const handleConfirmDelete = useCallback(() => {
+  const handleConfirmDelete = useCallback(async () => {
     if (!deletingProduct) return;
-    setItems((prev) => prev.filter((it) => it.id !== deletingProduct.id));
-    setDeletingProduct(null);
-  }, [deletingProduct]);
+
+    try {
+      // 1. Eliminar de la base de datos (registros dependientes y producto)
+      await deleteProductFromDB(deletingProduct.id);
+
+      // 2. Volver a cargar el inventario real desde Supabase
+      await loadInventory();
+    } catch (error) {
+      console.error("Error al eliminar el producto:", error);
+      alert("Ocurrió un error al intentar eliminar el producto de la base de datos.");
+    } finally {
+      // 3. Cerrar el modal limpiando el estado
+      setDeletingProduct(null);
+    }
+  }, [deletingProduct, loadInventory]);
 
   // Filtrado y ordenamiento de la lista completa
   const filteredItems = useMemo(() => {
@@ -707,9 +721,9 @@ export default function InventoryPage() {
               <button
                 type="button"
                 onClick={() => setIsNewProductOpen(true)}
-                className="flex items-center gap-1.5 px-4 h-10 bg-[#00A4FC] hover:bg-sky-600 text-white text-xs font-bold rounded-xl shadow-2xs transition-colors cursor-pointer shrink-0"
+                className="group flex items-center gap-1.5 px-4 h-10 bg-sky-50 border border-sky-200 hover:bg-sky-700 hover:text-white text-sky-700 text-xs font-bold rounded-xl shadow-2xs transition-colors cursor-pointer shrink-0"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-4 h-4 group-hover:text-white transition-colors" />
                 <span>Nuevo Producto</span>
               </button>
             )}
@@ -727,9 +741,11 @@ export default function InventoryPage() {
                 <button
                   type="button"
                   onClick={() => setIsHaciendaModalOpen(true)}
-                  className="flex items-center gap-1.5 px-3.5 h-9 bg-white hover:bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold rounded-xl shadow-2xs transition-colors cursor-pointer"
+                  className="group flex items-center gap-1.5 px-4 h-10 bg-white hover:bg-emerald-600 hover:text-white text-emerald-700 border border-emerald-200 text-xs font-bold rounded-xl shadow-2xs transition-colors cursor-pointer"
+
                 >
-                  <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+                  <FileSpreadsheet className="w-4 h-4 text-emerald-600 group-hover:text-white transition-colors" />
+                  
                   <span>Reporte Hacienda</span>
                 </button>
 
@@ -737,9 +753,9 @@ export default function InventoryPage() {
                 <button
                   type="button"
                   onClick={() => setIsTransferModalOpen(true)}
-                  className="flex items-center gap-1.5 px-3.5 h-9 bg-purple-50 hover:bg-purple-100 text-pruple-500 border border-purple-200 text-xs font-bold rounded-xl shadow-2xs transition-colors cursor-pointer"
+                  className="group flex items-center gap-1.5 px-4 h-10 bg-purple-50 hover:bg-purple-600 hover:text-white text-purple-700 border border-purple-200 text-xs font-bold rounded-xl shadow-2xs transition-colors cursor-pointer"
                 >
-                  <ArrowRightLeft className="w-3.5 h-3.5 text-purple-600" />
+                  <ArrowRightLeft className="w-4 h-4 text-purple-600 group-hover:text-white transition-colors" />
                   <span>Traslado de Stock</span>
                 </button>
               </div>
@@ -969,7 +985,7 @@ export default function InventoryPage() {
                                 <button
                                   type="button"
                                   onClick={() => setHistoryProduct(item)}
-                                  title="Auditar Kardex / Historial"
+                                  title="Auditar historial"
                                   className="p-1.5 text-sky-400 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-colors cursor-pointer"
                                 >
                                   <History className="w-3.5 h-3.5" />

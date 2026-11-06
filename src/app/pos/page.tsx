@@ -26,6 +26,8 @@ import {
   Loader2,
   CheckCircle2,
   Coins,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 function ShiftWarningModal({
@@ -119,7 +121,7 @@ interface DBProductPOS {
   branch_inventory: DBBranchInventory[] | null;
 }
 
-const CATEGORIES = ["All", "Ortodoncia", "Endodoncia", "Resinas", "Instrumentos", "Desechables"];
+const CATEGORIES = ["All", "Ortodoncia", "Endodoncia", "Resinas", "Instrumentos", "Desechables", "Insumos dentales"];
 const CASH_SUGGESTIONS = [5, 10, 20, 50, 100];
 
 // Funciones de sincronización reactiva con localStorage para el carrito
@@ -162,6 +164,10 @@ export default function PosPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "card" | "transfer">("cash");
   const [cashReceived, setCashReceived] = useState<string>("");
+
+  // Paginación para el POS (12 productos por página = 3 filas)
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12;
 
   const [isProcessing, setIsProcessing] = useState(false);
   const [ticketSuccess, setTicketSuccess] = useState<string | null>(null);
@@ -316,6 +322,15 @@ export default function PosPage() {
       return matchCategory && matchSearch;
     });
   }, [products, activeCategory, searchQuery]);
+
+  // Cálculo de páginas para la paginación del catálogo
+  const totalPages = Math.max(1, Math.ceil(filteredProducts.length / itemsPerPage));
+  const safePage = Math.min(currentPage, totalPages);
+
+  const paginatedProducts = useMemo(() => {
+    const start = (safePage - 1) * itemsPerPage;
+    return filteredProducts.slice(start, start + itemsPerPage);
+  }, [filteredProducts, safePage, itemsPerPage]);
 
   const handleAddToCart = (product: POSProduct) => {
     if (!isShiftOpen) {
@@ -515,6 +530,12 @@ export default function PosPage() {
     <div className="min-h-screen bg-[#F8FAFC] text-slate-700 flex flex-col font-sans select-none">
       <Navbar />
 
+      {/* Modal de Advertencia de Turno */}
+      <ShiftWarningModal isOpen={showShiftWarning} onClose={() => setShowShiftWarning(false)} />
+
+      {/* Componente oculto para la impresión térmica del ticket */}
+      <ThermalTicketReceipt data={lastTicketData} />
+
       {/* Banner de turno cerrado */}
       {!isShiftOpen && (
         <div className="bg-amber-50 border-b border-amber-200 px-6 py-2.5 flex items-center justify-between text-amber-800 text-xs font-semibold">
@@ -566,118 +587,160 @@ export default function PosPage() {
       )}
 
       <div className="flex-1 flex overflow-hidden">
-        {/* PANEL IZQUIERDO: Búsqueda, Filtros y Catálogo */}
-        <main className="flex-1 p-6 overflow-y-auto space-y-5">
-          <div className="border border-slate-200 rounded-xl p-3 bg-white flex items-center gap-3 shadow-2xs focus-within:border-sky-500 focus-within:ring-2 focus-within:ring-sky-100 transition-all">
-            <Scan className="w-5 h-5 text-sky-600 shrink-0" />
-            <input
-              ref={scanInputRef}
-              type="text"
-              autoFocus
-              value={searchQuery}
-              onKeyDown={handleScannerKeyDown}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Escanear código de barras o buscar por SKU / Nombre..."
-              className="w-full bg-transparent text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none"
-            />
-            {searchQuery && (
-              <button
-                type="button"
-                onClick={() => setSearchQuery("")}
-                className="text-slate-400 hover:text-slate-600 text-xs px-2 cursor-pointer"
-              >
-                Limpiar
-              </button>
+        {/* PANEL IZQUIERDO: Búsqueda, Filtros, Catálogo y Paginación */}
+        <main className="flex-1 p-6 overflow-y-auto space-y-5 flex flex-col justify-between">
+          <div className="space-y-5">
+            <div className="border border-slate-200 rounded-xl p-3 bg-white flex items-center gap-3 shadow-2xs focus-within:border-sky-500 focus-within:ring-2 focus-within:ring-sky-100 transition-all">
+              <Scan className="w-5 h-5 text-sky-600 shrink-0" />
+              <input
+                ref={scanInputRef}
+                type="text"
+                autoFocus
+                value={searchQuery}
+                onKeyDown={handleScannerKeyDown}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setCurrentPage(1);
+                }}
+                placeholder="Escanear código de barras o buscar por SKU / Nombre..."
+                className="w-full bg-transparent text-sm font-medium text-slate-800 placeholder-slate-400 focus:outline-none"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery("");
+                    setCurrentPage(1);
+                  }}
+                  className="text-slate-400 hover:text-slate-600 text-xs px-2 cursor-pointer"
+                >
+                  Limpiar
+                </button>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2 overflow-x-auto pb-1">
+              {CATEGORIES.map((cat) => (
+                <button
+                  type="button"
+                  key={cat}
+                  onClick={() => {
+                    setActiveCategory(cat);
+                    setCurrentPage(1);
+                  }}
+                  className={`px-4 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer shrink-0 ${
+                    activeCategory === cat
+                      ? "bg-[#0284C7] text-white border-[#0284C7] shadow-xs"
+                      : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
+                  }`}
+                >
+                  {cat === "All" ? "Todos" : cat}
+                </button>
+              ))}
+            </div>
+
+            {isLoading ? (
+              <div className="py-24 flex flex-col items-center justify-center text-slate-400 gap-2.5">
+                <Loader2 className="w-7 h-7 animate-spin text-sky-600" />
+                <span className="text-xs font-medium">Cargando inventario de {currentBranch}...</span>
+              </div>
+            ) : paginatedProducts.length > 0 ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                {paginatedProducts.map((item) => {
+                  const isOutOfStock = item.stock <= 0;
+
+                  return (
+                    <div
+                      key={item.id}
+                      onClick={() => handleAddToCart(item)}
+                      className={`bg-white border rounded-2xl overflow-hidden shadow-xs transition-all flex flex-col group ${
+                        isOutOfStock
+                          ? "border-slate-200 opacity-60 cursor-not-allowed"
+                          : "border-slate-200 hover:border-sky-400 hover:shadow-md cursor-pointer active:scale-[0.98]"
+                      }`}
+                    >
+                      <div className="h-32 bg-slate-50 relative flex items-center justify-center border-b border-slate-100 overflow-hidden">
+                        {item.image ? (
+                          <Image
+                            src={item.image}
+                            alt={item.name}
+                            fill
+                            unoptimized
+                            sizes="(max-width: 768px) 100vw, 25vw"
+                            className="object-contain p-2 group-hover:scale-105 transition-transform duration-200"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 border-2 border-slate-300 border-dashed rounded-xl flex items-center justify-center opacity-40 group-hover:opacity-80 transition-opacity">
+                            <Package className="w-5 h-5 text-slate-400 stroke-[1.5]" />
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="p-3.5 flex-1 flex flex-col justify-between">
+                        <div>
+                          <div className="flex items-start justify-between gap-1 mb-1">
+                            <span className="text-xs font-bold text-slate-700 leading-snug break-words">
+                              {item.name}
+                            </span>
+                            <span
+                              className={`text-[10px] px-1.5 py-0.5 rounded-md font-extrabold shrink-0 ${
+                                isOutOfStock
+                                  ? "bg-rose-50 text-rose-600"
+                                  : item.stock <= 5
+                                  ? "bg-amber-50 text-amber-600"
+                                  : "bg-emerald-50 text-emerald-600"
+                              }`}
+                            >
+                              {isOutOfStock ? "Agotado" : item.stock}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-500 line-clamp-2 leading-tight">
+                            {item.brand}
+                          </p>
+                        </div>
+                        <p className="text-sm font-extrabold text-sky-600 mt-3">
+                          ${item.price.toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="p-16 text-center text-slate-400 text-xs">
+                No se encontraron productos coincidentes en el inventario de {currentBranch}.
+              </div>
             )}
           </div>
 
-          <div className="flex items-center gap-2 overflow-x-auto pb-1">
-            {CATEGORIES.map((cat) => (
-              <button
-                type="button"
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
-                className={`px-4 py-1.5 rounded-full text-xs font-semibold border transition-all cursor-pointer shrink-0 ${
-                  activeCategory === cat
-                    ? "bg-[#0284C7] text-white border-[#0284C7] shadow-xs"
-                    : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
-                }`}
-              >
-                {cat === "All" ? "Todos" : cat}
-              </button>
-            ))}
-          </div>
+          {/* CONTROLES DE PAGINACIÓN */}
+          {!isLoading && filteredProducts.length > 0 && (
+            <div className="flex items-center justify-between pt-4 pb-2 border-t border-slate-200 mt-4">
+              <p className="text-xs font-medium text-slate-500">
+                Mostrando <strong className="text-slate-800 font-bold">{paginatedProducts.length}</strong> de <strong className="text-slate-800 font-bold">{filteredProducts.length}</strong> productos (Página <strong className="text-slate-800 font-bold">{safePage}</strong> de <strong className="text-slate-800 font-bold">{totalPages}</strong>)
+              </p>
 
-          {isLoading ? (
-            <div className="py-24 flex flex-col items-center justify-center text-slate-400 gap-2.5">
-              <Loader2 className="w-7 h-7 animate-spin text-sky-600" />
-              <span className="text-xs font-medium">Cargando inventario de {currentBranch}...</span>
-            </div>
-          ) : filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
-              {filteredProducts.map((item) => {
-                const isOutOfStock = item.stock <= 0;
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  disabled={safePage === 1}
+                  className="flex items-center gap-1 px-3.5 h-9 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white text-slate-700 border border-slate-200 text-xs font-bold rounded-xl shadow-2xs transition-colors cursor-pointer"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                  <span>Anterior</span>
+                </button>
 
-                return (
-                  <div
-                    key={item.id}
-                    onClick={() => handleAddToCart(item)}
-                    className={`bg-white border rounded-2xl overflow-hidden shadow-xs transition-all flex flex-col group ${
-                      isOutOfStock
-                        ? "border-slate-200 opacity-60 cursor-not-allowed"
-                        : "border-slate-200 hover:border-sky-400 hover:shadow-md cursor-pointer active:scale-[0.98]"
-                    }`}
-                  >
-                    <div className="h-32 bg-slate-50 relative flex items-center justify-center border-b border-slate-100 overflow-hidden">
-                      {item.image ? (
-                        <Image
-                          src={item.image}
-                          alt={item.name}
-                          fill
-                          unoptimized
-                          sizes="(max-width: 768px) 100vw, 25vw"
-                          className="object-contain p-2 group-hover:scale-105 transition-transform duration-200"
-                        />
-                      ) : (
-                        <div className="w-10 h-10 border-2 border-slate-300 border-dashed rounded-xl flex items-center justify-center opacity-40 group-hover:opacity-80 transition-opacity">
-                          <Package className="w-5 h-5 text-slate-400 stroke-[1.5]" />
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="p-3.5 flex-1 flex flex-col justify-between">
-                      <div>
-                        <div className="flex items-start justify-between gap-1 mb-1">
-                          <span className="text-xs font-bold text-slate-700 leading-snug break-words">
-                            {item.name}
-                          </span>
-                          <span
-                            className={`text-[10px] px-1.5 py-0.5 rounded-md font-extrabold shrink-0 ${
-                              isOutOfStock
-                                ? "bg-rose-50 text-rose-600"
-                                : item.stock <= 5
-                                ? "bg-amber-50 text-amber-600"
-                                : "bg-emerald-50 text-emerald-600"
-                            }`}
-                          >
-                            {isOutOfStock ? "Agotado" : item.stock}
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-slate-500 line-clamp-2 leading-tight">
-                          {item.brand}
-                        </p>
-                      </div>
-                      <p className="text-sm font-extrabold text-sky-600 mt-3">
-                        ${item.price.toFixed(2)}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="p-16 text-center text-slate-400 text-xs">
-              No se encontraron productos coincidentes en el inventario de {currentBranch}.
+                <button
+                  type="button"
+                  onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                  disabled={safePage === totalPages}
+                  className="flex items-center gap-1 px-3.5 h-9 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:hover:bg-white text-slate-700 border border-slate-200 text-xs font-bold rounded-xl shadow-2xs transition-colors cursor-pointer"
+                >
+                  <span>Siguiente</span>
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           )}
         </main>
@@ -867,26 +930,21 @@ export default function PosPage() {
                   <button
                     type="button"
                     onClick={() => setCashReceived(total.toFixed(2))}
-                    className="px-2 py-1 bg-white border border-emerald-300 hover:border-sky-400 text-slate-700 text-[10px] font-bold rounded-lg transition-colors cursor-pointer shadow-2xs"
+                    className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[10px] font-bold transition-colors cursor-pointer"
                   >
-                    Exacto (${total.toFixed(2)})
+                    Exacto
                   </button>
-                  {CASH_SUGGESTIONS.filter((val) => val >= total).map((val) => (
+                  {CASH_SUGGESTIONS.map((sug) => (
                     <button
-                      key={val}
+                      key={sug}
                       type="button"
-                      onClick={() => setCashReceived(val.toFixed(2))}
-                      className="px-2.5 py-1 bg-white border border-emerald-300 hover:border-sky-400 hover:bg-sky-50 text-slate-700 text-[10px] font-bold rounded-lg transition-colors cursor-pointer shadow-2xs"
+                      onClick={() => setCashReceived(sug.toString())}
+                      className="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-[10px] font-bold transition-colors cursor-pointer"
                     >
-                      ${val}
+                      ${sug}
                     </button>
                   ))}
                 </div>
-                {isCashInsufficient && (
-                  <p className="text-[10px] font-semibold text-rose-600">
-                    Faltan ${(total - numericCashReceived).toFixed(2)} para completar el pago.
-                  </p>
-                )}
               </div>
             )}
 
@@ -894,36 +952,27 @@ export default function PosPage() {
               type="button"
               disabled={!canCheckout}
               onClick={handleCheckout}
-              className={`w-full mt-2 py-3 rounded-xl font-bold text-xs flex items-center justify-center gap-2 shadow-xs transition-all ${
+              className={`w-full h-11 rounded-xl text-xs font-extrabold flex items-center justify-center gap-2 shadow-sm transition-all ${
                 canCheckout
-                  ? "bg-[#0284C7] hover:bg-sky-700 text-white cursor-pointer active:scale-[0.99]"
+                  ? "bg-[#0284C7] hover:bg-sky-600 text-white cursor-pointer active:scale-[0.99]"
                   : "bg-slate-200 text-slate-400 cursor-not-allowed"
               }`}
             >
               {isProcessing ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>Procesando venta...</span>
+                </>
               ) : (
-                <Printer className="w-4 h-4" />
+                <>
+                  <Printer className="w-4 h-4" />
+                  <span>Cobrar & Imprimir Ticket</span>
+                </>
               )}
-              <span>
-                {isProcessing
-                  ? "Procesando Venta..."
-                  : paymentMethod === "cash" && numericCashReceived >= total && numericCashReceived > 0
-                  ? `Cobrar $${total.toFixed(2)} (Entregar $${changeDue.toFixed(2)})`
-                  : "Cobrar & Imprimir Ticket"}
-              </span>
             </button>
           </div>
         </aside>
       </div>
-
-      <ShiftWarningModal
-        isOpen={showShiftWarning}
-        onClose={() => setShowShiftWarning(false)}
-      />
-
-      {/* Salida invisible en interfaz, activa exclusivamente al imprimir */}
-      <ThermalTicketReceipt data={lastTicketData} />
     </div>
   );
 }

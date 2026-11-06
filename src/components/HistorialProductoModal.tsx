@@ -113,15 +113,15 @@ export default function ProductHistoryModal({
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 id={`${modalId}-title`} className="text-sm font-bold text-slate-800 leading-tight">
-                  Kardex y Trazabilidad de Stock
+                <h3 id={`${modalId}-title`} className="text-sm font-bold text-sky-500 leading-tight">
+                  Historial de movimientos de producto
                 </h3>
                 <span className="tabular-nums text-[10px] bg-slate-200/80 font-bold text-slate-700 px-1.5 py-0.5 rounded">
                   {product.sku}
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400">
-                {product.name} • <span className="text-slate-600 font-medium">{product.brand}</span>
+              <p className="text-sm text-slate-600">
+                {product.name} • <span className="text-slate-800 font-medium">{product.brand}</span>
               </p>
             </div>
           </div>
@@ -129,7 +129,7 @@ export default function ProductHistoryModal({
           <button
             type="button"
             onClick={handleClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-rose-500 hover:text-white hover:bg-rose-500 transition-colors cursor-pointer"
             title="Cerrar modal"
           >
             <X className="w-4 h-4" />
@@ -259,14 +259,14 @@ export default function ProductHistoryModal({
         <div className="p-3.5 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 shrink-0">
           <div className="flex items-center gap-2">
             <ShieldAlert className="w-4 h-4 text-sky-600 shrink-0" />
-            <span className="text-[11px]">
-              Registro de auditoría contable inalterable en PostgreSQL.
+            <span className="text-xs">
+              Registro de auditoría contable inalterable
             </span>
           </div>
           <button
             type="button"
             onClick={handleClose}
-            className="px-4 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-2xs transition-colors cursor-pointer"
+            className="px-4 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 hover:text-white hover:bg-rose-500 shadow-2xs transition-colors cursor-pointer"
           >
             Cerrar
           </button>

@@ -556,7 +556,7 @@ function CajaContent() {
     }
   };
 
-  // Cerrar turno (Corte Z)
+  // Cerrar turno (Corte)
   const handleCloseShift = () => {
     const currentCounted = Number(countedCash) || 0;
     const currentExpected = Number(totals.expectedCash) || 0;
@@ -568,7 +568,7 @@ function CajaContent() {
         type: "warning",
         title: "Justificación Requerida",
         description:
-          "Existe un descuadre en el arqueo de efectivo. Es obligatorio ingresar una justificación antes de realizar el Corte Z.",
+          "Existe un descuadre en el arqueo de efectivo. Es obligatorio ingresar una justificación antes de realizar el Corte.",
         confirmText: "Entendido",
         onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
       });
@@ -580,7 +580,7 @@ function CajaContent() {
       type: "warning",
       title: "Confirmar Cierre de Turno",
       description:
-        "¿Confirmas el cierre de jornada (Corte Z)? Esta acción asentará el balance final en el sistema y cerrará la caja.",
+        "¿Confirmas el cierre de jornada (Corte)? Esta acción asentará el balance final en el sistema y cerrará la caja.",
       confirmText: "Sí, Cerrar Turno",
       cancelText: "Cancelar",
       onConfirm: async () => {
@@ -608,7 +608,7 @@ function CajaContent() {
             type: "success",
             title: "Turno Cerrado con Éxito",
             description:
-              "El balance final ha sido asentado correctamente en la base de datos (Corte Z registrado).",
+              "El balance final ha sido asentado correctamente en la base de datos (Corte registrado).",
             confirmText: "Aceptar",
             onConfirm: () => setDialogConfig((prev) => ({ ...prev, isOpen: false })),
           });
@@ -738,7 +738,7 @@ function CajaContent() {
               )}
             </div>
             <p className="text-xs text-slate-600 font-medium mt-0.5">
-              Cajón de efectivo, conciliación de ventas y cierre diario (Corte Z)
+              Cajón de efectivo, conciliación de ventas y cierre diario (Corte)
             </p>
           </div>
 
@@ -940,9 +940,9 @@ function CajaContent() {
                 <button
                   type="button"
                   onClick={() => setIsTicketAuditOpen(true)}
-                  className="px-3.5 h-10 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl shadow-2xs hover:border-sky-400 transition-colors flex items-center gap-2 cursor-pointer"
+                  className="group flex items-center gap-1.5 px-3.5 h-10 bg-sky-50 border border-sky-200 hover:bg-sky-700 hover:text-white text-sky-700 text-xs font-bold rounded-xl shadow-2xs hover:border-sky-400 transition-colors flex items-center gap-2 cursor-pointer"
                 >
-                  <FileText className="w-3.5 h-3.5 text-sky-600" />
+                  <FileText className="w-3.5 h-3.5 text-sky-600 group-hover:text-white transition-colors" />
                   <span>Auditar Tickets</span>
                 </button>
               </div>
@@ -1140,7 +1140,7 @@ function CajaContent() {
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
                 <h2 className="text-sm font-black text-sky-600 tracking-tight">
-                  {isAdmin ? "Auditoría de Arqueo (Corte Z)" : "Arqueo de Caja (Efectivo)"}
+                  {isAdmin ? "Auditoría de Arqueo" : "Arqueo de Caja (Efectivo)"}
                 </h2>
                 <p className="text-xs font-medium text-slate-600 mt-0.5">
                   {isAdmin
@@ -1330,7 +1330,7 @@ function CajaContent() {
                       className="flex items-center gap-1.5 px-3 py-2 border border-emerald-200 hover:bg-slate-50 text-slate-700 text-xs font-bold rounded-xl transition-colors cursor-pointer shadow-2xs disabled:opacity-40 disabled:cursor-not-allowed"
                     >
                       <FileText className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>Descargar Corte Z</span>
+                      <span>Descargar Corte</span>
                     </button>
                   </div>
 
@@ -1399,7 +1399,7 @@ function CajaContent() {
                     className="flex items-center gap-2 bg-[#B91C1C] hover:bg-red-800 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-xs transition-colors cursor-pointer"
                   >
                     <Lock className="w-3.5 h-3.5" />
-                    <span>Cerrar Turno (Corte Z)</span>
+                    <span>Cerrar Turno (Corte)</span>
                   </button>
                 )}
               </div>

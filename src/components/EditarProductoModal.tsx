@@ -40,7 +40,7 @@ interface EditProductModalProps {
   onSave: (updatedProduct: EditProductFormData) => Promise<void> | void;
 }
 
-const CATEGORIES = ["Resins", "Endo", "Ortho", "Instruments", "Disposables"];
+const CATEGORIES = ["Resinas", "Endodoncia", "Ortodoncia", "Instrumentos", "Desechables", "Insumos Dentales"];
 
 function EditProductFormContent({
   product,
@@ -174,21 +174,21 @@ function EditProductFormContent({
       {/* Cabecera */}
       <div className="flex items-center justify-between p-4 border-b border-slate-100 bg-slate-50/60 shrink-0">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
             <Pencil className="w-4 h-4" />
           </div>
           <div>
-            <h3 id={`${formId}-title`} className="text-sm font-bold text-slate-800 leading-tight">
+            <h3 id={`${formId}-title`} className="text-sm font-bold text-sky-500 leading-tight">
               Editar Ficha de Producto
             </h3>
-            <p className="text-[11px] text-slate-500 tabular-nums">SKU: {product.sku}</p>
+            <p className="text-[11px] text-slate-800 tabular-nums">SKU: {product.sku}</p>
           </div>
         </div>
         <button
           type="button"
           onClick={onClose}
           disabled={isSubmitting}
-          className="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer disabled:opacity-40"
+          className="p-1 rounded-lg text-rose-600 hover:text-white hover:bg-rose-600 transition-colors cursor-pointer disabled:opacity-40"
         >
           <X className="w-4 h-4" />
         </button>
@@ -205,7 +205,7 @@ function EditProductFormContent({
 
         {/* Carga de Imagen */}
         <div>
-          <label className="block text-xs font-semibold text-slate-600 mb-1.5">
+          <label className="block text-xs font-semibold text-sky-700 mb-1.5">
             Fotografía del Producto
           </label>
           <input
@@ -259,7 +259,7 @@ function EditProductFormContent({
           <div>
             <label
               htmlFor={`${formId}-sku`}
-              className="block text-xs font-semibold text-slate-600 mb-1"
+              className="block text-xs font-semibold text-sky-700 mb-1"
             >
               Código / SKU *
             </label>
@@ -277,9 +277,9 @@ function EditProductFormContent({
           <div>
             <label
               htmlFor={`${formId}-barcode`}
-              className="block text-xs font-semibold text-slate-600 mb-1"
+              className="block text-xs font-semibold text-sky-700 mb-1"
             >
-              Código de Barras (EAN/UPC)
+              Código de Barras
             </label>
             <input
               id={`${formId}-barcode`}
@@ -287,7 +287,7 @@ function EditProductFormContent({
               value={barcode}
               disabled={isSubmitting}
               onChange={(e) => setBarcode(e.target.value)}
-              placeholder="Opcional / Lector"
+              placeholder=""
               className="w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs tabular-nums font-medium focus:outline-none focus:border-sky-500 shadow-2xs disabled:opacity-50"
             />
           </div>
@@ -298,7 +298,7 @@ function EditProductFormContent({
           <div>
             <label
               htmlFor={`${formId}-name`}
-              className="block text-xs font-semibold text-slate-600 mb-1"
+              className="block text-xs font-semibold text-sky-700 mb-1"
             >
               Nombre del Producto *
             </label>
@@ -316,7 +316,7 @@ function EditProductFormContent({
           <div>
             <label
               htmlFor={`${formId}-category`}
-              className="block text-xs font-semibold text-slate-600 mb-1"
+              className="block text-xs font-semibold text-sky-700 mb-1"
             >
               Categoría *
             </label>
@@ -341,9 +341,9 @@ function EditProductFormContent({
           <div>
             <label
               htmlFor={`${formId}-brand`}
-              className="block text-xs font-semibold text-slate-600 mb-1"
+              className="block text-xs font-semibold text-sky-700 mb-1"
             >
-              Marca / Fabricante *
+              Marca *
             </label>
             <input
               id={`${formId}-brand`}
@@ -359,7 +359,7 @@ function EditProductFormContent({
           <div>
             <label
               htmlFor={`${formId}-desc`}
-              className="block text-xs font-semibold text-slate-600 mb-1"
+              className="block text-xs font-semibold text-sky-700 mb-1"
             >
               Descripción *
             </label>
@@ -380,7 +380,7 @@ function EditProductFormContent({
           <div>
             <label
               htmlFor={`${formId}-cost`}
-              className="block text-xs font-semibold text-slate-600 mb-1"
+              className="block text-xs font-semibold text-sky-700 mb-1"
             >
               Costo Unitario ($) *
             </label>
@@ -402,7 +402,7 @@ function EditProductFormContent({
           <div>
             <label
               htmlFor={`${formId}-price`}
-              className="block text-xs font-semibold text-slate-600 mb-1"
+              className="block text-xs font-semibold text-sky-700 mb-1"
             >
               Precio de Venta ($) *
             </label>
@@ -419,68 +419,6 @@ function EditProductFormContent({
               className="w-full h-9 px-3 bg-white border border-slate-200 rounded-xl text-xs tabular-nums font-bold text-slate-800 focus:outline-none focus:border-sky-500 shadow-2xs disabled:opacity-50"
               required
             />
-          </div>
-        </div>
-
-        {/* Existencias por Sucursal */}
-        <div>
-          <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">
-            Existencias por Sucursal
-          </label>
-          <div className="grid grid-cols-3 gap-2">
-            <div className="p-2 bg-slate-50 border border-slate-200 rounded-xl">
-              <span className="block text-[10px] text-slate-400 font-semibold mb-1">
-                Santa Ana
-              </span>
-              <input
-                type="number"
-                min="0"
-                value={stockSantaAna}
-                disabled={isSubmitting}
-                onChange={(e) =>
-                  setStockSantaAna(
-                    e.target.value === "" ? "" : parseInt(e.target.value, 10)
-                  )
-                }
-                className="w-full h-8 px-2 bg-white border border-slate-200 rounded-lg text-xs tabular-nums font-bold text-slate-800 focus:outline-none focus:border-sky-500 disabled:opacity-50"
-              />
-            </div>
-
-            <div className="p-2 bg-slate-50 border border-slate-200 rounded-xl">
-              <span className="block text-[10px] text-slate-400 font-semibold mb-1">
-                Ahuachapán
-              </span>
-              <input
-                type="number"
-                min="0"
-                value={stockAhuachapan}
-                disabled={isSubmitting}
-                onChange={(e) =>
-                  setStockAhuachapan(
-                    e.target.value === "" ? "" : parseInt(e.target.value, 10)
-                  )
-                }
-                className="w-full h-8 px-2 bg-white border border-slate-200 rounded-lg text-xs tabular-nums font-bold text-slate-800 focus:outline-none focus:border-sky-500 disabled:opacity-50"
-              />
-            </div>
-
-            <div className="p-2 bg-slate-50 border border-slate-200 rounded-xl">
-              <span className="block text-[10px] text-slate-400 font-semibold mb-1">
-                Sonsonate
-              </span>
-              <input
-                type="number"
-                min="0"
-                value={stockSonsonate}
-                disabled={isSubmitting}
-                onChange={(e) =>
-                  setStockSonsonate(
-                    e.target.value === "" ? "" : parseInt(e.target.value, 10)
-                  )
-                }
-                className="w-full h-8 px-2 bg-white border border-slate-200 rounded-lg text-xs tabular-nums font-bold text-slate-800 focus:outline-none focus:border-sky-500 disabled:opacity-50"
-              />
-            </div>
           </div>
         </div>
 

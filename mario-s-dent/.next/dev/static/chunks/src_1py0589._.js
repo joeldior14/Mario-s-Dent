@@ -1035,7 +1035,7 @@ function DashboardPage() {
                                         onFocus: ()=>{
                                             if (searchResults.length > 0) setIsSearchOpen(true);
                                         },
-                                        placeholder: `Consultar existencias y precios en ${selectedBranchKey === "all" ? "toda la red" : activeMetrics.name} (ej. Articaína, Resina A2, Fórceps)...`,
+                                        placeholder: `Consultar existencias y precios en ${selectedBranchKey === "all" ? "toda la red" : activeMetrics.name} `,
                                         className: "w-full pl-11 pr-12 py-3 bg-white border border-slate-200 rounded-2xl text-xs font-medium placeholder-slate-400 shadow-2xs focus:outline-none focus:border-sky-500 transition-colors"
                                     }, void 0, false, {
                                         fileName: "[project]/src/app/dashboard/page.tsx",
@@ -2456,6 +2456,8 @@ __turbopack_context__.s([
     ()=>fetchProductKardex,
     "fetchTicketsByBranchAndDate",
     ()=>fetchTicketsByBranchAndDate,
+    "generateNextSKU",
+    ()=>generateNextSKU,
     "processSaleInDB",
     ()=>processSaleInDB,
     "searchDashboardInventory",
@@ -2511,6 +2513,34 @@ async function createProductInDB(payload) {
     const { error: invError } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").insert(inventoryRows);
     if (invError) throw invError;
     return newProduct;
+}
+async function generateNextSKU(prefix = "P") {
+    try {
+        // 1. Traemos todos los SKU que comiencen con el prefijo
+        const { data, error } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("products").select("sku").ilike("sku", `${prefix}%`);
+        if (error || !data || data.length === 0) {
+            return `${prefix}001`; // Si no hay productos, empezamos con P001
+        }
+        let maxNumber = 0;
+        let detectedPadding = 3; // Por defecto rellenamos con ceros a 3 dígitos (ej. 001)
+        // 2. Iteramos para encontrar matemáticamente el número mayor de toda la tabla
+        data.forEach((item)=>{
+            const match = item.sku.match(/(\d+)$/); // Extrae los números al final del SKU
+            if (match) {
+                const num = parseInt(match[1], 10);
+                if (num > maxNumber) {
+                    maxNumber = num;
+                    detectedPadding = match[1].length; // Mantiene el formato de ceros (ej. si era 603, mantiene 3 dígitos)
+                }
+            }
+        });
+        const nextNumber = maxNumber + 1;
+        const paddedNumber = nextNumber.toString().padStart(detectedPadding, "0");
+        return `${prefix}${paddedNumber}`;
+    } catch (err) {
+        console.error("Error calculando el mayor SKU:", err);
+        return `${prefix}001`;
+    }
 }
 async function adjustProductStockInDB(payload) {
     const { productId, branchName, type, quantity, reason, userId } = payload;
@@ -2592,16 +2622,19 @@ async function updateProductInDB(payload) {
     return true;
 }
 async function deleteProductFromDB(productId) {
+    // 1. Eliminar dependencias en branch_inventory
     const { error: invErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("branch_inventory").delete().eq("product_id", productId);
     if (invErr) {
         console.error("Error al eliminar inventario de sucursales:", invErr);
         throw new Error(`Error en branch_inventory: ${invErr.message}`);
     }
+    // 2. Eliminar movimientos asociados en Kardex si existen
     const { error: movErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("stock_movements").delete().eq("product_id", productId);
     if (movErr) {
         console.error("Error al eliminar historial de movimientos:", movErr);
         throw new Error(`Error en stock_movements: ${movErr.message}`);
     }
+    // 3. Eliminar el registro maestro en products
     const { error: productErr } = await __TURBOPACK__imported__module__$5b$project$5d2f$src$2f$lib$2f$supabaseClient$2e$ts__$5b$app$2d$client$5d$__$28$ecmascript$29$__["supabase"].from("products").delete().eq("id", productId);
     if (productErr) {
         console.error("Error al eliminar producto maestro:", productErr);

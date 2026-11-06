@@ -118,10 +118,10 @@ export default function StockAdjustmentModal({
               <PackageCheck className="w-4 h-4" />
             </div>
             <div>
-              <h3 id={`${formId}-title`} className="text-sm font-bold text-slate-800">
+              <h3 id={`${formId}-title`} className="text-sm font-bold text-sky-500">
                 Ajuste Manual de Existencias
               </h3>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-xs text-slate-400">
                 Sucursal: <strong className="text-slate-600">{branchName}</strong>
               </p>
             </div>
@@ -130,7 +130,7 @@ export default function StockAdjustmentModal({
             type="button"
             onClick={handleClose}
             disabled={isSubmitting}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors disabled:opacity-40 cursor-pointer"
+            className="p-1.5 rounded-lg text-rose-500 hover:text-white hover:bg-rose-500 transition-colors disabled:opacity-40 cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -140,14 +140,14 @@ export default function StockAdjustmentModal({
         <div className="px-6 pt-4 pb-2">
           <div className="p-3 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-between">
             <div>
-              <p className="font-bold text-slate-800 text-xs">{productName}</p>
-              <p className="text-[10px] text-slate-400 tabular-nums">SKU: {sku}</p>
+              <p className="font-bold text-sky-700 text-xs">{productName}</p>
+              <p className="font-bold text-xs text-slate-700 tabular-nums">SKU: {sku}</p>
             </div>
-            <div className="text-right">
-              <span className="text-[10px] text-slate-400 uppercase font-bold block">
+            <div className="text-center">
+              <span className="text-xs text-slate-400 uppercase font-bold block">
                 Stock Actual
               </span>
-              <span className="text-sm font-bold text-slate-800 tabular-nums">
+              <span className="text-sm font-bold text-amber-500 tabular-nums">
                 {currentStock} unidades
               </span>
             </div>
@@ -158,7 +158,7 @@ export default function StockAdjustmentModal({
         <form onSubmit={handleSubmit} className="px-6 py-4 space-y-4">
           {/* Selector de Tipo de Movimiento */}
           <div>
-            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">
+            <label className="block text-xs font-bold text-sky-700 uppercase tracking-wider mb-2">
               Tipo de Movimiento
             </label>
             <div className="grid grid-cols-2 gap-2">
@@ -196,7 +196,7 @@ export default function StockAdjustmentModal({
           <div>
             <label
               htmlFor={`${formId}-reason`}
-              className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5"
+              className="block text-xs font-bold text-sky-700 uppercase tracking-wider mb-1.5"
             >
               Motivo del Ajuste
             </label>
@@ -219,7 +219,7 @@ export default function StockAdjustmentModal({
           <div>
             <label
               htmlFor={`${formId}-qty`}
-              className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5"
+              className="block text-xs font-bold text-sky-700 uppercase tracking-wider mb-1.5"
             >
               Cantidad de Unidades
             </label>
@@ -250,8 +250,8 @@ export default function StockAdjustmentModal({
 
           {/* Previsualización del Stock Resultante */}
           <div className="p-3 bg-sky-50/60 border border-sky-100 rounded-xl flex items-center justify-between text-xs">
-            <span className="text-slate-500">Nuevo stock resultante:</span>
-            <span className="font-bold text-sky-900 tabular-nums text-sm">
+            <span className="font-bold text-sky-700">Nuevo stock resultante:</span>
+            <span className="font-bold text-sky-600 tabular-nums text-sm">
               {projectedStock} unidades
             </span>
           </div>
